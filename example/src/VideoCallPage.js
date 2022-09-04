@@ -22,10 +22,12 @@ export default function VideoCallPage(props) {
                 callID={callID}
 
                 config={{
+                    bottomMenuBarConfig: {
+                        buttons: [1, 2, 0, 4, 3]
+                    },
                     onOnlySelfInRoom: () => { props.navigation.navigate('HomePage') },
                     onHangUp: () => { props.navigation.navigate('HomePage') },
-                    menuBarButtons: [1, 2, 0, 4, 3],
-                    onHangUpConfirming: () => {
+                    onHangUpConfirmation: () => {
                         return new Promise((resolve, reject) => {
                             Alert.alert(
                                 "Leave the call",

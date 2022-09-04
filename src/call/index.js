@@ -17,27 +17,38 @@ export default function ZegoUIKitPrebuiltCall(props) {
         config,
     } = props;
     const {
-        showMicrophoneStateOnView = true,
-        showCameraStateOnView = false,
-        showUserNameOnView = true,
-        showSoundWaveOnAudioView = true,
-        useVideoViewAspectFill = true,
+        audioVideoViewConfig = {},
+
         turnOnCameraWhenJoining = true,
         turnOnMicrophoneWhenJoining = true,
         useSpeakerWhenJoining = true,
+
+        bottomMenuBarConfig = {},
+
         layout = {},
-        menuBarButtonsMaxCount = 5,
-        menuBarButtons = [1, 2, 0, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
-        menuBarExtendedButtons = [],
-        hideMenuBarAutomatically = true,
-        hideMenuBardByClick = true,
+
         showHangUpConfirmDialog = false,
-        hangUpConfirmDialogInfo = {}, // {title: '', cancelButtonName: '', confirmButtonName: ''}
+        hangUpConfirmInfo = {}, // {title: '', cancelButtonName: '', confirmButtonName: ''}
+
         onHangUp,
-        onHangUpConfirming,
+        onHangUpConfirmation,
         onOnlySelfInRoom,
-        foregroundBuilder,
     } = config;
+    const {
+        showMicrophoneStateOnView = true,
+        showCameraStateOnView = false,
+        showUserNameOnView = true,
+        ShowSoundWavesInAudioMode = true,
+        useVideoViewAspectFill = true,
+        foregroundBuilder,
+    } = audioVideoViewConfig;
+    const {
+        buttons = [1, 2, 0, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
+        maxCount = 5,
+        extendedButtons = [],
+        hideAutomatically = true,
+        hideByClick = true,
+    } = bottomMenuBarConfig;
 
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     var hideCountdown = 5;
@@ -45,7 +56,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
     const onFullPageTouch = () => {
         hideCountdown = 5;
         if (isMenubarVisable) {
-            if (hideMenuBardByClick) {
+            if (hideByClick) {
                 setIsMenubarVidable(false);
             }
         } else {
@@ -97,7 +108,12 @@ export default function ZegoUIKitPrebuiltCall(props) {
     const showLeaveAlert = () => {
         return new Promise((resolve, reject) => {
             if (showHangUpConfirmDialog) {
-                const { title = "Leave the call", message = "Are you sure to leave the call?", cancelButtonName = "Cancel", confirmButtonName = "Confirm" } = hangUpConfirmDialogInfo;
+                const {
+                    title = "Leave the call",
+                    message = "Are you sure to leave the call?",
+                    cancelButtonName = "Cancel",
+                    confirmButtonName = "Confirm"
+                } = hangUpConfirmInfo;
                 Alert.alert(
                     title,
                     message,
@@ -181,7 +197,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         hideCountdown--;
         if (hideCountdown <= 0) {
             hideCountdown = 5;
-            if (hideMenuBarAutomatically) {
+            if (hideAutomatically) {
                 setIsMenubarVidable(false);
             }
         }
@@ -192,7 +208,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
                 <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
                     audioVideoConfig={{
-                        showSoundWaveOnAudioView: showSoundWaveOnAudioView,
+                        ShowSoundWavesInAudioMode: ShowSoundWavesInAudioMode,
                         useVideoViewAspectFill: useVideoViewAspectFill,
                     }}
                     layout={layout}
@@ -208,11 +224,11 @@ export default function ZegoUIKitPrebuiltCall(props) {
             </View>
             {isMenubarVisable ?
                 <ZegoBottomBar
-                    menuBarButtonsMaxCount={menuBarButtonsMaxCount}
-                    menuBarButtons={menuBarButtons}
-                    menuBarExtendedButtons={menuBarExtendedButtons}
+                    menuBarButtonsMaxCount={maxCount}
+                    menuBarButtons={buttons}
+                    menuBarExtendedButtons={extendedButtons}
                     onHangUp={onHangUp}
-                    onHangUpConfirming={onHangUpConfirming ? onHangUpConfirming : showLeaveAlert}
+                    onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                     useSpeakerWhenJoining={useSpeakerWhenJoining}

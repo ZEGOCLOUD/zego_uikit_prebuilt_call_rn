@@ -17,7 +17,7 @@ export default function ZegoBottomBar(props) {
         menuBarButtons = [],
         menuBarExtendedButtons = [],
         onHangUp,
-        onHangUpConfirming,
+        onHangUpConfirmation,
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
@@ -35,7 +35,7 @@ export default function ZegoBottomBar(props) {
     const getButtonByButtonIndex = (buttonIndex) => {
         switch (buttonIndex) {
             case 0:
-                return <ZegoLeaveButton key={0} onLeaveConfirming={onHangUpConfirming} onPressed={onHangUp} />
+                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
             case 1:
                 return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
             case 2:
