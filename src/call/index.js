@@ -207,7 +207,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
                 <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
                     audioVideoConfig={{
-                        ShowSoundWavesInAudioMode: ShowSoundWavesInAudioMode,
+                        showSoundWavesInAudioMode: ShowSoundWavesInAudioMode,
                         useVideoViewAspectFill: useVideoViewAspectFill,
                     }}
                     layout={layout}
