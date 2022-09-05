@@ -26,9 +26,8 @@ export default function ZegoUIKitPrebuiltCall(props) {
         bottomMenuBarConfig = {},
 
         layout = {},
-
-        showHangUpConfirmDialog = false,
-        hangUpConfirmInfo = {}, // {title: '', cancelButtonName: '', confirmButtonName: ''}
+        
+        hangUpConfirmInfo, // {title: '', cancelButtonName: '', confirmButtonName: ''}
 
         onHangUp,
         onHangUpConfirmation,
@@ -107,7 +106,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
     // Default operation for click the leave button
     const showLeaveAlert = () => {
         return new Promise((resolve, reject) => {
-            if (showHangUpConfirmDialog) {
+            if (hangUpConfirmInfo) {
                 const {
                     title = "Leave the call",
                     message = "Are you sure to leave the call?",
