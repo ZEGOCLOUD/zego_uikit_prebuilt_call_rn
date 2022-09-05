@@ -6,7 +6,7 @@ import {
     ZegoSwitchCameraButton,
     ZegoToggleCameraButton,
     ZegoToggleMicrophoneButton
-} from 'zego-uikit-rn'
+} from '@zegocloud/zego-uikit-rn'
 
 import ZegoMoreButton from './ZegoMoreButton';
 

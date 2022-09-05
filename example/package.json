@@ -20,7 +20,7 @@
     "react-native-screens": "^3.17.0",
     "react-native-web": "~0.18.7",
     "zego-express-engine-reactnative": "^0.20.1",
-    "zego-uikit-prebuilt-call-rn": "^0.1.14",
+    "zego-uikit-prebuilt-call-rn": "^0.1.15",
     "zego-uikit-rn": "^0.1.6"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native"
-import { ZegoMicrophoneStateIcon, ZegoCameraStateIcon } from 'zego-uikit-rn'
+import { ZegoMicrophoneStateIcon, ZegoCameraStateIcon } from '@zegocloud/zego-uikit-rn'
 
 export default function AudioVideoForegroundView(props) {
     const { userInfo, showUserNameOnView, showCameraStateOnView, showMicrophoneStateOnView } = props;

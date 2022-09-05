@@ -11,18 +11,18 @@ Read more from [our official website](https://docs.zegocloud.com/article/14764)
 
 ### Import the SDK
 
-### Add zego-uikit-prebuilt-call-rn as dependencies
+### Add @zegocloud/zego-uikit-prebuilt-call-rn as dependencies
 
 ```bash
-yarn add zego-uikit-prebuilt-call-rn 
+yarn add @zegocloud/zego-uikit-prebuilt-call-rn 
 ```
 
 ### Add other dependencies
 
-Run the following command to install other dependencies for making sure the `zego-uikit-prebuilt-call-rn` can work properly:
+Run the following command to install other dependencies for making sure the `@zegocloud/zego-uikit-prebuilt-call-rn` can work properly:
 
 ```bash
-yarn add zego-uikit-rn react-delegate-component zego-express-engine-reactnative
+yarn add @zegocloud/zego-uikit-rn react-delegate-component zego-express-engine-reactnative
 ```
 
 ### Using the `ZegoUIKitPrebuiltCall` Component in your project
@@ -42,7 +42,7 @@ yarn add zego-uikit-rn react-delegate-component zego-express-engine-reactnative
 <pre style="background-color: #011627; border-radius: 8px; padding: 25px; color: white"><div>
 // App.js
 import React, { Component } from 'react';
-import { ZegoUIKitPrebuiltCall } from 'zego-uikit-rn';
+import { ZegoUIKitPrebuiltCall } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 export default function App() {
   return (

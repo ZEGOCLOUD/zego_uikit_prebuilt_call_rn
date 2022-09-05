@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
 import { StyleSheet, View } from 'react-native';
-import ZegoUIKit, { ZegoAudioVideoContainer } from 'zego-uikit-rn'
+import ZegoUIKit, { ZegoAudioVideoContainer } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
 
@@ -42,7 +42,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = audioVideoViewConfig;
     const {
-        buttons = [1, 2, 0, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
+        buttons = [1, 2, 0, 4, 3], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
         maxCount = 5,
         extendedButtons = [],
         hideAutomatically = true,
