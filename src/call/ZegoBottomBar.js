@@ -26,24 +26,24 @@ export default function ZegoBottomBar(props) {
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
     // enum ZegoMenuBarButtonName {
-    //     hangUpButton,
     //     toggleCameraButton,
     //     toggleMicrophoneBUtton,
+    //     hangUpButton,
     //     swtichCameraFacingButton,
     //     swtichAudioOtputButton
     //     }
     const getButtonByButtonIndex = (buttonIndex) => {
         switch (buttonIndex) {
             case 0:
-                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
-            case 1:
                 return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
-            case 2:
+            case 1:
                 return <ZegoToggleMicrophoneButton key={2} isOn={turnOnMicrophoneWhenJoining} />;
+            case 2:
+                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
             case 3:
-                return <ZegoSwitchCameraButton key={3} />
-            case 4:
                 return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
+            case 4:
+                return <ZegoSwitchCameraButton key={3} />
         }
     }
     const getDisplayButtons = () => {

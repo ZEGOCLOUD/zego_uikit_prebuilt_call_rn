@@ -42,7 +42,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = audioVideoViewConfig;
     const {
-        buttons = [1, 2, 0, 4, 3], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
+        buttons = [0, 1, 2, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
         maxCount = 5,
         extendedButtons = [],
         hideAutomatically = true,
