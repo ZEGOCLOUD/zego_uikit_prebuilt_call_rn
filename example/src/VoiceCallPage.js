@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import ZegoUIKitPrebuiltCall from '@zegocloud/zego-uikit-prebuilt-call-rn'
+import ZegoUIKitPrebuiltCall, { ONE_ON_ONE_VOICE_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
 import KeyCenter from './KeyCenter';
 
 export default function VoiceCallPage(props) {
@@ -20,10 +20,7 @@ export default function VoiceCallPage(props) {
                 callID={callID}
 
                 config={{
-                    bottomMenuBarConfig: {
-                        buttons: [2, 0, 4]
-                    },
-                    turnOnCameraWhenJoining: false,
+                    ...ONE_ON_ONE_VOICE_CALL_CONFIG,
                     onOnlySelfInRoom: () => { props.navigation.navigate('HomePage') },
                     onHangUp: () => { props.navigation.navigate('HomePage') },
                     onHangUpConfirmation: () => {

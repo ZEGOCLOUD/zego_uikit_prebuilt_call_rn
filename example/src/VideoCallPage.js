@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import ZegoUIKitPrebuiltCall from '@zegocloud/zego-uikit-prebuilt-call-rn'
+import ZegoUIKitPrebuiltCall, { ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
 import KeyCenter from './KeyCenter';
 
 export default function VideoCallPage(props) {
@@ -20,9 +20,7 @@ export default function VideoCallPage(props) {
                 callID={callID}
 
                 config={{
-                    bottomMenuBarConfig: {
-                        buttons: [1, 2, 0, 4, 3]
-                    },
+                    ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
                     onOnlySelfInRoom: () => { props.navigation.navigate('HomePage') },
                     onHangUp: () => { props.navigation.navigate('HomePage') },
                     onHangUpConfirmation: () => {

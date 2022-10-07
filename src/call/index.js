@@ -5,6 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
+import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
+import ZegoMenuBarStyle from './ZegoMenuBarStyle';
 
 
 export default function ZegoUIKitPrebuiltCall(props) {
@@ -26,7 +28,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         bottomMenuBarConfig = {},
 
         layout = {},
-        
+
         hangUpConfirmInfo, // {title: '', cancelButtonName: '', confirmButtonName: ''}
 
         onHangUp,
@@ -42,11 +44,18 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = audioVideoViewConfig;
     const {
-        buttons = [0, 1, 2, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
+        buttons = [
+            ZegoMenuBarButtonName.toggleCameraButton,
+            ZegoMenuBarButtonName.switchCameraButton,
+            ZegoMenuBarButtonName.hangUpButton,
+            ZegoMenuBarButtonName.toggleMicrophoneButton,
+            ZegoMenuBarButtonName.switchAudioOutputButton
+        ],
         maxCount = 5,
         extendedButtons = [],
         hideAutomatically = true,
         hideByClick = true,
+        style = ZegoMenuBarStyle.light,
     } = bottomMenuBarConfig;
 
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
