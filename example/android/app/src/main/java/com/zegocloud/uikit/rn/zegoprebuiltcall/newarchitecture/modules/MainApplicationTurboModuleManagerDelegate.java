@@ -1,4 +1,4 @@
-package com.zegoprebuiltcall.newarchitecture.modules;
+package com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

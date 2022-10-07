@@ -1,4 +1,4 @@
-package com.zegoprebuiltcall.newarchitecture;
+package com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -16,12 +16,12 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.UIManager;
 import com.facebook.react.fabric.ComponentFactory;
 import com.facebook.react.fabric.CoreComponentsRegistry;
+import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
-import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.zegoprebuiltcall.BuildConfig;
-import com.zegoprebuiltcall.newarchitecture.components.MainComponentsRegistry;
-import com.zegoprebuiltcall.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.zegocloud.uikit.rn.zegoprebuiltcall.BuildConfig;
+import com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture.components.MainComponentsRegistry;
+import com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +105,7 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
                 return new FabricJSIModuleProvider(
                     reactApplicationContext,
                     componentFactory,
-                    ReactNativeConfig.DEFAULT_CONFIG,
+                    new EmptyReactNativeConfig(),
                     viewManagerRegistry);
               }
             });

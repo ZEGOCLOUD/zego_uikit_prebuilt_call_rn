@@ -2,10 +2,8 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import ZegoUIKitPrebuiltCall from 'zego-uikit-prebuilt-call-rn'
+import ZegoUIKitPrebuiltCall from '@zegocloud/zego-uikit-prebuilt-call-rn'
 import KeyCenter from './KeyCenter';
-// import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
-// import {ZegoUIKitPrebuiltCall} from @zego-uikit/prebuilt-call-rn
 
 export default function VoiceCallPage(props) {
     const { route } = props;

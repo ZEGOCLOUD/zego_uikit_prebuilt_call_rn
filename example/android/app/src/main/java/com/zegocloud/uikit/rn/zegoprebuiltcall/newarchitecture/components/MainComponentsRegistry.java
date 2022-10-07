@@ -1,4 +1,4 @@
-package com.zegoprebuiltcall.newarchitecture.components;
+package com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;
