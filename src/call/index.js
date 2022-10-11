@@ -26,6 +26,8 @@ export default function ZegoUIKitPrebuiltCall(props) {
         useSpeakerWhenJoining = true,
 
         bottomMenuBarConfig = {},
+        topMenuBarConfig = {},
+        memberListConfig = {},
 
         layout = {},
 
@@ -57,6 +59,21 @@ export default function ZegoUIKitPrebuiltCall(props) {
         hideByClick = true,
         style = ZegoMenuBarStyle.light,
     } = bottomMenuBarConfig;
+    const {
+        isVisible = true,
+        title = '',
+        buttons:top_buttons = [],
+        maxCount:top_maxCount = 3,
+        extendedButtons:top_extendedButtons = [],
+        hideAutomatically:top_hideAutomatically = true,
+        hideByClick:top_hideByClick = true,
+        style:top_style = ZegoMenuBarStyle.light,
+    } = topMenuBarConfig;
+    const {
+        showMicroPhoneState = true,
+        showCameraState = true,
+        itemBuilder,
+    } = memberListConfig;
 
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     var hideCountdown = 5;
