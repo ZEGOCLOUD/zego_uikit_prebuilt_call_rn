@@ -53,11 +53,53 @@ const ONE_ON_ONE_VOICE_CALL_CONFIG = {
     }
 }
 
+const GROUP_VIDEO_CALL = {
+    turnOnCameraWhenJoining: true,
+    turnOnMicrophoneWhenJoining: true,
+    useSpeakerWhenJoining: true,
+    layout: { 
+        mode: ZegoLayoutMode.grid,
+    },
+    bottomMenuBarConfig: {
+        buttons: [
+            ZegoMenuBarButtonName.toggleCameraButton,
+            ZegoMenuBarButtonName.switchCameraButton,
+            ZegoMenuBarButtonName.hangUpButton,
+            ZegoMenuBarButtonName.toggleMicrophoneButton,
+            ZegoMenuBarButtonName.switchAudioOutputButton,
+        ]
+    },
+    topMenuBarConfig: {
+        buttons: [ZegoMenuBarButtonName.showMemberListButton]
+    }
+};
+
+const GROUP_VOICE_CALL = {
+    turnOnCameraWhenJoining: false,
+    turnOnMicrophoneWhenJoining: true,
+    useSpeakerWhenJoining: true,
+    layout: { 
+        mode: ZegoLayoutMode.grid,
+    },
+    bottomMenuBarConfig: {
+        buttons: [
+            ZegoMenuBarButtonName.hangUpButton,
+            ZegoMenuBarButtonName.toggleMicrophoneButton,
+            ZegoMenuBarButtonName.switchAudioOutputButton,
+        ]
+    },
+    topMenuBarConfig: {
+        buttons: [ZegoMenuBarButtonName.showMemberListButton]
+    }
+};
+
 export default ZegoUIKitPrebuiltCall;
 
 export {
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
-    ONE_ON_ONE_VOICE_CALL_CONFIG
+    ONE_ON_ONE_VOICE_CALL_CONFIG,
+    GROUP_VIDEO_CALL,
+    GROUP_VOICE_CALL
 }
 
 
