@@ -5,6 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
+import ZegoTopMenuBar from './ZegoTopMenuBar';
+import ZegoCallMemberList from './ZegoCallMemberList';
 import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
 
@@ -61,7 +63,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
     } = bottomMenuBarConfig;
     const {
         isVisible = true,
-        title = '',
+        title:top_title = userName || '',
         buttons:top_buttons = [],
         maxCount:top_maxCount = 3,
         extendedButtons:top_extendedButtons = [],
@@ -76,16 +78,29 @@ export default function ZegoUIKitPrebuiltCall(props) {
     } = memberListConfig;
 
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
+    const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
+    const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     var hideCountdown = 5;
+    var hideCountdownOnTopMenu = 5;
 
     const onFullPageTouch = () => {
         hideCountdown = 5;
+        hideCountdownOnTopMenu = 5;
         if (isMenubarVisable) {
             if (hideByClick) {
                 setIsMenubarVidable(false);
+                setIsCallMemberListVisable(false);
             }
         } else {
             setIsMenubarVidable(true);
+        }
+        if (isTopMenubarVisable) {
+            if (top_hideByClick) {
+                setTopIsMenubarVidable(false);
+                setIsCallMemberListVisable(false);
+            }
+        } else {
+            setTopIsMenubarVidable(true);
         }
     }
     const grantPermissions = async (callback) => {
@@ -217,6 +232,13 @@ export default function ZegoUIKitPrebuiltCall(props) {
         }, [delay]);
     }
 
+    function onOpenCallMemberList() {
+        setIsCallMemberListVisable(true);
+    }
+
+    function onCloseCallMemberList() {
+        setIsCallMemberListVisable(false);
+    }
 
     useInterval(() => {
         hideCountdown--;
@@ -228,8 +250,27 @@ export default function ZegoUIKitPrebuiltCall(props) {
         }
     }, 1000);
 
+    useInterval(() => {
+        hideCountdownOnTopMenu--;
+        if (hideCountdownOnTopMenu <= 0) {
+            hideCountdownOnTopMenu = 5;
+            if (top_hideAutomatically) {
+                setTopIsMenubarVidable(false);
+            }
+        }
+    }, 1000);
+
     return (
         <View style={styles.container} >
+            {isVisible && isMenubarVisable ?
+                <ZegoTopMenuBar
+                    menuTitle={top_title}
+                    menuBarButtonsMaxCount={top_maxCount}
+                    menuBarButtons={top_buttons}
+                    menuBarExtendedButtons={top_extendedButtons}
+                    onOpenCallMemberList={onOpenCallMemberList}
+                /> : <View />
+            }
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
                 <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
                     audioVideoConfig={{
@@ -258,6 +299,15 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                     useSpeakerWhenJoining={useSpeakerWhenJoining}
                     onMorePress={() => { hideCountdown = 5; }}
+                /> :
+                <View />
+            }
+            {isCallMemberListVisable ?
+                <ZegoCallMemberList
+                    showMicroPhoneState={showMicroPhoneState}
+                    showCameraState={showCameraState}
+                    itemBuilder={itemBuilder}
+                    onCloseCallMemberList={onCloseCallMemberList}
                 /> :
                 <View />
             }
