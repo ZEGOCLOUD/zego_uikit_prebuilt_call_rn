@@ -12,6 +12,13 @@ export default function HomePage(props) {
             callID: callID,
         })
     }
+    const onJoinGroupPress = (isVoiceCall) => {
+        navigation.navigate(isVoiceCall ? 'GroupVoiceCallPage' : 'GroupVideoCallPage', {
+            userID: userID,
+            userName: userID,
+            callID: callID,
+        })
+    }
     const [userID, setUserID] = useState('');
     const [callID, setCallID] = useState('');
     useEffect(() => {
@@ -38,6 +45,11 @@ export default function HomePage(props) {
                 <Button disabled={callID.length == 0} style={styles.button} title="1 on 1 Voice Call" onPress={() => { onJoinPress(true) }} />
                 <View style={styles.buttonSpacing} />
                 <Button  disabled={callID.length == 0} style={styles.button} title="1 on 1 Video Call" onPress={() => { onJoinPress(false) }} />
+            </View>
+            <View style={[styles.buttonLine, styles.leftPadding]}>
+                <Button disabled={callID.length == 0} style={styles.button} title="Group Voice Call" onPress={() => { onJoinGroupPress(true) }} />
+                <View style={styles.buttonSpacing} />
+                <Button  disabled={callID.length == 0} style={styles.button} title="Group Video Call" onPress={() => { onJoinGroupPress(false) }} />
             </View>
             {/* <View style={styles.buttonLine}>
                 <Button title="Disconnect SDK" onPress={() => { ZegoUIKit.disconnectSDK() }} />
