@@ -268,6 +268,11 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     menuBarButtonsMaxCount={top_maxCount}
                     menuBarButtons={top_buttons}
                     menuBarExtendedButtons={top_extendedButtons}
+                    onHangUp={onHangUp}
+                    onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
+                    turnOnCameraWhenJoining={turnOnCameraWhenJoining}
+                    turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+                    useSpeakerWhenJoining={useSpeakerWhenJoining}
                     onOpenCallMemberList={onOpenCallMemberList}
                 /> : <View />
             }
