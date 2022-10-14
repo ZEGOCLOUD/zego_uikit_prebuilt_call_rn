@@ -53,7 +53,7 @@ const ONE_ON_ONE_VOICE_CALL_CONFIG = {
     }
 }
 
-const GROUP_VIDEO_CALL = {
+const GROUP_VIDEO_CALL_CONFIG = {
     turnOnCameraWhenJoining: true,
     turnOnMicrophoneWhenJoining: true,
     useSpeakerWhenJoining: true,
@@ -74,7 +74,7 @@ const GROUP_VIDEO_CALL = {
     }
 };
 
-const GROUP_VOICE_CALL = {
+const GROUP_VOICE_CALL_CONFIG = {
     turnOnCameraWhenJoining: false,
     turnOnMicrophoneWhenJoining: true,
     useSpeakerWhenJoining: true,
@@ -90,6 +90,9 @@ const GROUP_VOICE_CALL = {
     },
     topMenuBarConfig: {
         buttons: [ZegoMenuBarButtonName.showMemberListButton]
+    },
+    memberListConfig: {
+        showCameraState: false
     }
 };
 
@@ -98,8 +101,8 @@ export default ZegoUIKitPrebuiltCall;
 export {
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
     ONE_ON_ONE_VOICE_CALL_CONFIG,
-    GROUP_VIDEO_CALL,
-    GROUP_VOICE_CALL
+    GROUP_VIDEO_CALL_CONFIG,
+    GROUP_VOICE_CALL_CONFIG
 }
 
 
