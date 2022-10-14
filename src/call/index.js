@@ -43,7 +43,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         showMicrophoneStateOnView = true,
         showCameraStateOnView = false,
         showUserNameOnView = true,
-        ShowSoundWavesInAudioMode = true,
+        showSoundWavesInAudioMode = true,
         useVideoViewAspectFill = true,
         foregroundBuilder,
     } = audioVideoViewConfig;
@@ -279,7 +279,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
                 <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
                     audioVideoConfig={{
-                        showSoundWavesInAudioMode: ShowSoundWavesInAudioMode,
+                        showSoundWavesInAudioMode: showSoundWavesInAudioMode,
                         useVideoViewAspectFill: useVideoViewAspectFill,
                     }}
                     layout={layout}
