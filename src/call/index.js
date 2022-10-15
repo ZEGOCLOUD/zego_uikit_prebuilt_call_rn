@@ -56,20 +56,20 @@ export default function ZegoUIKitPrebuiltCall(props) {
             ZegoMenuBarButtonName.switchAudioOutputButton
         ],
         maxCount = 5,
-        extendedButtons = [],
+        extendButtons = [],
         hideAutomatically = true,
         hideByClick = true,
         style = ZegoMenuBarStyle.light,
     } = bottomMenuBarConfig;
     const {
         isVisible = true,
-        title:top_title = userName || '',
-        buttons:top_buttons = [],
-        maxCount:top_maxCount = 3,
-        extendedButtons:top_extendedButtons = [],
-        hideAutomatically:top_hideAutomatically = true,
-        hideByClick:top_hideByClick = true,
-        style:top_style = ZegoMenuBarStyle.light,
+        title:topTitle = userName || '',
+        buttons:topButtons = [],
+        maxCount:topMaxCount = 3,
+        extendButtons:topExtendButtons = [],
+        hideAutomatically:topHideAutomatically = true,
+        hideByClick:topHideByClick = true,
+        style:topStyle = ZegoMenuBarStyle.light,
     } = topMenuBarConfig;
     const {
         showMicrophoneState = true,
@@ -95,7 +95,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             setIsMenubarVidable(true);
         }
         if (isTopMenubarVisable) {
-            if (top_hideByClick) {
+            if (topHideByClick) {
                 setTopIsMenubarVidable(false);
                 setIsCallMemberListVisable(false);
             }
@@ -254,7 +254,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         hideCountdownOnTopMenu--;
         if (hideCountdownOnTopMenu <= 0) {
             hideCountdownOnTopMenu = 5;
-            if (top_hideAutomatically) {
+            if (topHideAutomatically) {
                 setTopIsMenubarVidable(false);
             }
         }
@@ -264,10 +264,10 @@ export default function ZegoUIKitPrebuiltCall(props) {
         <View style={styles.container} >
             {isVisible && isMenubarVisable ?
                 <ZegoTopMenuBar
-                    menuTitle={top_title}
-                    menuBarButtonsMaxCount={top_maxCount}
-                    menuBarButtons={top_buttons}
-                    menuBarExtendedButtons={top_extendedButtons}
+                    menuTitle={topTitle}
+                    menuBarButtonsMaxCount={topMaxCount}
+                    menuBarButtons={topButtons}
+                    menuBarExtendedButtons={topExtendButtons}
                     onHangUp={onHangUp}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
@@ -297,7 +297,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 <ZegoBottomBar
                     menuBarButtonsMaxCount={maxCount}
                     menuBarButtons={buttons}
-                    menuBarExtendedButtons={extendedButtons}
+                    menuBarExtendedButtons={extendButtons}
                     onHangUp={onHangUp}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
