@@ -49,7 +49,7 @@ export default function ZegoTopBar(props) {
         return allButtons;
     };
     const getButtonStyle = () => {
-        return styles.customIconCon;
+        return styles.customIconContainer;
     };
     const openCallMemberList = () => {
         onOpenCallMemberList();
@@ -57,7 +57,7 @@ export default function ZegoTopBar(props) {
 
     const allButtons = getDisplayButtons();
 
-    return (<View style={styles.topBarCon}>
+    return (<View style={styles.topBarContainer}>
         <View style={styles.left}>
             <TouchableWithoutFeedback>
                 <Image
@@ -74,7 +74,7 @@ export default function ZegoTopBar(props) {
 }
 
 const styles = StyleSheet.create({
-    topBarCon: {
+    topBarContainer: {
         backgroundColor: '#171821',
         flex: 1,
         position: 'absolute',
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 4,
     },
-    customIconCon: {
+    customIconContainer: {
         width: 40,
         height: 40,
         marginLeft: 10,

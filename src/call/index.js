@@ -277,7 +277,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 /> : <View />
             }
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
-                <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
+                <ZegoAudioVideoContainer style={[styles.audioVideoView, styles.fillParent]}
                     audioVideoConfig={{
                         showSoundWavesInAudioMode: showSoundWavesInAudioMode,
                         useVideoViewAspectFill: useVideoViewAspectFill,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
         height: '100%',
         position: 'absolute',
     },
-    avView: {
+    audioVideoView: {
         flex: 1,
         zIndex: 2,
         right: 0,

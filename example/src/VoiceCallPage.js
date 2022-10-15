@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         zIndex: 0,
     },
-    avView: {
+    audioVideoView: {
         flex: 1,
         width: '100%',
         height: '100%',

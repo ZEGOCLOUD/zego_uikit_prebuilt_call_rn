@@ -22,7 +22,7 @@ export default function ZegoCallMemberList(props) {
             <Text style={styles.title}>Member</Text>
         </View>
         <View style={styles.divide}></View>
-        <View style={styles.memberListCon}>
+        <View style={styles.memberListContainer}>
             <ZegoMemberList 
                 showMicroPhoneState={showMicroPhoneState}
                 showCameraState={showCameraState}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         opacity: 0.15,
     },
-    memberListCon: {
+    memberListContainer: {
         flex: 1,
     },
 });
