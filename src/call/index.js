@@ -72,7 +72,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         style:top_style = ZegoMenuBarStyle.light,
     } = topMenuBarConfig;
     const {
-        showMicroPhoneState = true,
+        showMicrophoneState = true,
         showCameraState = true,
         itemBuilder,
     } = memberListConfig;
@@ -309,7 +309,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             }
             {isCallMemberListVisable ?
                 <ZegoCallMemberList
-                    showMicroPhoneState={showMicroPhoneState}
+                    showMicrophoneState={showMicrophoneState}
                     showCameraState={showCameraState}
                     itemBuilder={itemBuilder}
                     onCloseCallMemberList={onCloseCallMemberList}

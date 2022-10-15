@@ -4,7 +4,7 @@ import { StyleSheet, View, Image, Text, TouchableWithoutFeedback } from "react-n
 
 export default function ZegoCallMemberList(props) {
     const {
-        showMicroPhoneState,
+        showMicrophoneState,
         showCameraState,
         itemBuilder,
         onCloseCallMemberList
@@ -24,7 +24,7 @@ export default function ZegoCallMemberList(props) {
         <View style={styles.divide}></View>
         <View style={styles.memberListContainer}>
             <ZegoMemberList 
-                showMicroPhoneState={showMicroPhoneState}
+                showMicrophoneState={showMicrophoneState}
                 showCameraState={showCameraState}
                 itemBuilder={itemBuilder}
             />
