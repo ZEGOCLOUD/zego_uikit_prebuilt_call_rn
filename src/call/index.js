@@ -19,6 +19,8 @@ export default function ZegoUIKitPrebuiltCall(props) {
         userName,
         callID,
         config,
+        token,
+        onRequireNewToken,
     } = props;
     const {
         audioVideoViewConfig = {},
@@ -189,8 +191,12 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 onOnlySelfInRoom();
             }
         });
+        ZegoUIKit.onRoomTokenTillExpire(callbackID, (roomID, remainTimeInSecond) => {
+            ZegoUIKit.renewToken(onRequireNewToken()); 
+        });
         return () => {
             ZegoUIKit.onOnlySelfInRoom(callbackID);
+            ZegoUIKit.onRoomTokenTillExpire(callbackID);
         }
     }, [])
     useEffect(() => {
@@ -204,7 +210,11 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
 
                 grantPermissions(() => {
-                    ZegoUIKit.joinRoom(callID);
+                    if (appSign) {
+                        ZegoUIKit.joinRoom(callID);
+                    } else {
+                        ZegoUIKit.joinRoom(callID, token || onRequireNewToken());
+                    }
                 });
 
             });
