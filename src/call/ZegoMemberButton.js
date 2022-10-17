@@ -4,21 +4,12 @@ import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 export default function ZegoMemberButton(props) {
     const { onPress } = props;
 
-    return (<View style={styles.full}>
+    return (<View>
         <TouchableOpacity 
-            onPress={onPress}
-            style={styles.full}>
+            onPress={onPress}>
             <Image
-                style={styles.full}
                 source={require('./resources/white_button_members.png')}
             />
         </TouchableOpacity>
     </View>);
 }
-
-const styles = StyleSheet.create({
-    full: {
-        width: '100%',
-        height: '100%',
-    },
-});
