@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableWithoutFeedback, SafeAreaView, StyleSheet } from "react-native";
 import ZegoMenuBarButtonName from "./ZegoMenuBarButtonName";
 import ZegoMemberButton from "./ZegoMemberButton";
 import {
@@ -54,7 +54,7 @@ export default function ZegoTopBar(props) {
 
     const allButtons = getDisplayButtons();
 
-    return (<View style={styles.topBarContainer}>
+    return (<SafeAreaView style={styles.topBarContainer}>
         <View style={styles.left}>
             <TouchableWithoutFeedback>
                 <Image
@@ -67,7 +67,7 @@ export default function ZegoTopBar(props) {
         <View style={styles.right}>{
             allButtons.map(button => <View style={getButtonStyle()}>{button}</View>)
         }</View>
-    </View>);
+    </SafeAreaView>);
 }
 
 const styles = StyleSheet.create({
