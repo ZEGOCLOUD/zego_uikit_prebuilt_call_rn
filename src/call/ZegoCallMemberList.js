@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         flexDirection: 'column',
-        paddingBottom: 35,
     },
     header: {
         flexDirection: 'row',
