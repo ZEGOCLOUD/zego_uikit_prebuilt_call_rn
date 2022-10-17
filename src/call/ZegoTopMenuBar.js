@@ -37,7 +37,7 @@ export default function ZegoTopBar(props) {
             case ZegoMenuBarButtonName.switchCameraButton:
                 return <ZegoSwitchCameraButton key={3} />
             case ZegoMenuBarButtonName.showMemberListButton:
-                return <ZegoMemberButton key={5} onPress={openCallMemberList}/>
+                return <ZegoMemberButton key={5} onPressed={onOpenCallMemberList}/>
         }
     };
     const getDisplayButtons = () => {
@@ -50,9 +50,6 @@ export default function ZegoTopBar(props) {
     };
     const getButtonStyle = () => {
         return styles.customIconContainer;
-    };
-    const openCallMemberList = () => {
-        onOpenCallMemberList();
     };
 
     const allButtons = getDisplayButtons();
