@@ -191,12 +191,12 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 onOnlySelfInRoom();
             }
         });
-        ZegoUIKit.onRoomTokenTillExpire(callbackID, (roomID, remainTimeInSecond) => {
-            ZegoUIKit.renewToken(onRequireNewToken()); 
+        ZegoUIKit.onRequireNewToken(callbackID, (roomID, remainTimeInSecond) => {
+            ZegoUIKit.setNewToken(onRequireNewToken()); 
         });
         return () => {
             ZegoUIKit.onOnlySelfInRoom(callbackID);
-            ZegoUIKit.onRoomTokenTillExpire(callbackID);
+            ZegoUIKit.onRequireNewToken(callbackID);
         }
     }, [])
     useEffect(() => {
