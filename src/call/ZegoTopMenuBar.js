@@ -82,11 +82,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         top: 0,
-        height: 60,
+        height: 44,
         zIndex: 3,
         justifyContent: 'space-between',
-        paddingLeft: 4,
-        paddingRight: 16,
+        paddingLeft: 3.5,
+        paddingRight: 13.5,
     },
     left: {
         opacity: 0,
@@ -97,18 +97,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",
     },
-    downArrowIcon: {
-        width: 50,
-        height: 50,
-    },
     title: {
         color: '#FFFFFF',
-        fontSize: 20,
+        fontSize: 18,
         marginLeft: 4,
     },
     customIconContainer: {
-        width: 40,
-        height: 40,
         marginLeft: 10,
     },
 });

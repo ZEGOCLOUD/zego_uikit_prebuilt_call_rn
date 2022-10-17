@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 40,
         backgroundColor: 'rgba(34,34,34,0.8)',
         width: '100%',
-        height: '80%',
+        height: 571,
         zIndex: 4,
         position: 'absolute',
         bottom: 0,
@@ -50,16 +50,14 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 60,
+        height: 49,
     },
     downArrowIcon: {
-        marginLeft: 16,
-        width: 45,
-        height: 45,
-        marginRight: 10,
+        marginLeft: 11.5,
+        marginRight: 5,
     },
     title: {
-        fontSize: 20,
+        fontSize: 18,
         color: '#FFFFFF',
     },
     divide: {
@@ -70,5 +68,7 @@ const styles = StyleSheet.create({
     },
     memberListContainer: {
         flex: 1,
+        paddingTop: 12,
+        paddingBottom: 14,
     },
 });
