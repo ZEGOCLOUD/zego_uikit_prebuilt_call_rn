@@ -269,7 +269,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
     }, 1000);
 
     return (
-        <View style={styles.container} >
+        <View style={[styles.container, styles.fillParent]} >
             {isVisible && isMenubarVisable ?
                 <ZegoTopMenuBar
                     menuTitle={topTitle}
