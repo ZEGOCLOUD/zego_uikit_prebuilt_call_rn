@@ -72,7 +72,6 @@ export default function ZegoTopBar(props) {
 
 const styles = StyleSheet.create({
     topBarContainer: {
-        backgroundColor: '#171821',
         flex: 1,
         position: 'absolute',
         flexDirection: 'row',
