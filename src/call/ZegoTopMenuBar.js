@@ -54,7 +54,7 @@ export default function ZegoTopBar(props) {
 
     const allButtons = getDisplayButtons();
 
-    return (<SafeAreaView style={styles.topBarContainer}>
+    return (<View style={styles.topBarContainer}>
         <View style={styles.left}>
             <TouchableWithoutFeedback>
                 <Image
@@ -67,7 +67,7 @@ export default function ZegoTopBar(props) {
         <View style={styles.right}>{
             allButtons.map(button => <View style={getButtonStyle()}>{button}</View>)
         }</View>
-    </SafeAreaView>);
+    </View>);
 }
 
 const styles = StyleSheet.create({
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        top: 0,
+        top: 35,
         height: 44,
         zIndex: 3,
         justifyContent: 'space-between',
