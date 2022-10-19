@@ -65,7 +65,7 @@ export default function ZegoTopBar(props) {
             <Text style={styles.title}>{menuTitle}</Text>
         </View>
         <View style={styles.right}>{
-            allButtons.map(button => <View style={getButtonStyle()}>{button}</View>)
+            allButtons.map((button, index) => <View key={index} style={getButtonStyle()}>{button}</View>)
         }</View>
     </View>);
 }

@@ -83,7 +83,7 @@ export default function ZegoBottomBar(props) {
         isNormalStyle ?
             <View style={styles.normalBar}>
                 {firstLevelButtons.map((button, index) => (
-                    <View style={getButtonStyle()}>
+                    <View key={index} style={getButtonStyle()}>
                         {button}
                     </View>
                 ))}
@@ -94,7 +94,7 @@ export default function ZegoBottomBar(props) {
                 </View>
                 <View style={styles.popupBar}>
                     {secondLevelButtons.map((button, index) => (
-                        <View style={{ marginBottom: 20, marginRight: 32 / 2, marginLeft: 32 / 2 }}>
+                        <View key={index} style={{ marginBottom: 20, marginRight: 32 / 2, marginLeft: 32 / 2 }}>
                             {button}
                         </View>
                     ))}
