@@ -58,7 +58,7 @@ const GROUP_VIDEO_CALL_CONFIG = {
     turnOnMicrophoneWhenJoining: true,
     useSpeakerWhenJoining: true,
     layout: { 
-        mode: ZegoLayoutMode.grid,
+        mode: ZegoLayoutMode.gallery,
     },
     bottomMenuBarConfig: {
         buttons: [
@@ -79,7 +79,7 @@ const GROUP_VOICE_CALL_CONFIG = {
     turnOnMicrophoneWhenJoining: true,
     useSpeakerWhenJoining: true,
     layout: { 
-        mode: ZegoLayoutMode.grid,
+        mode: ZegoLayoutMode.gallery,
     },
     bottomMenuBarConfig: {
         buttons: [
