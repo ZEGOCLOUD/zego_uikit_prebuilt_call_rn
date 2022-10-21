@@ -100,6 +100,7 @@ export default ZegoUIKitPrebuiltCall;
 
 export {
     ZegoMenuBarButtonName,
+    ZegoMenuBarStyle,
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
     ONE_ON_ONE_VOICE_CALL_CONFIG,
     GROUP_VIDEO_CALL_CONFIG,
