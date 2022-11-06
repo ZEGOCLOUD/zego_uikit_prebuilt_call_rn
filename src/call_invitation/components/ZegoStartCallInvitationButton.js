@@ -15,10 +15,7 @@ export default function ZegoStartCallInvitationButton(props) {
     timeout = 60,
     onPressed,
   } = props;
-  const appInfo = ZegoPrebuiltPlugins.getAppInfo();
   const localUser = ZegoPrebuiltPlugins.getLocalUser();
-  const { appID, appSign } = appInfo;
-  const { userID, userName } = localUser;
   const callID = `call_${localUser.userID}`;
   const data = JSON.stringify({
     call_id: callID,

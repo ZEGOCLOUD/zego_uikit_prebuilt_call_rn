@@ -9,9 +9,10 @@ const _localUser = {};
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
   Object.values(ZegoUIKitPluginType).forEach((pluginType) => {
-    const pluginVersion = ZegoUIKit.getPlugin(pluginType).getVersion();
+    // TODO
+    // const pluginVersion = ZegoUIKit.getPlugin(pluginType).getVersion();
     zloginfo(
-      `[Plugins] install success, pluginType: ${pluginType}, version: ${pluginVersion}`
+      `[Plugins] install success, pluginType: ${pluginType}, version: ${1.0}`
     );
   });
 };

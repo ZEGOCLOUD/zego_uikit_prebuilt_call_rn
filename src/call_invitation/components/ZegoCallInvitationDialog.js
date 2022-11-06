@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
 import {
   ZegoUIKitInvitationService,
@@ -9,13 +10,13 @@ import {
 
 export default function ZegoCallInvitationDialog(props) {
   const {
-    onAccept,
-    onRefuse,
-    onTimeout,
-    onCancelled,
     inviter = {},
     type = ZegoInvitationType.voiceCall,
+    callID,
+    visable,
   } = props;
+  const navigation = useNavigation();
+  const [isDialogVisable, setIsDialogVisable] = useState(!!visable);
   const callTitle =
     type === ZegoInvitationType.voiceCall
       ? 'ZEGO Voice Call'
@@ -39,24 +40,33 @@ export default function ZegoCallInvitationDialog(props) {
       return require('../resources/button_call_video_accept.png');
     }
   };
+  const refuseHandle = () => {
+    setIsDialogVisable(false);
+  };
+  const acceptHandle = () => {
+    setIsDialogVisable(false);
+    navigation.navigate('RoomPage', {
+      callID,
+    });
+  };
 
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
     ZegoUIKitInvitationService.onInvitationTimeout(callbackID, () => {
-      onTimeout();
+      setIsDialogVisable(false);
     });
     ZegoUIKitInvitationService.onInvitationCanceled(callbackID, () => {
-      onCancelled();
+      setIsDialogVisable(false);
     });
     return () => {
       ZegoUIKitInvitationService.onInvitationTimeout(callbackID);
       ZegoUIKitInvitationService.onInvitationCanceled(callbackID);
     };
-  }, [onCancelled, onTimeout]);
+  }, []);
 
   return (
-    <View>
+    <View style={[styles.container, isDialogVisable ? styles.show : null]}>
       <View style={styles.mask} />
       <View style={styles.dialog}>
         <View style={styles.left}>
@@ -73,12 +83,12 @@ export default function ZegoCallInvitationDialog(props) {
         <View style={styles.right}>
           <ZegoRefuseInvitationButton
             inviterID={inviter.userID}
-            onPressed={onRefuse}
+            onPressed={refuseHandle}
           />
           <ZegoAcceptInvitationButton
             icon={getImageSourceByPath()}
             inviterID={inviter.userID}
-            onPressed={onAccept}
+            onPressed={acceptHandle}
           />
         </View>
       </View>
@@ -87,6 +97,12 @@ export default function ZegoCallInvitationDialog(props) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    display: 'none',
+  },
+  show: {
+    display: 'flex',
+  },
   mask: {},
   dialog: {},
   left: {},

@@ -83,7 +83,8 @@ export default function ZegoCallInvitationWaiting(props) {
         ZegoUIKit.joinRoom(callID);
       });
     });
-  }, [appID, appSign, userID, userName, isVideoCall, callID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationWaiting' + String(Math.floor(Math.random() * 10000));
@@ -105,7 +106,8 @@ export default function ZegoCallInvitationWaiting(props) {
       ZegoUIKitInvitationService.onInvitationRefused(callbackID);
       ZegoUIKitInvitationService.onInvitationAccepted(callbackID);
     };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -116,7 +118,11 @@ export default function ZegoCallInvitationWaiting(props) {
       ) : (
         <View />
       )}
-      {isVideoCall ? <ZegoAudioVideoView /> : <View />}
+      {isVideoCall ? (
+        <ZegoAudioVideoView userID={userID} roomID={callID} />
+      ) : (
+        <View />
+      )}
       <View style={styles.content}>
         <View style={styles.avatar}>
           <Text style={styles.nameLabel}>{getShotName(userName)}</Text>

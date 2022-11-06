@@ -5,70 +5,51 @@ import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
 import ZegoUIKitPrebuiltCall from '../call/index';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 export default function ZegoUIKitPrebuiltInvitationCall(props) {
-  // const navigation = useNavigation();
   const { appID, appSign, userID, userName, config, plugins } = props;
   const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [notifyData, setNotifyData] = useState({});
 
-  const onAccept = () => {
-    setIsDialogVisable(false);
-    const callID = JSON.parse(notifyData.data).call_id;
-    navigation.navigate('RoomPage', {
-      callID,
-    });
-  };
-  const onRefuse = () => {
-    setIsDialogVisable(false);
-  };
-  const onTimeout = () => {
-    setIsDialogVisable(false);
-  };
-  const onCancelled = () => {
-    setIsDialogVisable(false);
-  };
-
   useEffect(() => {
     ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins);
-  }, [appID, appSign, userID, userName, plugins]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const callbackID =
       'ZegoUIKitPrebuiltInvitationCall' +
       String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInvitationService.onCallInvitationReceived(callbackID, (data) => {
+    ZegoUIKitInvitationService.onInvitationReceived(callbackID, (data) => {
       setIsDialogVisable(true);
       setNotifyData(data);
     });
     return () => {
-      ZegoUIKitInvitationService.onCallInvitationReceived(callbackID);
+      ZegoUIKitInvitationService.onInvitationReceived(callbackID);
     };
   }, []);
 
   return (
-    <View style={styles.customView}>
-      {isDialogVisable ? (
+    <View style={styles.container}>
+      <NavigationContainer initialRouteName="HomePage">
         <ZegoCallInvitationDialog
-          onAccept={onAccept}
-          onRefuse={onRefuse}
-          onTimeout={onTimeout}
-          onCancelled={onCancelled}
+          visable={isDialogVisable}
           inviter={notifyData.inviter}
           type={notifyData.type}
+          callID={notifyData.data}
         />
-      ) : (
-        <View />
-      )}
-      {/* <NavigationContainer initialRouteName="HomePage">
-        <Stack.Navigator>
-          <Stack.Screen name="HomePage" component={() => props.children} />
-        </Stack.Navigator>
         <Stack.Navigator>
           <Stack.Screen
+            options={{ headerShown: false }}
+            headerMode="none"
+            name="HomePage"
+            children={() => props.children}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
             name="CallPage"
             component={ZegoCallInvitationWaiting}
             appID={appID}
@@ -76,9 +57,8 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
             userID={userID}
             userName={userName}
           />
-        </Stack.Navigator>
-        <Stack.Navigator>
-          <Stack.Screen
+          {/* <Stack.Screen
+            options={{ headerShown: false }}
             name="RoomPage"
             component={ZegoUIKitPrebuiltCall}
             appID={appID}
@@ -86,18 +66,17 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
             userID={userID}
             userName={userName}
             config={config}
-          />
+          /> */}
         </Stack.Navigator>
-      </NavigationContainer> */}
+      </NavigationContainer>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  customView: {
+  container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     zIndex: 0,
+    backgroundColor: '#dddddd',
   },
 });
