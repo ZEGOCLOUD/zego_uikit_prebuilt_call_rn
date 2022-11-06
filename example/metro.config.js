@@ -9,7 +9,7 @@ const uikitRoot = path.resolve(__dirname, '../../..');
 const signalingPluginRoot = path.resolve(
   __dirname,
   '../../../../SignalingPlugin/',
-);;
+);
 
 const uikitModules = Object.keys({
   ...uikitPak.peerDependencies,
@@ -37,7 +37,7 @@ module.exports = {
         m =>
           new RegExp(
             `^${escape(path.join(prebuiltRoot, 'node_modules', m))}\\/.*$`,
-          ),,
+          ),
       ),
     ]),
 
