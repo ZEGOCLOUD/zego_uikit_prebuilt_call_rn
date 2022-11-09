@@ -1,23 +1,17 @@
 import React, { useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  PermissionsAndroid,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, View, Platform, PermissionsAndroid } from 'react-native';
 
 import ZegoUIKit, {
   ZegoAudioVideoView,
   ZegoSwitchCameraButton,
-  ZegoLeaveButton,
   ZegoUIKitInvitationService,
 } from '@zegocloud/zego-uikit-rn';
+import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 
 export default function ZegoCallInvitationWaiting(props) {
-  const navigation = useNavigation();
-  const { appID, appSign, userID, userName, callID, isVideoCall } = props;
+  const { route, navigation } = props;
+  const { appID, appSign, userID, userName, callID, isVideoCall } =
+    route.params;
 
   const grantPermissions = async (callback) => {
     // Android: Dynamically obtaining device permissions
@@ -60,24 +54,17 @@ export default function ZegoCallInvitationWaiting(props) {
       callback();
     }
   };
-  const getShotName = (name) => {
-    if (!name) {
-      return '';
-    }
-    const nl = name.split(' ');
-    var shotName = '';
-    nl.forEach((part) => {
-      if (part !== '') {
-        shotName += part.substring(0, 1);
-      }
-    });
-    return shotName;
+  const onHangUp = () => {
+    ZegoUIKit.leaveRoom();
+    navigation.goBack();
   };
 
   useEffect(() => {
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
       if (isVideoCall) {
         ZegoUIKit.turnCameraOn(userID, true);
+        ZegoUIKit.turnMicrophoneOn(userID, true);
+        ZegoUIKit.setAudioOutputToSpeaker(true);
       }
       grantPermissions(() => {
         ZegoUIKit.joinRoom(callID);
@@ -112,31 +99,48 @@ export default function ZegoCallInvitationWaiting(props) {
   return (
     <View style={styles.container}>
       {isVideoCall ? (
+        <ZegoAudioVideoView
+          userID={userID}
+          roomID={callID}
+          useVideoViewAspectFill={true}
+          // eslint-disable-next-line react/no-unstable-nested-components
+          foregroundBuilder={() => (
+            <ZegoCallInvationForeground
+              isVideoCall={isVideoCall}
+              userName={userName}
+              onHangUp={onHangUp}
+            />
+          )}
+        />
+      ) : (
+        <ZegoCallInvationForeground
+          isVideoCall={isVideoCall}
+          userName={userName}
+          onHangUp={onHangUp}
+        />
+      )}
+      {isVideoCall ? (
         <View style={styles.topMenuContainer}>
           <ZegoSwitchCameraButton />
         </View>
       ) : (
         <View />
       )}
-      {isVideoCall ? (
-        <ZegoAudioVideoView userID={userID} roomID={callID} />
-      ) : (
-        <View />
-      )}
-      <View style={styles.content}>
-        <View style={styles.avatar}>
-          <Text style={styles.nameLabel}>{getShotName(userName)}</Text>
-        </View>
-        <Text>{userName}</Text>
-        <Text>Calling...</Text>
-      </View>
-      <View style={styles.bottomMenuContainer}>
-        <ZegoLeaveButton />
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    width: '100%',
+    height: '100%',
+    flex: 1,
+  },
+  topMenuContainer: {
+    zIndex: 2,
+    width: '100%',
+    paddingRight: 15,
+    top: 30,
+    alignItems: 'flex-end',
+  },
 });

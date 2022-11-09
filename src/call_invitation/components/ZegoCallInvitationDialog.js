@@ -81,15 +81,19 @@ export default function ZegoCallInvitationDialog(props) {
           </View>
         </View>
         <View style={styles.right}>
-          <ZegoRefuseInvitationButton
-            inviterID={inviter.userID}
-            onPressed={refuseHandle}
-          />
-          <ZegoAcceptInvitationButton
-            icon={getImageSourceByPath()}
-            inviterID={inviter.userID}
-            onPressed={acceptHandle}
-          />
+          <View style={styles.refuse}>
+            <ZegoRefuseInvitationButton
+              inviterID={inviter.userID}
+              onPressed={refuseHandle}
+            />
+          </View>
+          <View style={styles.accept}>
+            <ZegoAcceptInvitationButton
+              icon={getImageSourceByPath()}
+              inviterID={inviter.userID}
+              onPressed={acceptHandle}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -99,16 +103,70 @@ export default function ZegoCallInvitationDialog(props) {
 const styles = StyleSheet.create({
   container: {
     display: 'none',
+    flex: 1,
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    zIndex: 3,
+    alignItems: 'center',
   },
   show: {
     display: 'flex',
   },
-  mask: {},
-  dialog: {},
-  left: {},
-  avatar: {},
-  nameLabel: {},
-  callName: {},
-  callTitle: {},
-  right: {},
+  mask: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
+    backgroundColor: '#333333',
+    opacity: 0.4,
+  },
+  dialog: {
+    width: '96%',
+    height: 80,
+    backgroundColor: '#333333',
+    borderRadius: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  left: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    backgroundColor: '#ffffff',
+    borderRadius: 1000,
+    color: '#2A2A2A',
+    width: 42,
+    height: 42,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 13,
+  },
+  nameLabel: {
+    fontSize: 26,
+  },
+  callName: {
+    fontSize: 24,
+    color: '#ffffff',
+    lineHeight: 25,
+    marginBottom: 3.5,
+  },
+  callTitle: {
+    fontSize: 12,
+    color: '#ffffff',
+    opacity: 0.8,
+    lineHeight: 16.5,
+  },
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  refuse: {
+    marginRight: 20,
+  },
 });

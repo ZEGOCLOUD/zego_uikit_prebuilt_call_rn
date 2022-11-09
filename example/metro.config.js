@@ -8,7 +8,7 @@ const prebuiltRoot = path.resolve(__dirname, '..');
 const uikitRoot = path.resolve(__dirname, '../../..');
 const signalingPluginRoot = path.resolve(
   __dirname,
-  '../../../../SignalingPlugin/',
+  '../../../../SignalingPlugin',
 );
 
 const uikitModules = Object.keys({

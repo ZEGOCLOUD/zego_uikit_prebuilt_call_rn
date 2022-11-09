@@ -4,6 +4,7 @@ import { ZegoStartInvitationButton } from '@zegocloud/zego-uikit-rn';
 import { ZegoInvitationType } from '../services/defines';
 import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
+import { zloginfo } from '../../utils/logger';
 
 export default function ZegoStartCallInvitationButton(props) {
   const navigation = useNavigation();
@@ -24,17 +25,21 @@ export default function ZegoStartCallInvitationButton(props) {
   const onPress = () => {
     if (invitees.length === 1) {
       // Jump to call waiting page
+      zloginfo('Jump to call waiting page.');
       navigation.navigate('CallPage', {
         callID,
         isVideoCall,
       });
     } else {
       // Jump to call room page
+      zloginfo('Jump to call room page.');
       navigation.navigate('RoomPage', {
         callID,
       });
     }
-    onPressed();
+    if (typeof onPressed === 'function') {
+      onPressed();
+    }
   };
   return (
     <View style={styles.container}>

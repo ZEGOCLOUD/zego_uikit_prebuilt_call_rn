@@ -12,8 +12,6 @@
   "dependencies": {
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
-    "@zegocloud/zego-uikit-prebuilt-call-rn": "link: ../",
-    "@zegocloud/zego-uikit-rn": "link: ../../../",
     "react": "17.0.2",
     "react-delegate-component": "^1.0.0",
     "react-native": "0.68.2",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { ZegoUIKitInvitationService } from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
@@ -12,10 +12,15 @@ const Stack = createNativeStackNavigator();
 export default function ZegoUIKitPrebuiltInvitationCall(props) {
   const { appID, appSign, userID, userName, config, plugins } = props;
   const [isDialogVisable, setIsDialogVisable] = useState(false);
+  const [isInit, setIsInit] = useState(false);
   const [notifyData, setNotifyData] = useState({});
 
   useEffect(() => {
-    ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins);
+    ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
+      () => {
+        setIsInit(true);
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -35,12 +40,16 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
   return (
     <View style={styles.container}>
       <NavigationContainer initialRouteName="HomePage">
-        <ZegoCallInvitationDialog
-          visable={isDialogVisable}
-          inviter={notifyData.inviter}
-          type={notifyData.type}
-          callID={notifyData.data}
-        />
+        {isInit ? (
+          <ZegoCallInvitationDialog
+            visable={isDialogVisable}
+            inviter={notifyData.inviter}
+            type={notifyData.type}
+            callID={notifyData.data}
+          />
+        ) : (
+          <View />
+        )}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}
@@ -52,20 +61,24 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
             options={{ headerShown: false }}
             name="CallPage"
             component={ZegoCallInvitationWaiting}
-            appID={appID}
-            appSign={appSign}
-            userID={userID}
-            userName={userName}
+            initialParams={{
+              appID,
+              appSign,
+              userID,
+              userName,
+            }}
           />
           {/* <Stack.Screen
             options={{ headerShown: false }}
             name="RoomPage"
             component={ZegoUIKitPrebuiltCall}
-            appID={appID}
-            appSign={appSign}
-            userID={userID}
-            userName={userName}
-            config={config}
+            initialParams={{
+              appID,
+              appSign,
+              userID,
+              userName,
+              config
+            }}
           /> */}
         </Stack.Navigator>
       </NavigationContainer>
