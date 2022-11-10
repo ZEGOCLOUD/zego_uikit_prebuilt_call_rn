@@ -36,6 +36,8 @@ export default function ZegoStartCallInvitationButton(props) {
       navigation.navigate('RoomPage', {
         callID,
         isVideoCall,
+        invitees,
+        inviter: localUser,
       });
     }
     if (typeof onPressed === 'function') {

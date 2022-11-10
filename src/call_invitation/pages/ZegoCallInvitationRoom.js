@@ -14,14 +14,16 @@ export default function ZegoCallInvitationRoom(props) {
     token,
     onRequireNewToken,
     requireConfig,
+    invitees,
+    inviter,
   } = route.params;
   const callInvitationData = {
     roomID: callID,
     type: isVideoCall
       ? ZegoInvitationType.videoCall
       : ZegoInvitationType.voiceCall,
-    invitees: [],
-    inviter: {},
+    invitees,
+    inviter,
   };
   const config = requireConfig(callInvitationData);
   return (
