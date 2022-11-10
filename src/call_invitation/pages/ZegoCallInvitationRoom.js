@@ -3,7 +3,7 @@ import ZegoUIKitPrebuiltCall from '../../call';
 import { ZegoInvitationType } from '../../call_invitation/services/defines';
 
 export default function ZegoCallInvitationRoom(props) {
-  const { route } = props;
+  const { route, navigation } = props;
   const {
     appID,
     appSign,
@@ -33,7 +33,13 @@ export default function ZegoCallInvitationRoom(props) {
       userID={userID}
       userName={userName}
       callID={callID}
-      config={config}
+      config={{
+        ...config,
+        onHangUp: () => {
+          navigation.goBack();
+          config.onHangUp && config.onHangUp();
+        },
+      }}
       token={token}
       onRequireNewToken={onRequireNewToken}
     />

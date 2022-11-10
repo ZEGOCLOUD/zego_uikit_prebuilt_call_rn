@@ -9,19 +9,17 @@ import {
 } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoCallInvitationDialog(props) {
-  const {
-    inviter = {},
-    type = ZegoInvitationType.voiceCall,
-    callID,
-    visable,
-  } = props;
   const navigation = useNavigation();
-  const [isDialogVisable, setIsDialogVisable] = useState(!!visable);
-  const callTitle =
-    type === ZegoInvitationType.voiceCall
+  const [isDialogVisable, setIsDialogVisable] = useState(false);
+  const [inviteType, setInviteType] = useState(ZegoInvitationType.voiceCall);
+  const [inviterData, setInviterData] = useState({});
+  const [extendData, setExtendData] = useState({});
+
+  const getCallTitle = () => {
+    return inviteType === ZegoInvitationType.voiceCall
       ? 'ZEGO Voice Call'
       : 'ZEGO Video Call';
-
+  };
   const getShotName = (name) => {
     if (!name) {
       return '';
@@ -36,7 +34,7 @@ export default function ZegoCallInvitationDialog(props) {
     return shotName;
   };
   const getImageSourceByPath = () => {
-    if (type === ZegoInvitationType.videoCall) {
+    if (inviteType === ZegoInvitationType.videoCall) {
       return require('../resources/button_call_video_accept.png');
     }
   };
@@ -46,14 +44,22 @@ export default function ZegoCallInvitationDialog(props) {
   const acceptHandle = () => {
     setIsDialogVisable(false);
     navigation.navigate('RoomPage', {
-      callID,
-      isVideoCall: type === ZegoInvitationType.videoCall,
+      callID: extendData.call_id,
+      isVideoCall: inviteType === ZegoInvitationType.videoCall,
+      inviter: inviterData,
+      invitees: extendData.invitees,
     });
   };
 
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
+    ZegoUIKitInvitationService.onInvitationReceived(callbackID, (data) => {
+      setInviteType(data.type);
+      setInviterData(data.inviter);
+      setExtendData(JSON.parse(data.data));
+      setIsDialogVisable(true);
+    });
     ZegoUIKitInvitationService.onInvitationTimeout(callbackID, () => {
       setIsDialogVisable(false);
     });
@@ -73,25 +79,25 @@ export default function ZegoCallInvitationDialog(props) {
         <View style={styles.left}>
           <View style={styles.avatar}>
             <Text style={styles.nameLabel}>
-              {getShotName(inviter.userName)}
+              {getShotName(inviterData.name)}
             </Text>
           </View>
           <View>
-            <Text style={styles.callName}>{inviter.userName}</Text>
-            <Text style={styles.callTitle}>{callTitle}</Text>
+            <Text style={styles.callName}>{inviterData.name}</Text>
+            <Text style={styles.callTitle}>{getCallTitle()}</Text>
           </View>
         </View>
         <View style={styles.right}>
           <View style={styles.refuse}>
             <ZegoRefuseInvitationButton
-              inviterID={inviter.userID}
+              inviterID={inviterData.id}
               onPressed={refuseHandle}
             />
           </View>
           <View style={styles.accept}>
             <ZegoAcceptInvitationButton
               icon={getImageSourceByPath()}
-              inviterID={inviter.userID}
+              inviterID={inviterData.id}
               onPressed={acceptHandle}
             />
           </View>

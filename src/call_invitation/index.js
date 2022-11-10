@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ZegoUIKitInvitationService } from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
@@ -20,9 +19,7 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
     requireConfig,
     plugins,
   } = props;
-  const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [isInit, setIsInit] = useState(false);
-  const [notifyData, setNotifyData] = useState({});
 
   useEffect(() => {
     ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
@@ -33,32 +30,10 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const callbackID =
-      'ZegoUIKitPrebuiltInvitationCall' +
-      String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInvitationService.onInvitationReceived(callbackID, (data) => {
-      setIsDialogVisable(true);
-      setNotifyData(data);
-    });
-    return () => {
-      ZegoUIKitInvitationService.onInvitationReceived(callbackID);
-    };
-  }, []);
-
   return (
     <View style={styles.container}>
       <NavigationContainer initialRouteName="HomePage">
-        {isInit ? (
-          <ZegoCallInvitationDialog
-            visable={isDialogVisable}
-            inviter={notifyData.inviter}
-            type={notifyData.type}
-            callID={notifyData.data}
-          />
-        ) : (
-          <View />
-        )}
+        {isInit ? <ZegoCallInvitationDialog /> : <View />}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}
