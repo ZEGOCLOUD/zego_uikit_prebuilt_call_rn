@@ -10,8 +10,16 @@ import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 
 export default function ZegoCallInvitationWaiting(props) {
   const { route, navigation } = props;
-  const { appID, appSign, userID, userName, callID, isVideoCall } =
-    route.params;
+  const {
+    appID,
+    appSign,
+    userID,
+    userName,
+    callID,
+    isVideoCall,
+    token,
+    onRequireNewToken,
+  } = route.params;
 
   const grantPermissions = async (callback) => {
     // Android: Dynamically obtaining device permissions
@@ -63,11 +71,13 @@ export default function ZegoCallInvitationWaiting(props) {
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
       if (isVideoCall) {
         ZegoUIKit.turnCameraOn(userID, true);
-        ZegoUIKit.turnMicrophoneOn(userID, true);
-        ZegoUIKit.setAudioOutputToSpeaker(true);
       }
       grantPermissions(() => {
-        ZegoUIKit.joinRoom(callID);
+        if (appSign) {
+          ZegoUIKit.joinRoom(callID);
+        } else {
+          ZegoUIKit.joinRoom(callID, token || onRequireNewToken());
+        }
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,6 +85,7 @@ export default function ZegoCallInvitationWaiting(props) {
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationWaiting' + String(Math.floor(Math.random() * 10000));
+    ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
     ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID, () => {
       ZegoUIKit.leaveRoom();
       navigation.goBack();
@@ -86,9 +97,11 @@ export default function ZegoCallInvitationWaiting(props) {
     ZegoUIKitInvitationService.onInvitationAccepted(callbackID, () => {
       navigation.navigate('RoomPage', {
         callID,
+        isVideoCall,
       });
     });
     return () => {
+      ZegoUIKit.onRequireNewToken(callbackID);
       ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID);
       ZegoUIKitInvitationService.onInvitationRefused(callbackID);
       ZegoUIKitInvitationService.onInvitationAccepted(callbackID);

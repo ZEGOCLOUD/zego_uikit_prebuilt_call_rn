@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ZegoUIKitInvitationService } from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
-import ZegoUIKitPrebuiltCall from '../call/index';
+import ZegoCallInvitationRoom from './pages/ZegoCallInvitationRoom';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 export default function ZegoUIKitPrebuiltInvitationCall(props) {
-  const { appID, appSign, userID, userName, config, plugins } = props;
+  const {
+    appID,
+    appSign,
+    userID,
+    userName,
+    token,
+    onRequireNewToken,
+    requireConfig,
+    plugins,
+  } = props;
   const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [isInit, setIsInit] = useState(false);
   const [notifyData, setNotifyData] = useState({});
@@ -66,20 +75,24 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
               appSign,
               userID,
               userName,
+              token,
+              onRequireNewToken,
             }}
           />
-          {/* <Stack.Screen
+          <Stack.Screen
             options={{ headerShown: false }}
             name="RoomPage"
-            component={ZegoUIKitPrebuiltCall}
+            component={ZegoCallInvitationRoom}
             initialParams={{
               appID,
               appSign,
               userID,
               userName,
-              config
+              token,
+              onRequireNewToken,
+              requireConfig,
             }}
-          /> */}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

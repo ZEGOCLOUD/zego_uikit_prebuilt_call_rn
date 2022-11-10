@@ -47,6 +47,7 @@ export default function ZegoCallInvitationDialog(props) {
     setIsDialogVisable(false);
     navigation.navigate('RoomPage', {
       callID,
+      isVideoCall: type === ZegoInvitationType.videoCall,
     });
   };
 

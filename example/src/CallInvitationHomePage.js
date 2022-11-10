@@ -1,6 +1,11 @@
 import React, {useState} from 'react';
 import ZegoUIKitPrebuiltInvitationCall, {
   ZegoStartCallInvitationButton,
+  ZegoInvitationType,
+  ONE_ON_ONE_VIDEO_CALL_CONFIG,
+  ONE_ON_ONE_VOICE_CALL_CONFIG,
+  GROUP_VIDEO_CALL_CONFIG,
+  GROUP_VOICE_CALL_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import ZegoUIKitSignalingPlugin from '@zegocloud/zego-signaling-plugin';
 import KeyCenter from './KeyCenter';
@@ -16,6 +21,17 @@ export default function CallInvitationHomePage(props) {
       appSign={KeyCenter.appSign}
       userID={userID}
       userName={userID}
+      requireConfig={data => {
+        const config =
+          data.invitees.length > 1
+            ? ZegoInvitationType.videoCall === data.type
+              ? GROUP_VIDEO_CALL_CONFIG
+              : GROUP_VOICE_CALL_CONFIG
+            : ZegoInvitationType.videoCall === data.type
+            ? ONE_ON_ONE_VIDEO_CALL_CONFIG
+            : ONE_ON_ONE_VOICE_CALL_CONFIG;
+        return config;
+      }}
       plugins={[ZegoUIKitSignalingPlugin]}>
       <View style={styles.container}>
         <Text>Your userID: {userID}</Text>
