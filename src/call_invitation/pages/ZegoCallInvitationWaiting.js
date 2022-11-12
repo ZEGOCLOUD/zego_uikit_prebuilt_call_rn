@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Platform, PermissionsAndroid } from 'react-native';
-
 import ZegoUIKit, {
   ZegoAudioVideoView,
   ZegoSwitchCameraButton,
   ZegoUIKitInvitationService,
 } from '@zegocloud/zego-uikit-rn';
 import ZegoCallInvationForeground from './ZegoCallInvationForeground';
+import BellManage from '../services/bell';
+import { zloginfo } from '../../utils/logger';
+import CallInviteStateManage from '../services/inviteStateManager';
 
 export default function ZegoCallInvitationWaiting(props) {
   const { route, navigation } = props;
@@ -15,10 +17,13 @@ export default function ZegoCallInvitationWaiting(props) {
     appSign,
     userID,
     userName,
-    callID,
-    isVideoCall,
     token,
     onRequireNewToken,
+    roomID,
+    isVideoCall,
+    invitees,
+    inviter,
+    callID,
   } = route.params;
 
   const grantPermissions = async (callback) => {
@@ -62,21 +67,28 @@ export default function ZegoCallInvitationWaiting(props) {
       callback();
     }
   };
-  const onHangUp = () => {
-    ZegoUIKit.leaveRoom();
+  const hangUpHandle = () => {
+    zloginfo('Leave room on waiting page');
+    if (CallInviteStateManage.isAutoCancelInvite(callID)) {
+      ZegoUIKitInvitationService.cancelInvitation(invitees);
+    }
+    BellManage.stopOutgoingSound();
     navigation.goBack();
   };
 
   useEffect(() => {
+    BellManage.playOutgoingSound();
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
       if (isVideoCall) {
-        ZegoUIKit.turnCameraOn(userID, true);
+        ZegoUIKit.turnCameraOn('', true);
+        ZegoUIKit.turnMicrophoneOn('', true);
+        ZegoUIKit.setAudioOutputToSpeaker(true);
       }
       grantPermissions(() => {
         if (appSign) {
-          ZegoUIKit.joinRoom(callID);
+          ZegoUIKit.joinRoom(roomID);
         } else {
-          ZegoUIKit.joinRoom(callID, token || onRequireNewToken());
+          ZegoUIKit.joinRoom(roomID, token || onRequireNewToken());
         }
       });
     });
@@ -87,19 +99,29 @@ export default function ZegoCallInvitationWaiting(props) {
       'ZegoCallInvitationWaiting' + String(Math.floor(Math.random() * 10000));
     ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
     ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID, () => {
+      BellManage.stopOutgoingSound();
       ZegoUIKit.leaveRoom();
       navigation.goBack();
     });
     ZegoUIKitInvitationService.onInvitationRefused(callbackID, () => {
+      BellManage.stopOutgoingSound();
       ZegoUIKit.leaveRoom();
       navigation.goBack();
     });
-    ZegoUIKitInvitationService.onInvitationAccepted(callbackID, () => {
-      navigation.navigate('RoomPage', {
-        callID,
-        isVideoCall,
-      });
-    });
+    ZegoUIKitInvitationService.onInvitationAccepted(
+      callbackID,
+      ({ invitee, data }) => {
+        zloginfo('Jump to call room page.');
+        BellManage.stopOutgoingSound();
+        navigation.navigate('RoomPage', {
+          roomID,
+          isVideoCall,
+          invitees,
+          inviter,
+          callID,
+        });
+      }
+    );
     return () => {
       ZegoUIKit.onRequireNewToken(callbackID);
       ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID);
@@ -114,14 +136,14 @@ export default function ZegoCallInvitationWaiting(props) {
       {isVideoCall ? (
         <ZegoAudioVideoView
           userID={userID}
-          roomID={callID}
+          roomID={roomID}
           useVideoViewAspectFill={true}
           // eslint-disable-next-line react/no-unstable-nested-components
           foregroundBuilder={() => (
             <ZegoCallInvationForeground
               isVideoCall={isVideoCall}
               userName={userName}
-              onHangUp={onHangUp}
+              onHangUp={hangUpHandle}
             />
           )}
         />
@@ -129,7 +151,7 @@ export default function ZegoCallInvitationWaiting(props) {
         <ZegoCallInvationForeground
           isVideoCall={isVideoCall}
           userName={userName}
-          onHangUp={onHangUp}
+          onHangUp={hangUpHandle}
         />
       )}
       {isVideoCall ? (

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
+import CallInviteStateManage from '../services/inviteStateManager';
+import { zloginfo } from '../../utils/logger';
+
 import {
   ZegoUIKitInvitationService,
   ZegoAcceptInvitationButton,
@@ -44,22 +47,31 @@ export default function ZegoCallInvitationDialog(props) {
   const acceptHandle = () => {
     setIsDialogVisable(false);
     navigation.navigate('RoomPage', {
-      callID: extendData.call_id,
+      roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
-      inviter: inviterData,
       invitees: extendData.invitees,
+      inviter: inviterData.id,
     });
   };
 
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInvitationService.onInvitationReceived(callbackID, (data) => {
-      setInviteType(data.type);
-      setInviterData(data.inviter);
-      setExtendData(JSON.parse(data.data));
-      setIsDialogVisable(true);
-    });
+    ZegoUIKitInvitationService.onInvitationReceived(
+      callbackID,
+      ({ callID, type, inviter, data }) => {
+        if (CallInviteStateManage.isOncall()) {
+          zloginfo('Automatically declining invitations');
+          // Automatically declining invitations
+          ZegoUIKitInvitationService.refuseInvitation(inviter.id);
+        } else {
+          setInviteType(type);
+          setInviterData(inviter);
+          setExtendData(JSON.parse(data));
+          setIsDialogVisable(true);
+        }
+      }
+    );
     ZegoUIKitInvitationService.onInvitationTimeout(callbackID, () => {
       setIsDialogVisable(false);
     });

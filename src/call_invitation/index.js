@@ -4,6 +4,8 @@ import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
 import ZegoCallInvitationRoom from './pages/ZegoCallInvitationRoom';
+import CallInviteStateManage from '../call_invitation/services/inviteStateManager';
+import BellManage from '../call_invitation/services/bell';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
@@ -25,8 +27,17 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
     ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
       () => {
         setIsInit(true);
+        CallInviteStateManage.init();
+        BellManage.initIncomingSound();
+        BellManage.initOutgoingSound();
       }
     );
+    return () => {
+      BellManage.releaseIncomingSound();
+      BellManage.releaseOutgoingSound();
+      CallInviteStateManage.uninit();
+      ZegoPrebuiltPlugins.uninit();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
