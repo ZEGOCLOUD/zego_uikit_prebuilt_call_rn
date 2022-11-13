@@ -45,13 +45,13 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const refuseHandle = () => {
-    CallInviteStateManage.updateInviteDataAfterRejected(callID, inviterData.id);
+    CallInviteStateManage.updateInviteDataAfterRejected(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
     setIsDialogVisable(false);
   };
   const acceptHandle = () => {
-    CallInviteStateManage.updateInviteDataAfterAccepted(callID, inviterData.id);
+    CallInviteStateManage.updateInviteDataAfterAccepted(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
     setIsDialogVisable(false);
@@ -72,7 +72,7 @@ export default function ZegoCallInvitationDialog(props) {
     ZegoUIKitInvitationService.onInvitationReceived(
       callbackID,
       ({ callID: resCallID, type, inviter, data }) => {
-        const onCall = CallInviteStateManage.isOncall();
+        const onCall = CallInviteStateManage.isOncall(resCallID);
         const onRoom = ZegoUIKit.isRoomConnected();
         if (onCall || onRoom) {
           zloginfo(
@@ -80,10 +80,7 @@ export default function ZegoCallInvitationDialog(props) {
           );
           // Automatically declining invitations
           ZegoUIKitInvitationService.refuseInvitation(inviter.id);
-          CallInviteStateManage.updateInviteDataAfterRejected(
-            resCallID,
-            inviter.id
-          );
+          CallInviteStateManage.updateInviteDataAfterRejected(resCallID);
         } else {
           setCallID(resCallID);
           setInviteType(type);
@@ -195,6 +192,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 3,
     alignItems: 'center',
+    backgroundColor: 'red',
   },
   mask: {
     position: 'absolute',

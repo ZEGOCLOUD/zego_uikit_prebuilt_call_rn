@@ -42,13 +42,14 @@ export default function ZegoCallInvitationRoom(props) {
       CallInviteStateManage.updateInviteDataAfterCancel(callID);
     }
     BellManage.stopOutgoingSound();
+    CallInviteStateManage.initInviteData();
     navigation.navigate('HomePage');
   };
 
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationRoom ' + String(Math.floor(Math.random() * 10000));
-    if (invitees.length > 1) {
+    if (invitees.length > 1 && inviter === userID) {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
         zloginfo('Someone accepted the invitation');
@@ -57,6 +58,7 @@ export default function ZegoCallInvitationRoom(props) {
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
         zloginfo('Invite completed with nobody');
         BellManage.stopOutgoingSound();
+        CallInviteStateManage.initInviteData();
         navigation.navigate('HomePage');
       });
     }
