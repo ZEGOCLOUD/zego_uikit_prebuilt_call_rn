@@ -49,12 +49,14 @@ export default function ZegoCallInvitationDialog(props) {
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
     setIsDialogVisable(false);
+    setIsFullScreen(false);
   };
   const acceptHandle = () => {
     CallInviteStateManage.updateInviteDataAfterAccepted(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
     setIsDialogVisable(false);
+    setIsFullScreen(false);
     navigation.navigate('RoomPage', {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
@@ -96,11 +98,13 @@ export default function ZegoCallInvitationDialog(props) {
       BellManage.stopIncomingSound();
       BellManage.cancleVirate();
       setIsDialogVisable(false);
+      setIsFullScreen(false);
     });
     ZegoUIKitInvitationService.onInvitationCanceled(callbackID, () => {
       BellManage.stopIncomingSound();
       BellManage.cancleVirate();
       setIsDialogVisable(false);
+      setIsFullScreen(false);
     });
     return () => {
       ZegoUIKitInvitationService.onInvitationReceived(callbackID);

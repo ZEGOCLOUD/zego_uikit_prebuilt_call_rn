@@ -7,21 +7,25 @@ import ZegoUIKitPrebuiltInvitationCall, {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import ZegoUIKitSignalingPlugin from '@zegocloud/zego-signaling-plugin';
+// import ZegoUIKitSignalingPlugin from '@zegocloud/zego-signaling-plugin';
+import ZegoUIKitSignalingPlugin from './plugin';
 import KeyCenter from './KeyCenter';
-import {View, Text, TextInput, StyleSheet} from 'react-native';
+import {View, Text, TextInput, StyleSheet, Alert} from 'react-native';
+
+const userID = String(Math.floor(Math.random() * 10000));
+const userName = `user_${userID}`;
 
 export default function CallInvitationHomePage(props) {
   const [text, onChangeText] = useState('');
-  const userID = String(Math.floor(Math.random() * 100000));
   return (
     // <View />
     <ZegoUIKitPrebuiltInvitationCall
       appID={KeyCenter.appID}
       appSign={KeyCenter.appSign}
       userID={userID}
-      userName={userID}
+      userName={userName}
       requireConfig={data => {
+        console.warn('requireConfig', data);
         const config =
           data.invitees.length > 1
             ? ZegoInvitationType.videoCall === data.type
@@ -30,7 +34,31 @@ export default function CallInvitationHomePage(props) {
             : ZegoInvitationType.videoCall === data.type
             ? ONE_ON_ONE_VIDEO_CALL_CONFIG
             : ONE_ON_ONE_VOICE_CALL_CONFIG;
-        return config;
+        return {
+          ...config,
+          onHangUp: () => {
+            // Custom
+          },
+          onHangUpConfirmation: () => {
+            return new Promise((resolve, reject) => {
+              Alert.alert('Leave the call', 'Are your sure to leave the call', [
+                {
+                  text: 'Cancel',
+                  onPress: () => {
+                    reject();
+                  },
+                  style: 'cancel',
+                },
+                {
+                  text: 'Confirm',
+                  onPress: () => {
+                    resolve();
+                  },
+                },
+              ]);
+            });
+          },
+        };
       }}
       plugins={[ZegoUIKitSignalingPlugin]}>
       <View style={styles.container}>

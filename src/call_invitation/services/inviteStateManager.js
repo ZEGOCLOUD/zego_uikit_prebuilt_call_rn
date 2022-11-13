@@ -10,11 +10,10 @@ import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
 const InviteState = {
   uncompleted: 1, // inviter: send an invitation、init state
   completed: 2, // inviter: send an invitation
-  canceled: 3, // inviter: send an invitation
-  pending: 4, // invitee: call pending、init state
-  accepted: 5, // invitee: accept
-  missed: 6, // invitee: timout
-  rejected: 7, // invitee: rejection
+  pending: 3, // invitee: call pending、init state
+  accepted: 4, // invitee: accept
+  missed: 5, // invitee: timout
+  rejected: 6, // invitee: rejection
 };
 
 const CallInviteStateManage = {
@@ -30,13 +29,11 @@ const CallInviteStateManage = {
         callID,
         CallInviteStateManage._callIDMap
       );
-      const completedWithNobody = !Array.from(
-        stateDetails.invitees.values()
-      ).find(
-        (inviteState) =>
-          inviteState !== InviteState.missed &&
-          inviteState !== InviteState.rejected
-      );
+      const completedWithNobody =
+        stateDetails.inviteState === InviteState.completed &&
+        !Array.from(stateDetails.invitees.values()).find(
+          (inviteState) => inviteState === InviteState.accepted
+        );
       if (completedWithNobody) {
         // notify
         Array.from(
@@ -50,10 +47,7 @@ const CallInviteStateManage = {
   _judgeInviteCompleted: (callID) => {
     const inviteDetails = CallInviteStateManage._callIDMap.get(callID);
     return !Array.from(inviteDetails.invitees.values()).find(
-      (inviteState) =>
-        inviteState !== InviteState.accepted &&
-        inviteState !== InviteState.rejected &&
-        inviteState !== InviteState.missed
+      (inviteState) => inviteState === InviteState.pending
     );
   },
   init: () => {
@@ -157,8 +151,7 @@ const CallInviteStateManage = {
         const inviteDetails = CallInviteStateManage._callIDMap.get(callID);
         if (inviteDetails) {
           const localUser = ZegoPrebuiltPlugins.getLocalUser();
-          inviteDetails.invitees.get(localUser.userID).inviteState =
-            InviteState.missed;
+          inviteDetails.invitees.set(localUser.userID, InviteState.missed);
         } else {
           // No such case
         }
@@ -205,11 +198,6 @@ const CallInviteStateManage = {
   // This interface is called after the invitation is successfully rejected
   updateInviteDataAfterRejected: (callID) => {
     // update _callIDMap
-    const localUser = ZegoPrebuiltPlugins.getLocalUser();
-    const inviteDetails = CallInviteStateManage._callIDMap.get(callID);
-    if (inviteDetails) {
-      inviteDetails.invitees.set(localUser.userID, InviteState.rejected);
-    }
     CallInviteStateManage._callIDMap.delete(callID);
   },
   // This interface is called after the invitation is successfully accepted
@@ -223,6 +211,7 @@ const CallInviteStateManage = {
   },
   // This interface is called after the invitation is successfully cancel
   updateInviteDataAfterCancel: (callID) => {
+    // update _callIDMap
     CallInviteStateManage._callIDMap.delete(callID);
   },
   isInviteCompleted: (callID) => {
@@ -266,17 +255,16 @@ const CallInviteStateManage = {
     return auto;
   },
   // Determine whether a call is being made
-  isOncall: (callID, inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID) => {
-    console.warn(
-      '######isOncall######',
-      inviteeID,
-      CallInviteStateManage._callIDMap
-    );
+  isOncall: (
+    newCallID,
+    inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID
+  ) => {
+    console.warn('######isOncall######', CallInviteStateManage._callIDMap);
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._callIDMap.keys());
     for (let index = 0, len = callIDs.length; index < len; index++) {
       const currentCallID = callIDs[index];
-      if (currentCallID !== callID) {
+      if (currentCallID !== newCallID) {
         const stateDetails =
           CallInviteStateManage._callIDMap.get(currentCallID);
         if (stateDetails) {

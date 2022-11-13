@@ -14,7 +14,7 @@ export default function ZegoStartCallInvitationButton(props) {
     text,
     invitees = [],
     isVideoCall = false,
-    timeout = 60,
+    timeout = 10,
     onPressed,
   } = props;
   const localUser = ZegoPrebuiltPlugins.getLocalUser();
