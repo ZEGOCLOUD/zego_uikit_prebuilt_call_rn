@@ -19,7 +19,6 @@ target 'ZegoPrebuiltCall' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'RNSound', :path => '../node_modules/react-native-sound'
 
   target 'ZegoPrebuiltCallTests' do
     inherit! :complete
