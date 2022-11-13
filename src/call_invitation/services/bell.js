@@ -10,7 +10,7 @@ const BellManage = {
   vibrate: () => {
     Vibration.vibrate([0, 500, 1000, 500], true);
   },
-  virateCancle: () => {
+  cancleVirate: () => {
     Vibration.cancel();
   },
   initIncomingSound: () => {

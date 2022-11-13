@@ -92,6 +92,9 @@ export default function ZegoCallInvitationWaiting(props) {
         }
       });
     });
+    return () => {
+      BellManage.stopOutgoingSound();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {

@@ -62,6 +62,7 @@ export default function ZegoCallInvitationRoom(props) {
     return () => {
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
+      BellManage.stopOutgoingSound();
     };
   });
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
+import BellManage from '../services/bell';
 
-import {
+import ZegoUIKit, {
   ZegoUIKitInvitationService,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
@@ -14,6 +15,7 @@ import {
 export default function ZegoCallInvitationDialog(props) {
   const navigation = useNavigation();
   const [isDialogVisable, setIsDialogVisable] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [inviteType, setInviteType] = useState(ZegoInvitationType.voiceCall);
   const [inviterData, setInviterData] = useState({});
   const [extendData, setExtendData] = useState({});
@@ -42,9 +44,13 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const refuseHandle = () => {
+    BellManage.stopIncomingSound();
+    BellManage.cancleVirate();
     setIsDialogVisable(false);
   };
   const acceptHandle = () => {
+    BellManage.stopIncomingSound();
+    BellManage.cancleVirate();
     setIsDialogVisable(false);
     navigation.navigate('RoomPage', {
       roomID: extendData.call_id,
@@ -53,6 +59,9 @@ export default function ZegoCallInvitationDialog(props) {
       inviter: inviterData.id,
     });
   };
+  const pressHandle = () => {
+    setIsFullScreen(true);
+  };
 
   useEffect(() => {
     const callbackID =
@@ -60,8 +69,12 @@ export default function ZegoCallInvitationDialog(props) {
     ZegoUIKitInvitationService.onInvitationReceived(
       callbackID,
       ({ callID, type, inviter, data }) => {
-        if (CallInviteStateManage.isOncall()) {
-          zloginfo('Automatically declining invitations');
+        const onCall = CallInviteStateManage.isOncall();
+        const onRoom = ZegoUIKit.isRoomConnected();
+        if (onCall || onRoom) {
+          zloginfo(
+            `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
+          );
           // Automatically declining invitations
           ZegoUIKitInvitationService.refuseInvitation(inviter.id);
         } else {
@@ -69,68 +82,111 @@ export default function ZegoCallInvitationDialog(props) {
           setInviterData(inviter);
           setExtendData(JSON.parse(data));
           setIsDialogVisable(true);
+          BellManage.playIncomingSound();
+          BellManage.vibrate();
         }
       }
     );
     ZegoUIKitInvitationService.onInvitationTimeout(callbackID, () => {
+      BellManage.stopIncomingSound();
+      BellManage.cancleVirate();
       setIsDialogVisable(false);
     });
     ZegoUIKitInvitationService.onInvitationCanceled(callbackID, () => {
+      BellManage.stopIncomingSound();
+      BellManage.cancleVirate();
       setIsDialogVisable(false);
     });
     return () => {
+      ZegoUIKitInvitationService.onInvitationReceived(callbackID);
       ZegoUIKitInvitationService.onInvitationTimeout(callbackID);
       ZegoUIKitInvitationService.onInvitationCanceled(callbackID);
+      BellManage.stopIncomingSound();
+      BellManage.cancleVirate();
     };
   }, []);
 
   return (
     <View style={[styles.container, isDialogVisable ? styles.show : null]}>
-      <View style={styles.mask} />
-      <View style={styles.dialog}>
-        <View style={styles.left}>
-          <View style={styles.avatar}>
-            <Text style={styles.nameLabel}>
-              {getShotName(inviterData.name)}
-            </Text>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isDialogVisable}
+        style={styles.modal}
+      >
+        <View style={styles.mask} />
+        {!isFullScreen ? (
+          <TouchableOpacity onPress={pressHandle} activeOpacity={0.9}>
+            <View style={styles.dialog}>
+              <View style={styles.left}>
+                <View style={styles.avatar}>
+                  <Text style={styles.nameLabel}>
+                    {getShotName(inviterData.name)}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={styles.callName}>{inviterData.name}</Text>
+                  <Text style={styles.callTitle}>{getCallTitle()}</Text>
+                </View>
+              </View>
+              <View style={styles.right}>
+                <View style={styles.refuse}>
+                  <ZegoRefuseInvitationButton
+                    inviterID={inviterData.id}
+                    onPressed={refuseHandle}
+                  />
+                </View>
+                <View style={styles.accept}>
+                  <ZegoAcceptInvitationButton
+                    icon={getImageSourceByPath()}
+                    inviterID={inviterData.id}
+                    onPressed={acceptHandle}
+                  />
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.fullDialog}>
+            <View style={styles.content}>
+              <View style={styles.fullAvatar}>
+                <Text style={styles.fullNameLabel}>
+                  {getShotName(inviterData.name)}
+                </Text>
+              </View>
+              <Text style={styles.fullCallName}>{inviterData.name}</Text>
+              <Text style={styles.calling}>Calling...</Text>
+            </View>
+            <View style={styles.bottomBarContainer}>
+              <View style={styles.fullRefuse}>
+                <ZegoRefuseInvitationButton
+                  inviterID={inviterData.id}
+                  onPressed={refuseHandle}
+                />
+                <Text style={styles.fullRefuseTitle}>Decline</Text>
+              </View>
+              <View style={styles.fullAccept}>
+                <ZegoAcceptInvitationButton
+                  icon={getImageSourceByPath()}
+                  inviterID={inviterData.id}
+                  onPressed={acceptHandle}
+                />
+                <Text style={styles.fullAcceptTitle}>Accept</Text>
+              </View>
+            </View>
           </View>
-          <View>
-            <Text style={styles.callName}>{inviterData.name}</Text>
-            <Text style={styles.callTitle}>{getCallTitle()}</Text>
-          </View>
-        </View>
-        <View style={styles.right}>
-          <View style={styles.refuse}>
-            <ZegoRefuseInvitationButton
-              inviterID={inviterData.id}
-              onPressed={refuseHandle}
-            />
-          </View>
-          <View style={styles.accept}>
-            <ZegoAcceptInvitationButton
-              icon={getImageSourceByPath()}
-              inviterID={inviterData.id}
-              onPressed={acceptHandle}
-            />
-          </View>
-        </View>
-      </View>
+        )}
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: 'none',
     flex: 1,
     position: 'absolute',
-    width: '100%',
-    height: '100%',
     zIndex: 3,
     alignItems: 'center',
-  },
-  show: {
-    display: 'flex',
   },
   mask: {
     position: 'absolute',
@@ -142,7 +198,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   dialog: {
-    width: '96%',
     height: 80,
     backgroundColor: '#333333',
     borderRadius: 8,
@@ -151,6 +206,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: 12,
     paddingRight: 12,
+    marginLeft: 8,
+    marginRight: 8,
   },
   left: {
     flexDirection: 'row',
@@ -187,5 +244,66 @@ const styles = StyleSheet.create({
   },
   refuse: {
     marginRight: 20,
+  },
+  fullDialog: {
+    backgroundColor: '#333333',
+    width: '100%',
+    height: '100%',
+  },
+  content: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 114,
+  },
+  fullAvatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 1000,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 5,
+  },
+  fullNameLabel: {
+    color: '#222222',
+    fontSize: 22,
+  },
+  fullCallName: {
+    fontSize: 21,
+    lineHeight: 29.5,
+    marginBottom: 23.5,
+    color: '#ffffff',
+  },
+  calling: {
+    fontSize: 16,
+    lineHeight: 22.5,
+    color: '#ffffff',
+    opacity: 0.7,
+  },
+  bottomBarContainer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
+  fullRefuse: {},
+  fullRefuseTitle: {
+    fontSize: 13,
+    opacity: 0.7,
+    color: '#FFFFFF',
+    lineHeight: 18.5,
+    marginTop: 7.5,
+  },
+  fullAccept: {},
+  fullAcceptTitle: {
+    fontSize: 13,
+    opacity: 0.7,
+    color: '#FFFFFF',
+    lineHeight: 18.5,
+    marginTop: 7.5,
   },
 });

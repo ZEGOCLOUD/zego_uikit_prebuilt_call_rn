@@ -256,6 +256,11 @@ const CallInviteStateManage = {
   },
   // Determine whether a call is being made
   isOncall: (inviteeID) => {
+    console.warn(
+      '######isOncall######',
+      inviteeID,
+      CallInviteStateManage._callIDMap
+    );
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._callIDMap.keys());
     for (let index = 0, len = callIDs.length; index < len; index++) {
