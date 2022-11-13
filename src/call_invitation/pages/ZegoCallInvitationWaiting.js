@@ -71,6 +71,7 @@ export default function ZegoCallInvitationWaiting(props) {
     zloginfo('Leave room on waiting page');
     if (CallInviteStateManage.isAutoCancelInvite(callID)) {
       ZegoUIKitInvitationService.cancelInvitation(invitees);
+      CallInviteStateManage.updateInviteDataAfterCancel(callID);
     }
     BellManage.stopOutgoingSound();
     navigation.goBack();

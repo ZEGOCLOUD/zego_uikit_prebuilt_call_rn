@@ -39,6 +39,7 @@ export default function ZegoCallInvitationRoom(props) {
       CallInviteStateManage.isAutoCancelInvite(callID)
     ) {
       ZegoUIKitInvitationService.cancelInvitation(invitees);
+      CallInviteStateManage.updateInviteDataAfterCancel(callID);
     }
     BellManage.stopOutgoingSound();
     navigation.navigate('HomePage');
