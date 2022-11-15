@@ -4,7 +4,8 @@ import ZegoBottomBar from '../../call/ZegoBottomBar';
 import ZegoMenuBarButtonName from '../../call/ZegoMenuBarButtonName';
 
 export default function ZegoCallInvationForeground(props) {
-  const { isVideoCall, userName, onHangUp } = props;
+  const { isVideoCall, invitee, onHangUp } = props;
+  const userName = 'user_' + invitee;
   const getShotName = (name) => {
     if (!name) {
       return '';

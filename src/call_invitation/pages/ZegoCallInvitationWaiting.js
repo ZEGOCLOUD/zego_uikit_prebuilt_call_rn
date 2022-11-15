@@ -147,7 +147,7 @@ export default function ZegoCallInvitationWaiting(props) {
           foregroundBuilder={() => (
             <ZegoCallInvationForeground
               isVideoCall={isVideoCall}
-              userName={userName}
+              invitee={invitees[0]}
               onHangUp={hangUpHandle}
             />
           )}
@@ -155,7 +155,7 @@ export default function ZegoCallInvitationWaiting(props) {
       ) : (
         <ZegoCallInvationForeground
           isVideoCall={isVideoCall}
-          userName={userName}
+          invitee={invitees[0]}
           onHangUp={hangUpHandle}
         />
       )}
