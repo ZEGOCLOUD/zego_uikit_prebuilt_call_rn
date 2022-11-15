@@ -39,6 +39,9 @@ export default function CallInvitationHomePage(props) {
           onHangUp: () => {
             // Custom
           },
+          onOnlySelfInRoom: () => {
+            // Custom
+          },
           onHangUpConfirmation: () => {
             return new Promise((resolve, reject) => {
               Alert.alert('Leave the call', 'Are your sure to leave the call', [

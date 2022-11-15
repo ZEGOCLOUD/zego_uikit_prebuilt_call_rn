@@ -49,6 +49,15 @@ export default function ZegoCallInvitationRoom(props) {
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationRoom ' + String(Math.floor(Math.random() * 10000));
+    ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
+      if (typeof config.onOnlySelfInRoom === 'function') {
+        // Invite a single
+        if (invitees.length === 1) {
+          navigation.navigate('HomePage');
+        }
+        config.onOnlySelfInRoom();
+      }
+    });
     if (invitees.length > 1 && inviter === userID) {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
