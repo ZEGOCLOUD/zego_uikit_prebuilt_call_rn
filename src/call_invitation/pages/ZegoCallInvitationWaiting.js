@@ -81,11 +81,9 @@ export default function ZegoCallInvitationWaiting(props) {
   useEffect(() => {
     BellManage.playOutgoingSound();
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
-      if (isVideoCall) {
-        ZegoUIKit.turnCameraOn('', true);
-        ZegoUIKit.turnMicrophoneOn('', true);
-        ZegoUIKit.setAudioOutputToSpeaker(true);
-      }
+      ZegoUIKit.turnCameraOn('', true);
+      ZegoUIKit.turnMicrophoneOn('', true);
+      ZegoUIKit.setAudioOutputToSpeaker(true);
       grantPermissions(() => {
         if (appSign) {
           ZegoUIKit.joinRoom(roomID);
