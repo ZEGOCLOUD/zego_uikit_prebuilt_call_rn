@@ -53,6 +53,7 @@ export default function ZegoCallInvitationRoom(props) {
       if (typeof config.onOnlySelfInRoom === 'function') {
         // Invite a single
         if (invitees.length === 1) {
+          CallInviteStateManage.initInviteData();
           navigation.navigate('HomePage');
         }
         config.onOnlySelfInRoom();
