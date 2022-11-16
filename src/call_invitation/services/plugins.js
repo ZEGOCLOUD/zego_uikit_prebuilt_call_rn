@@ -27,10 +27,9 @@ const ZegoPrebuiltPlugins = {
     ZegoUIKitInvitationService.init(appID, appSign);
     _appInfo.appID = appID;
     _appInfo.appSign = appSign;
-    return ZegoUIKitInvitationService.login(userID, userName).then(() => {
-      _localUser.userID = userID;
-      _localUser.userName = userName;
-    });
+    _localUser.userID = userID;
+    _localUser.userName = userName;
+    return ZegoUIKitInvitationService.login(userID, userName).then(() => {});
   },
   uninit: () => {
     ZegoUIKitInvitationService.uninit();

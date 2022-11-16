@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ZegoStartInvitationButton } from '@zegocloud/zego-uikit-rn';
 import { ZegoInvitationType } from '../services/defines';
@@ -27,6 +27,8 @@ export default function ZegoStartCallInvitationButton(props) {
     custom_data: '',
   });
 
+  const [forceRender, setForceRender] = useState(Date.now());
+
   const onPress = ({ callID, invitees: successfulInvitees }) => {
     CallInviteStateManage.addInviteData(
       callID,
@@ -54,6 +56,7 @@ export default function ZegoStartCallInvitationButton(props) {
         callID,
       });
     }
+    setForceRender(Date.now());
     if (typeof onPressed === 'function') {
       onPressed();
     }
