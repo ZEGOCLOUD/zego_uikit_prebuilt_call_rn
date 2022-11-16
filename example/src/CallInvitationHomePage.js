@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import ZegoUIKitPrebuiltInvitationCall, {
   ZegoStartCallInvitationButton,
   ZegoInvitationType,
@@ -10,13 +10,27 @@ import ZegoUIKitPrebuiltInvitationCall, {
 // import ZegoUIKitSignalingPlugin from '@zegocloud/zego-signaling-plugin';
 import ZegoUIKitSignalingPlugin from './plugin';
 import KeyCenter from './KeyCenter';
-import {View, Text, TextInput, StyleSheet, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  TouchableWithoutFeedback,
+} from 'react-native';
 
 const userID = String(Math.floor(Math.random() * 10000));
 const userName = `user_${userID}`;
 
 export default function CallInvitationHomePage(props) {
-  const [text, onChangeText] = useState('');
+  const [invitees, setInvitees] = useState([]);
+  const viewRef = useRef(null);
+  const pressHandle = () => {
+    viewRef.current.blur();
+  };
+  const changeTextHandle = value => {
+    setInvitees(value ? value.split(',') : []);
+  };
   return (
     // <View />
     <ZegoUIKitPrebuiltInvitationCall
@@ -64,25 +78,27 @@ export default function CallInvitationHomePage(props) {
         };
       }}
       plugins={[ZegoUIKitSignalingPlugin]}>
-      <View style={styles.container}>
-        <Text>Your userID: {userID}</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeText}
-            value={text}
-            placeholder="Invitees ID, Separate ids by ','"
-          />
-          <ZegoStartCallInvitationButton
-            invitees={text ? text.split(',') : []}
-            isVideoCall={false}
-          />
-          <ZegoStartCallInvitationButton
-            invitees={text ? text.split(',') : []}
-            isVideoCall={true}
-          />
+      <TouchableWithoutFeedback onPress={pressHandle}>
+        <View style={styles.container}>
+          <Text>Your userID: {userID}</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              ref={viewRef}
+              style={styles.input}
+              onChangeText={changeTextHandle}
+              placeholder="Invitees ID, Separate ids by ','"
+            />
+            <ZegoStartCallInvitationButton
+              invitees={invitees}
+              isVideoCall={false}
+            />
+            <ZegoStartCallInvitationButton
+              invitees={invitees}
+              isVideoCall={true}
+            />
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </ZegoUIKitPrebuiltInvitationCall>
   );
 }
