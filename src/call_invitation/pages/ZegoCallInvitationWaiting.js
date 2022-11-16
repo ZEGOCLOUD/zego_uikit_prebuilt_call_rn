@@ -118,12 +118,14 @@ export default function ZegoCallInvitationWaiting(props) {
       ({ invitee, data }) => {
         zloginfo('Jump to call room page.');
         BellManage.stopOutgoingSound();
-        navigation.navigate('RoomPage', {
-          roomID,
-          isVideoCall,
-          invitees,
-          inviter,
-          callID,
+        ZegoUIKit.leaveRoom().then(() => {
+          navigation.navigate('RoomPage', {
+            roomID,
+            isVideoCall,
+            invitees,
+            inviter,
+            callID,
+          });
         });
       }
     );
