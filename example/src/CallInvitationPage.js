@@ -7,7 +7,6 @@ import ZegoUIKitPrebuiltCallInvitation, {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-// import ZegoUIKitSignalingPlugin from '@zegocloud/zego-signaling-plugin';
 import ZegoUIKitSignalingPlugin from './plugin';
 import KeyCenter from './KeyCenter';
 import {

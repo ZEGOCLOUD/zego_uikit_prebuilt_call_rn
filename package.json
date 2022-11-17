@@ -73,7 +73,10 @@
     "@zegocloud/zego-uikit-rn": ">=1.0.0",
     "react": "*",
     "react-delegate-component": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "@react-navigation/native": "*",
+    "@react-navigation/native-stack": "*",
+    "react-native-sound": "*"
   },
   "jest": {
     "preset": "react-native",

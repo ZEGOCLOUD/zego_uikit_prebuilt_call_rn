@@ -6,10 +6,6 @@ const prebuiltPak = require('../package.json');
 
 const prebuiltRoot = path.resolve(__dirname, '..');
 const uikitRoot = path.resolve(__dirname, '../../..');
-const signalingPluginRoot = path.resolve(
-  __dirname,
-  '../../../../SignalingPlugin',
-);
 
 const uikitModules = Object.keys({
   ...uikitPak.peerDependencies,
@@ -21,7 +17,7 @@ const prebuiltModules = Object.keys({
 
 module.exports = {
   projectRoot: __dirname,
-  watchFolders: [prebuiltRoot, uikitRoot, signalingPluginRoot],
+  watchFolders: [prebuiltRoot, uikitRoot],
 
   // We need to make sure that only one version is loaded for peerDependencies
   // So we block them at the root, and alias them to the versions in example's node_modules
