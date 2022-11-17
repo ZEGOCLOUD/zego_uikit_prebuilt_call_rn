@@ -81,7 +81,12 @@ export default function ZegoCallInvitationDialog(props) {
             `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
           );
           // Automatically declining invitations
-          ZegoUIKitInvitationService.refuseInvitation(inviter.id);
+          ZegoUIKitInvitationService.refuseInvitation(
+            inviter.id,
+            JSON.stringify({
+              callID: resCallID,
+            })
+          );
           CallInviteStateManage.updateInviteDataAfterRejected(resCallID);
         } else {
           setCallID(resCallID);

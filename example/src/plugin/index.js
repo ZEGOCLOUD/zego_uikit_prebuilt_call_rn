@@ -71,6 +71,12 @@ export default class ZegoUIKitSignalingPlugin {
   }
   registerPluginEventHandler(event, callbackID, callback) {
     switch (event) {
+      case 'connectionStateChanged':
+        ZegoPluginInvitationService.getInstance().onConnectionStateChanged(
+          callbackID,
+          callback,
+        );
+        break;
       case 'invitationReceived':
         ZegoPluginInvitationService.getInstance().onCallInvitationReceived(
           callbackID,

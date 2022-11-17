@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, AppState } from 'react-native';
 import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
@@ -23,7 +23,19 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
   } = props;
   const [isInit, setIsInit] = useState(false);
 
+  const handleAppStateChange = (nextAppState) => {
+    if (isInit) {
+      if (nextAppState === 'active') {
+        ZegoPrebuiltPlugins.reconnectIfDisconnected();
+      }
+    }
+  };
+
   useEffect(() => {
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange
+    );
     ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
       () => {
         setIsInit(true);
@@ -37,6 +49,7 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
       BellManage.releaseOutgoingSound();
       CallInviteStateManage.uninit();
       ZegoPrebuiltPlugins.uninit();
+      subscription.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

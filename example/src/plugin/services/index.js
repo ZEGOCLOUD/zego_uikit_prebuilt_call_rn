@@ -77,8 +77,15 @@ export default class ZegoPluginInvitationService {
     );
   }
   refuseInvitation(inviterID, data) {
-    const callID =
-      ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
+    let callID;
+    // Parse data and adapt automatic rejection
+    if (data) {
+      const dataObj = JSON.parse(data);
+      callID = dataObj.callID;
+    } else {
+      callID =
+        ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
+    }
     if (!callID) {
       zlogerror('[Service]Call id corresponding to the inviterID is empty.');
       return Promise.reject(new ZegoPluginResult());
@@ -101,6 +108,12 @@ export default class ZegoPluginInvitationService {
       `[Service]Accept invitation: callID: ${callID}, inviter id: ${inviterID}, data: ${data}.`,
     );
     return ZegoSignalingPluginCore.getInstance().accept(callID, config);
+  }
+  onConnectionStateChanged(callbackID, callback) {
+    ZegoSignalingPluginCore.getInstance().onConnectionStateChanged(
+      callbackID,
+      callback,
+    );
   }
   onCallInvitationReceived(callbackID, callback) {
     ZegoSignalingPluginCore.getInstance().onCallInvitationReceived(
