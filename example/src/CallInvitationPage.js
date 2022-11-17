@@ -22,7 +22,7 @@ import {
 const userID = String(Math.floor(Math.random() * 10000));
 const userName = `user_${userID}`;
 
-export default function CallInvitationHomePage(props) {
+export default function CallInvitationPage(props) {
   const [invitees, setInvitees] = useState([]);
   const viewRef = useRef(null);
   const pressHandle = () => {
@@ -32,7 +32,6 @@ export default function CallInvitationHomePage(props) {
     setInvitees(value ? value.split(',') : []);
   };
   return (
-    // <View />
     <ZegoUIKitPrebuiltInvitationCall
       appID={KeyCenter.appID}
       appSign={KeyCenter.appSign}
