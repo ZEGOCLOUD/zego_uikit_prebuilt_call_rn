@@ -1,5 +1,5 @@
 import ZegoUIKitPrebuiltCall from './call';
-import ZegoUIKitPrebuiltInvitationCall from './call_invitation';
+import ZegoUIKitPrebuiltCallInvitation from './call_invitation';
 import { ZegoInvitationType } from './call_invitation/services/defines';
 import ZegoMenuBarButtonName from './call/ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './call/ZegoMenuBarStyle';
@@ -99,10 +99,10 @@ const GROUP_VOICE_CALL_CONFIG = {
   },
 };
 
-// export default ZegoUIKitPrebuiltCall;
-export default ZegoUIKitPrebuiltInvitationCall;
+export default ZegoUIKitPrebuiltCallInvitation;
 
 export {
+  ZegoUIKitPrebuiltCall,
   ZegoMenuBarButtonName,
   ZegoMenuBarStyle,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
