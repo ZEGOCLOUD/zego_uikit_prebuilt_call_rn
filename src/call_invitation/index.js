@@ -43,13 +43,13 @@ export default function ZegoUIKitPrebuiltInvitationCall(props) {
 
   return (
     <View style={styles.container}>
-      <NavigationContainer initialRouteName="HomePage">
+      <NavigationContainer initialRouteName="UserPage">
         {isInit ? <ZegoCallInvitationDialog /> : <View />}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}
             headerMode="none"
-            name="HomePage"
+            name="UserPage"
             children={() => props.children}
           />
           <Stack.Screen

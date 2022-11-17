@@ -43,7 +43,7 @@ export default function ZegoCallInvitationRoom(props) {
     }
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();
-    navigation.navigate('HomePage');
+    navigation.navigate('UserPage');
   };
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function ZegoCallInvitationRoom(props) {
         // Invite a single
         if (invitees.length === 1) {
           CallInviteStateManage.initInviteData();
-          navigation.navigate('HomePage');
+          navigation.navigate('UserPage');
         }
         config.onOnlySelfInRoom();
       }
@@ -69,7 +69,7 @@ export default function ZegoCallInvitationRoom(props) {
         zloginfo('Invite completed with nobody');
         BellManage.stopOutgoingSound();
         CallInviteStateManage.initInviteData();
-        navigation.navigate('HomePage');
+        navigation.navigate('UserPage');
       });
     }
     return () => {
