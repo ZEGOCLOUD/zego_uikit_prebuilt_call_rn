@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import ZegoUIKitPrebuiltCallInvitation, {
+import ZegoUIKitPrebuiltCallWithInvitation, {
   ZegoStartCallInvitationButton,
   ZegoInvitationType,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
@@ -21,7 +21,7 @@ import {
 const userID = String(Math.floor(Math.random() * 10000));
 const userName = `user_${userID}`;
 
-export default function CallInvitationPage(props) {
+export default function CallWithInvitationPage(props) {
   const [invitees, setInvitees] = useState([]);
   const viewRef = useRef(null);
   const pressHandle = () => {
@@ -31,7 +31,7 @@ export default function CallInvitationPage(props) {
     setInvitees(value ? value.split(',') : []);
   };
   return (
-    <ZegoUIKitPrebuiltCallInvitation
+    <ZegoUIKitPrebuiltCallWithInvitation
       appID={KeyCenter.appID}
       appSign={KeyCenter.appSign}
       userID={userID}
@@ -97,7 +97,7 @@ export default function CallInvitationPage(props) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </ZegoUIKitPrebuiltCallInvitation>
+    </ZegoUIKitPrebuiltCallWithInvitation>
   );
 }
 

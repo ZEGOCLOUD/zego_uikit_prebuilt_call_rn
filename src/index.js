@@ -1,5 +1,5 @@
 import ZegoUIKitPrebuiltCall from './call';
-import ZegoUIKitPrebuiltCallInvitation from './call_invitation';
+import ZegoUIKitPrebuiltCallWithInvitation from './call_invitation';
 import { ZegoInvitationType } from './call_invitation/services/defines';
 import ZegoMenuBarButtonName from './call/ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './call/ZegoMenuBarStyle';
@@ -99,7 +99,7 @@ const GROUP_VOICE_CALL_CONFIG = {
   },
 };
 
-export default ZegoUIKitPrebuiltCallInvitation;
+export default ZegoUIKitPrebuiltCallWithInvitation;
 
 export {
   ZegoUIKitPrebuiltCall,
