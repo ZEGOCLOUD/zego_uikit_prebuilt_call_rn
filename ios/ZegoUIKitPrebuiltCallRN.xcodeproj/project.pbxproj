@@ -25,6 +25,8 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libZegoUikitRn.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZegoUikitRn.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3E7B5891CC2AC0600A0062D /* ZegoUIKitPrebuiltCallRN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZegoUIKitPrebuiltCallRN.m; sourceTree = "<group>"; };
+		EB37F4932927A11100D73CFD /* zego_outgoing.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = zego_outgoing.mp3; path = ../android/app/src/main/res/raw/zego_outgoing.mp3; sourceTree = "<group>"; };
+		EB37F4942927A11100D73CFD /* zego_incoming.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = zego_incoming.mp3; path = ../android/app/src/main/res/raw/zego_incoming.mp3; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZegoUIKitRN-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* ZegoUIKitPrebuiltCallRN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZegoUIKitPrebuiltCallRN.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -51,6 +53,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				EB37F4942927A11100D73CFD /* zego_incoming.mp3 */,
+				EB37F4932927A11100D73CFD /* zego_outgoing.mp3 */,
 				F4FF95D6245B92E800C19C63 /* ZegoUIKitPrebuiltCallRN.swift */,
 				B3E7B5891CC2AC0600A0062D /* ZegoUIKitPrebuiltCallRN.m */,
 				F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */,
