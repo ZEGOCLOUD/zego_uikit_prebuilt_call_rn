@@ -5,7 +5,6 @@
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "react-native": "src/index",
-  "source": "src/index",
   "files": [
     "lib",
     "android",
