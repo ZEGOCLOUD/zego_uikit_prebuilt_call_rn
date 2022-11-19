@@ -20,7 +20,10 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     onRequireNewToken,
     requireConfig,
     plugins,
-    ringtoneConfig = {},
+    ringtoneConfig = {
+      incomingCallFileName: 'zego_incoming.mp3',
+      outgoingCallFileName: 'zego_outgoing.mp3',
+    },
   } = props;
   const [isInit, setIsInit] = useState(false);
 
