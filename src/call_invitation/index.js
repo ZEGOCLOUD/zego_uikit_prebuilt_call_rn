@@ -20,6 +20,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     onRequireNewToken,
     requireConfig,
     plugins,
+    ringtoneConfig = {},
   } = props;
   const [isInit, setIsInit] = useState(false);
 
@@ -40,6 +41,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
       () => {
         setIsInit(true);
         CallInviteStateManage.init();
+        BellManage.initRingtoneConfig(ringtoneConfig);
         BellManage.initIncomingSound();
         BellManage.initOutgoingSound();
       }

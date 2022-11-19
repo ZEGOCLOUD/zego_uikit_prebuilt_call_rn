@@ -1,5 +1,6 @@
 import React, {useState, useRef} from 'react';
-import ZegoUIKitPrebuiltCallWithInvitation, {
+import {
+  ZegoUIKitPrebuiltCallWithInvitation,
   ZegoStartCallInvitationButton,
   ZegoInvitationType,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
@@ -36,6 +37,10 @@ export default function CallWithInvitationPage(props) {
       appSign={KeyCenter.appSign}
       userID={userID}
       userName={userName}
+      ringtoneConfig={{
+        incomingCallFileName: 'zego_incoming.mp3',
+        outgoingCallFileName: 'zego_outgoing.mp3',
+      }}
       requireConfig={data => {
         console.warn('requireConfig', data);
         const config =

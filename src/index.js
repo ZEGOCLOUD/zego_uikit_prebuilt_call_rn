@@ -99,10 +99,10 @@ const GROUP_VOICE_CALL_CONFIG = {
   },
 };
 
-export default ZegoUIKitPrebuiltCallWithInvitation;
+export default ZegoUIKitPrebuiltCall;
 
 export {
-  ZegoUIKitPrebuiltCall,
+  ZegoUIKitPrebuiltCallWithInvitation,
   ZegoMenuBarButtonName,
   ZegoMenuBarStyle,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,

@@ -5,6 +5,8 @@ import { Vibration } from 'react-native';
 // console.warn('Vibration', Vibration);
 
 const BellManage = {
+  _incomingCallFileName: '',
+  _outgoingCallFileName: '',
   _whooshIncoming: null,
   _whooshOutgoing: null,
   vibrate: () => {
@@ -13,11 +15,15 @@ const BellManage = {
   cancleVirate: () => {
     Vibration.cancel();
   },
+  initRingtoneConfig: (ringtoneConfig) => {
+    BellManage._incomingCallFileName = ringtoneConfig.incomingCallFileName;
+    BellManage._outgoingCallFileName = ringtoneConfig.outgoingCallFileName;
+  },
   initIncomingSound: () => {
     Sound.setCategory('Playback');
     return new Promise((resolve, reject) => {
       BellManage._whooshIncoming = new Sound(
-        'zego_incoming.mp3',
+        BellManage._incomingCallFileName,
         Sound.MAIN_BUNDLE,
         (error) => {
           if (error) {
@@ -35,7 +41,7 @@ const BellManage = {
   initOutgoingSound: () => {
     return new Promise((resolve, reject) => {
       BellManage._whooshOutgoing = new Sound(
-        'zego_outgoing.mp3',
+        BellManage._outgoingCallFileName,
         Sound.MAIN_BUNDLE,
         (error) => {
           if (error) {
