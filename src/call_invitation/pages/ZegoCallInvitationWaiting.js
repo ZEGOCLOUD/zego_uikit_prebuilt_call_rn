@@ -3,7 +3,6 @@ import { StyleSheet, View, Platform, PermissionsAndroid } from 'react-native';
 import ZegoUIKit, {
   ZegoAudioVideoView,
   ZegoSwitchCameraButton,
-  ZegoUIKitInvitationService,
 } from '@zegocloud/zego-uikit-rn';
 import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 import BellManage from '../services/bell';
@@ -70,7 +69,7 @@ export default function ZegoCallInvitationWaiting(props) {
   const hangUpHandle = () => {
     zloginfo('Leave room on waiting page');
     if (CallInviteStateManage.isAutoCancelInvite(callID)) {
-      ZegoUIKitInvitationService.cancelInvitation(invitees);
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
       CallInviteStateManage.updateInviteDataAfterCancel(callID);
     }
     BellManage.stopOutgoingSound();
@@ -101,19 +100,19 @@ export default function ZegoCallInvitationWaiting(props) {
     const callbackID =
       'ZegoCallInvitationWaiting' + String(Math.floor(Math.random() * 10000));
     ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
-    ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID, () => {
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
       BellManage.stopOutgoingSound();
       ZegoUIKit.leaveRoom();
       CallInviteStateManage.initInviteData();
       navigation.goBack();
     });
-    ZegoUIKitInvitationService.onInvitationRefused(callbackID, () => {
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, () => {
       BellManage.stopOutgoingSound();
       ZegoUIKit.leaveRoom();
       CallInviteStateManage.initInviteData();
       navigation.goBack();
     });
-    ZegoUIKitInvitationService.onInvitationAccepted(
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       callbackID,
       ({ invitee, data }) => {
         zloginfo('Jump to call room page.');
@@ -131,9 +130,9 @@ export default function ZegoCallInvitationWaiting(props) {
     );
     return () => {
       ZegoUIKit.onRequireNewToken(callbackID);
-      ZegoUIKitInvitationService.onInvitationResponseTimeout(callbackID);
-      ZegoUIKitInvitationService.onInvitationRefused(callbackID);
-      ZegoUIKitInvitationService.onInvitationAccepted(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

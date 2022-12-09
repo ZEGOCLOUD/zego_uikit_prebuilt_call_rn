@@ -1,6 +1,5 @@
 import ZegoUIKit, {
   ZegoUIKitPluginType,
-  ZegoUIKitInvitationService,
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from '../../utils/logger';
@@ -28,8 +27,8 @@ const ZegoPrebuiltPlugins = {
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
     _install(plugins);
-    ZegoUIKitInvitationService.init(appID, appSign);
-    ZegoUIKitInvitationService.onConnectionStateChanged(
+    ZegoUIKit.getSignalingPlugin().init(appID, appSign);
+    ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(
       callbackID,
       ({ state }) => {
         _pluginConnectionState = state;
@@ -39,7 +38,7 @@ const ZegoPrebuiltPlugins = {
     _appInfo.appSign = appSign;
     _localUser.userID = userID;
     _localUser.userName = userName;
-    return ZegoUIKitInvitationService.login(userID, userName).then(() => {
+    return ZegoUIKit.getSignalingPlugin().login(userID, userName).then(() => {
       zloginfo('[Plugins] login success.');
     });
   },
@@ -50,9 +49,9 @@ const ZegoPrebuiltPlugins = {
       ZegoInvitationConnectionState.disconnected
     );
     if (_pluginConnectionState === ZegoInvitationConnectionState.disconnected) {
-      ZegoUIKitInvitationService.logout.then(() => {
+      ZegoUIKit.getSignalingPlugin().logout.then(() => {
         zloginfo('[Plugins] auto logout success.');
-        ZegoUIKitInvitationService.login(
+        ZegoUIKit.getSignalingPlugin().login(
           _localUser.userID,
           _localUser.userName
         ).then(() => {
@@ -62,8 +61,8 @@ const ZegoPrebuiltPlugins = {
     }
   },
   uninit: () => {
-    ZegoUIKitInvitationService.logout();
-    ZegoUIKitInvitationService.uninit();
+    ZegoUIKit.getSignalingPlugin().logout();
+    ZegoUIKit.getSignalingPlugin().uninit();
   },
   getLocalUser: () => {
     return _localUser;

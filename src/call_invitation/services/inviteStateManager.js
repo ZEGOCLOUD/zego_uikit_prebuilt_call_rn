@@ -1,4 +1,4 @@
-import { ZegoUIKitInvitationService } from '@zegocloud/zego-uikit-rn';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './plugins';
 import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
 
@@ -63,7 +63,7 @@ const CallInviteStateManage = {
     zloginfo('[CallInviteStateManage]registerCallback success');
     CallInviteStateManage._callbackID =
       'CallInviteStateManage' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInvitationService.onInvitationResponseTimeout(
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(
       CallInviteStateManage._callbackID,
       ({ callID, invitees, data }) => {
         // update _callIDMap
@@ -80,7 +80,7 @@ const CallInviteStateManage = {
         }
       }
     );
-    ZegoUIKitInvitationService.onInvitationRefused(
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(
       CallInviteStateManage._callbackID,
       ({ callID, invitee, data }) => {
         // update _callIDMap
@@ -95,7 +95,7 @@ const CallInviteStateManage = {
         }
       }
     );
-    ZegoUIKitInvitationService.onInvitationAccepted(
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       CallInviteStateManage._callbackID,
       ({ callID, invitee, data }) => {
         // update _callIDMap
@@ -120,7 +120,7 @@ const CallInviteStateManage = {
         }
       }
     );
-    ZegoUIKitInvitationService.onInvitationReceived(
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(
       CallInviteStateManage._callbackID,
       ({ callID, type, inviter, data }) => {
         data = JSON.parse(data);
@@ -137,14 +137,14 @@ const CallInviteStateManage = {
         }
       }
     );
-    ZegoUIKitInvitationService.onInvitationCanceled(
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(
       CallInviteStateManage._callbackID,
       ({ callID, inviter, data }) => {
         // update _callIDMap
         CallInviteStateManage._callIDMap.delete(callID);
       }
     );
-    ZegoUIKitInvitationService.onInvitationTimeout(
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(
       CallInviteStateManage._callbackID,
       ({ callID, inviter, data }) => {
         // update _callIDMap
@@ -159,22 +159,22 @@ const CallInviteStateManage = {
     );
   },
   unRegisterCallback: () => {
-    ZegoUIKitInvitationService.onInvitationResponseTimeout(
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(
       CallInviteStateManage._callbackID
     );
-    ZegoUIKitInvitationService.onInvitationRefused(
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(
       CallInviteStateManage._callbackID
     );
-    ZegoUIKitInvitationService.onInvitationAccepted(
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       CallInviteStateManage._callbackID
     );
-    ZegoUIKitInvitationService.onInvitationReceived(
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(
       CallInviteStateManage._callbackID
     );
-    ZegoUIKitInvitationService.onInvitationCanceled(
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(
       CallInviteStateManage._callbackID
     );
-    ZegoUIKitInvitationService.onInvitationTimeout(
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(
       CallInviteStateManage._callbackID
     );
   },

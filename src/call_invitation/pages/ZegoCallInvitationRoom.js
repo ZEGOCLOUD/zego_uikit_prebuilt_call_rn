@@ -4,9 +4,7 @@ import { ZegoInvitationType } from '../services/defines';
 import BellManage from '../services/bell';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
-import ZegoUIKit, {
-  ZegoUIKitInvitationService,
-} from '@zegocloud/zego-uikit-rn';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoCallInvitationRoom(props) {
   const { route, navigation } = props;
@@ -38,7 +36,7 @@ export default function ZegoCallInvitationRoom(props) {
       inviter === userID &&
       CallInviteStateManage.isAutoCancelInvite(callID)
     ) {
-      ZegoUIKitInvitationService.cancelInvitation(invitees);
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
       CallInviteStateManage.updateInviteDataAfterCancel(callID);
     }
     BellManage.stopOutgoingSound();

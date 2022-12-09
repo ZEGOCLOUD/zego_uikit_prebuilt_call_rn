@@ -7,7 +7,6 @@ import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
 
 import ZegoUIKit, {
-  ZegoUIKitInvitationService,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
 } from '@zegocloud/zego-uikit-rn';
@@ -71,7 +70,7 @@ export default function ZegoCallInvitationDialog(props) {
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInvitationService.onInvitationReceived(
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(
       callbackID,
       ({ callID: resCallID, type, inviter, data }) => {
         const onCall = CallInviteStateManage.isOncall(resCallID);
@@ -81,7 +80,7 @@ export default function ZegoCallInvitationDialog(props) {
             `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
           );
           // Automatically declining invitations
-          ZegoUIKitInvitationService.refuseInvitation(
+          ZegoUIKit.getSignalingPlugin().refuseInvitation(
             inviter.id,
             JSON.stringify({
               callID: resCallID,
@@ -99,22 +98,22 @@ export default function ZegoCallInvitationDialog(props) {
         }
       }
     );
-    ZegoUIKitInvitationService.onInvitationTimeout(callbackID, () => {
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, () => {
       BellManage.stopIncomingSound();
       BellManage.cancleVirate();
       setIsDialogVisable(false);
       setIsFullScreen(false);
     });
-    ZegoUIKitInvitationService.onInvitationCanceled(callbackID, () => {
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, () => {
       BellManage.stopIncomingSound();
       BellManage.cancleVirate();
       setIsDialogVisable(false);
       setIsFullScreen(false);
     });
     return () => {
-      ZegoUIKitInvitationService.onInvitationReceived(callbackID);
-      ZegoUIKitInvitationService.onInvitationTimeout(callbackID);
-      ZegoUIKitInvitationService.onInvitationCanceled(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
       BellManage.stopIncomingSound();
       BellManage.cancleVirate();
     };
