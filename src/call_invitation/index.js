@@ -8,6 +8,7 @@ import CallInviteStateManage from '../call_invitation/services/inviteStateManage
 import BellManage from '../call_invitation/services/bell';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 const Stack = createNativeStackNavigator();
 
 export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
@@ -18,13 +19,18 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     userName,
     token,
     onRequireNewToken,
+    config = {}
+  } = props;
+  const {
     requireConfig,
     plugins,
     ringtoneConfig = {
       incomingCallFileName: 'zego_incoming.mp3',
       outgoingCallFileName: 'zego_outgoing.mp3',
     },
-  } = props;
+    showDeclineButton = true,
+    notifyWhenAppRunningInBackgroundOrQuit = true,
+  } = config
   const [isInit, setIsInit] = useState(false);
 
   const handleAppStateChange = (nextAppState) => {
@@ -49,6 +55,10 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
         BellManage.initOutgoingSound();
       }
     );
+
+    // Enable offline notification
+    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit);
+
     return () => {
       BellManage.releaseIncomingSound();
       BellManage.releaseOutgoingSound();

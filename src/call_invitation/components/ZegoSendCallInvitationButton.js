@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { zloginfo } from '../../utils/logger';
 import CallInviteStateManage from '../services/inviteStateManager';
 
-export default function ZegoStartCallInvitationButton(props) {
+export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
   const {
     icon,
@@ -16,6 +16,9 @@ export default function ZegoStartCallInvitationButton(props) {
     isVideoCall = false,
     timeout = 60,
     onPressed,
+    resourcesID: _resourcesID = '',
+    notificationTitle: _notificationTitle,
+    notificationMessage: _notificationMessage
   } = props;
   const localUser = ZegoPrebuiltPlugins.getLocalUser();
   const roomID = `call_${localUser.userID}_${Date.now()}`;
@@ -61,6 +64,32 @@ export default function ZegoStartCallInvitationButton(props) {
       onPressed();
     }
   };
+  const getNotificationTitle = () => {
+    if (_notificationTitle) {
+      return _notificationTitle
+    } else {
+      return localUser.userName;
+    }
+  }
+  const getNotificationMessage = () => {
+    if (_notificationMessage) {
+      return _notificationMessage;
+    } else {
+      if (isVideoCall) {
+        if (invitees.length > 1) {
+          return 'Incoming group video call...'
+        } else {
+          return 'Incoming video call...'
+        }
+      } else {
+        if (invitees.length > 1) {
+          return 'Incoming group voice call...'
+        } else {
+          return 'Incoming voice call...'
+        }
+      }
+    }
+  }
   return (
     <View style={styles.container}>
       <ZegoStartInvitationButton
@@ -75,6 +104,9 @@ export default function ZegoStartCallInvitationButton(props) {
         data={data}
         timeout={timeout}
         onPressed={onPress}
+        resourcesID={_resourcesID}
+        notificationTitle={getNotificationTitle()}
+        notificationMessage={getNotificationMessage()}
       />
     </View>
   );

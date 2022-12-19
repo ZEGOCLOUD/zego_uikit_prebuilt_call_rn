@@ -1,4 +1,4 @@
-package com.zegocloud.uikit.rn.zegoprebuiltcall;
+package com.zegocloud.zegouikit.example.prebuiltcall;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

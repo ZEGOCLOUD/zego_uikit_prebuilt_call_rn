@@ -1,4 +1,6 @@
 apply plugin: "com.android.application"
+// ZIM 文档少了下面一行
+apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -135,7 +137,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.zegocloud.uikit.rn.zegoprebuiltcall"
+        applicationId "com.zegocloud.zegouikit.example.prebuiltcall"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -260,6 +262,14 @@ android {
 }
 
 dependencies {
+        // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:29.3.1')
+
+    // Add the dependency for the Firebase SDK for Google Analytics
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-messaging:21.1.0'
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //noinspection GradleDynamicVersion
