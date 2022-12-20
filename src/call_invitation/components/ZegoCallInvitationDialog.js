@@ -5,6 +5,7 @@ import { ZegoInvitationType } from '../services/defines';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
+import InnerTextHelper from '../services/inner_text_helper'
 
 import ZegoUIKit, {
   ZegoAcceptInvitationButton,
@@ -16,14 +17,17 @@ export default function ZegoCallInvitationDialog(props) {
   const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [inviteType, setInviteType] = useState(ZegoInvitationType.voiceCall);
-  const [inviterData, setInviterData] = useState({});
+  const [inviter, setInviter] = useState({});
   const [extendData, setExtendData] = useState({});
   const [callID, setCallID] = useState('');
 
-  const getCallTitle = () => {
-    return inviteType === ZegoInvitationType.voiceCall
-      ? 'ZEGO Voice Call'
-      : 'ZEGO Video Call';
+  const getDialogTitle = () => {
+    const count = extendData.invitees ? extendData.invitees.length : 0;
+    return InnerTextHelper.instance().getIncomingCallDialogTitle(inviter.name, inviteType, count);
+  }
+  const getDialogMessage = () => {
+    const count = extendData.invitees ? extendData.invitees.length : 0;
+    return InnerTextHelper.instance().getIncomingCallDialogMessage(inviteType, count)
   };
   const getShotName = (name) => {
     if (!name) {
@@ -60,7 +64,7 @@ export default function ZegoCallInvitationDialog(props) {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
       invitees: extendData.invitees,
-      inviter: inviterData.id,
+      inviter: inviter.id,
     });
   };
   const pressHandle = () => {
@@ -90,7 +94,7 @@ export default function ZegoCallInvitationDialog(props) {
         } else {
           setCallID(resCallID);
           setInviteType(type);
-          setInviterData(inviter);
+          setInviter(inviter);
           setExtendData(JSON.parse(data));
           setIsDialogVisable(true);
           BellManage.playIncomingSound();
@@ -134,25 +138,25 @@ export default function ZegoCallInvitationDialog(props) {
               <View style={styles.left}>
                 <View style={styles.avatar}>
                   <Text style={styles.nameLabel}>
-                    {getShotName(inviterData.name)}
+                    {getShotName(inviter.name)}
                   </Text>
                 </View>
                 <View>
-                  <Text style={styles.callName}>{inviterData.name}</Text>
-                  <Text style={styles.callTitle}>{getCallTitle()}</Text>
+                  <Text style={styles.callName}>{getDialogTitle()}</Text>
+                  <Text style={styles.callTitle}>{getDialogMessage()}</Text>
                 </View>
               </View>
               <View style={styles.right}>
                 <View style={styles.refuse}>
                   <ZegoRefuseInvitationButton
-                    inviterID={inviterData.id}
+                    inviterID={inviter.id}
                     onPressed={refuseHandle}
                   />
                 </View>
                 <View style={styles.accept}>
                   <ZegoAcceptInvitationButton
                     icon={getImageSourceByPath()}
-                    inviterID={inviterData.id}
+                    inviterID={inviter.id}
                     onPressed={acceptHandle}
                   />
                 </View>
@@ -164,16 +168,16 @@ export default function ZegoCallInvitationDialog(props) {
             <View style={styles.content}>
               <View style={styles.fullAvatar}>
                 <Text style={styles.fullNameLabel}>
-                  {getShotName(inviterData.name)}
+                  {getShotName(inviter.name)}
                 </Text>
               </View>
-              <Text style={styles.fullCallName}>{inviterData.name}</Text>
+              <Text style={styles.fullCallName}>{inviter.name}</Text>
               <Text style={styles.calling}>Calling...</Text>
             </View>
             <View style={styles.bottomBarContainer}>
               <View style={styles.fullRefuse}>
                 <ZegoRefuseInvitationButton
-                  inviterID={inviterData.id}
+                  inviterID={inviter.id}
                   onPressed={refuseHandle}
                 />
                 <Text style={styles.fullRefuseTitle}>Decline</Text>
@@ -181,7 +185,7 @@ export default function ZegoCallInvitationDialog(props) {
               <View style={styles.fullAccept}>
                 <ZegoAcceptInvitationButton
                   icon={getImageSourceByPath()}
-                  inviterID={inviterData.id}
+                  inviterID={inviter.id}
                   onPressed={acceptHandle}
                 />
                 <Text style={styles.fullAcceptTitle}>Accept</Text>

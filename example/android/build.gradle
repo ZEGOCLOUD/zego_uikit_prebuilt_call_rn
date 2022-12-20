@@ -33,6 +33,10 @@ buildscript {
 
 allprojects {
     repositories {
+        // // ADD THIS BLOCK - this is how Notifee finds its Android library:
+        // maven {
+        //   url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+        // }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url("$rootDir/../node_modules/react-native/android")

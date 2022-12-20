@@ -11,6 +11,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@notifee/react-native": "5.3.0",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.5",
     "@zegocloud/zego-uikit-prebuilt-call-rn": "link: ../",
