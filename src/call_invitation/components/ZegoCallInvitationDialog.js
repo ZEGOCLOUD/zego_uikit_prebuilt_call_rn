@@ -60,7 +60,7 @@ export default function ZegoCallInvitationDialog(props) {
     BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
-    navigation.navigate('RoomPage', {
+    navigation.navigate('ZegoCallInvitationRoomPage', {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
       invitees: extendData.invitees,
@@ -172,7 +172,7 @@ export default function ZegoCallInvitationDialog(props) {
                 </Text>
               </View>
               <Text style={styles.fullCallName}>{inviter.name}</Text>
-              <Text style={styles.calling}>Calling...</Text>
+              <Text style={styles.calling}>{getDialogMessage()}</Text>
             </View>
             <View style={styles.bottomBarContainer}>
               <View style={styles.fullRefuse}>
@@ -180,7 +180,7 @@ export default function ZegoCallInvitationDialog(props) {
                   inviterID={inviter.id}
                   onPressed={refuseHandle}
                 />
-                <Text style={styles.fullRefuseTitle}>Decline</Text>
+                <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
               </View>
               <View style={styles.fullAccept}>
                 <ZegoAcceptInvitationButton
@@ -188,7 +188,7 @@ export default function ZegoCallInvitationDialog(props) {
                   inviterID={inviter.id}
                   onPressed={acceptHandle}
                 />
-                <Text style={styles.fullAcceptTitle}>Accept</Text>
+                <Text style={styles.fullAcceptTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton}</Text>
               </View>
             </View>
           </View>

@@ -13,7 +13,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 
 notifee.createChannel({
-  id: 'callinvite',
+  id: 'zego_uikit_prebuilt_callinvite',
   name: 'Call Invite',
   badge: false,
   vibration: false,
@@ -131,7 +131,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           />
           <Stack.Screen
             options={{ headerShown: false }}
-            name="CallPage"
+            name='ZegoCallInvitationWaitingPage'
             component={ZegoCallInvitationWaiting}
             initialParams={{
               appID,
@@ -144,7 +144,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           />
           <Stack.Screen
             options={{ headerShown: false }}
-            name="RoomPage"
+            name='ZegoCallInvitationRoomPage'
             component={ZegoCallInvitationRoom}
             initialParams={{
               appID,

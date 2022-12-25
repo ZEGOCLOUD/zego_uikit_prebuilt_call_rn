@@ -88,7 +88,8 @@ export default class ZegoPluginInvitationService {
 
   }
   sendInvitation(inviterName, invitees, timeout, type, data, notificationConfig) {
-    invitees = invitees.map((invitee) => invitee);
+    
+    // invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
       zlogerror('[Service]Send invitees is empty.');
       return Promise.reject(new ZegoPluginResult());
@@ -99,6 +100,7 @@ export default class ZegoPluginInvitationService {
       type,
       data,
     });
+    
     if (this._notifyWhenAppRunningInBackgroundOrQuit) {
       config.pushConfig = {
         title: notificationConfig.title ?? "",

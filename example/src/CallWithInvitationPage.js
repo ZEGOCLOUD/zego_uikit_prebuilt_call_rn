@@ -35,9 +35,9 @@ function getCallID(message) {
 
 var userID = String(Math.floor(Math.random() * 10000));
 if (Platform.OS === "ios") {
-  userID = "365"
+  userID = "654"
 } else {
-  userID = "12333"
+  userID = "321"
 }
 const userName = `user_${userID}`;
 
@@ -117,12 +117,16 @@ export default function CallWithInvitationPage(props) {
               placeholder="Invitees ID, Separate ids by ','"
             />
             <ZegoSendCallInvitationButton
-              invitees={invitees}
+              invitees={invitees.map((inviteeID) => {
+                return { userID: inviteeID, userName: 'user_' + inviteeID };
+              })}
               isVideoCall={false}
               resourcesID={"zegouikit_call"}
             />
             <ZegoSendCallInvitationButton
-              invitees={invitees}
+              invitees={invitees.map((inviteeID) => {
+                return { userID: inviteeID, userName: 'user_' + inviteeID };
+              })}
               isVideoCall={true}
               resourcesID={"zegouikit_call"}
             />

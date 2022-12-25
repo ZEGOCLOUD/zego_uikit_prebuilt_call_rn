@@ -8,6 +8,7 @@ export default class InnerTextHelper {
     static instance() {
         if (InnerTextHelper._innerTextHelper == null) {
             InnerTextHelper._innerTextHelper = new InnerTextHelper()
+            this._innerTextHelper.init({})
         }
         return this._innerTextHelper;
     }
@@ -68,6 +69,41 @@ export default class InnerTextHelper {
     }
     uninit() {
         this._innerText = {}
+    }
+    getInnerText() {
+        return this._innerText;
+    }
+    getOutgoingCallPageTitle(inviteeName, type) {
+        return inviteeName
+        var title = "%0"
+
+        title = type == ZegoInvitationType.videoCall ? this._innerText.outgoingVideoCallPageTitle : this._innerText.outgoingVoiceCallPageTitle;
+
+        return title.replace("%0", inviteeName)
+    }
+    getOutgoingCallPageMessage(type) {
+        return type == ZegoInvitationType.videoCall ? this._innerText.outgoingVideoCallPageMessage : this._innerText.outgoingVoiceCallPageMessage;
+    }
+    getIncomingCallPageTitle(inviterName, type, count) {
+        var title = "%0";
+
+        if (type == ZegoInvitationType.videoCall) {
+            title = count > 1 ? this._innerText.incomingGroupVideoCallPageTitle : this._innerText.incomingVideoCallPageTitle;
+        } else {
+            title = count > 1 ? this._innerText.incomingGroupVoiceCallPageTitle : this._innerText.incomingVoiceCallPageTitle;
+        }
+
+        return title.replace("%0", inviterName)
+    }
+    getIncomingCallPageMessage(type, count) {
+        var message = "";
+
+        if (type == ZegoInvitationType.videoCall) {
+            message = count > 1 ? this._innerText.incomingGroupVideoCallPageMessage : this._innerText.incomingVideoCallPageMessage
+        } else {
+            message = count > 1 ? this._innerText.incomingGroupVoiceCallPageMessage : this._innerText.incomingVoiceCallPageMessage
+        }
+        return message;
     }
     getIncomingCallDialogTitle(inviterName, type, count) {
         var title = "%0";

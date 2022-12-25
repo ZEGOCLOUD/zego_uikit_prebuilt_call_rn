@@ -134,7 +134,7 @@ const CallInviteStateManage = {
           CallInviteStateManage.addInviteData(
             callID,
             inviter.id,
-            data.invitees.map((invitee) => invitee.user_id)
+            data.invitees.map((invitee) => invitee.userID)
           );
           // notify
           Array.from(
