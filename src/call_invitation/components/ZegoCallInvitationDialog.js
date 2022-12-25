@@ -13,6 +13,8 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoCallInvitationDialog(props) {
+  const { showDeclineButton = true } = props;
+
   const navigation = useNavigation();
   const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -147,12 +149,14 @@ export default function ZegoCallInvitationDialog(props) {
                 </View>
               </View>
               <View style={styles.right}>
-                <View style={styles.refuse}>
-                  <ZegoRefuseInvitationButton
-                    inviterID={inviter.id}
-                    onPressed={refuseHandle}
-                  />
-                </View>
+                {
+                  showDeclineButton ? <View style={styles.refuse}>
+                    <ZegoRefuseInvitationButton
+                      inviterID={inviter.id}
+                      onPressed={refuseHandle}
+                    />
+                  </View> : null
+                }
                 <View style={styles.accept}>
                   <ZegoAcceptInvitationButton
                     icon={getImageSourceByPath()}
@@ -175,13 +179,16 @@ export default function ZegoCallInvitationDialog(props) {
               <Text style={styles.calling}>{getDialogMessage()}</Text>
             </View>
             <View style={styles.bottomBarContainer}>
-              <View style={styles.fullRefuse}>
-                <ZegoRefuseInvitationButton
-                  inviterID={inviter.id}
-                  onPressed={refuseHandle}
-                />
-                <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
-              </View>
+              {
+                showDeclineButton ? <View style={styles.fullRefuse}>
+                  <ZegoRefuseInvitationButton
+                    inviterID={inviter.id}
+                    onPressed={refuseHandle}
+                  />
+                  <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
+                </View> : null
+              }
+
               <View style={styles.fullAccept}>
                 <ZegoAcceptInvitationButton
                   icon={getImageSourceByPath()}

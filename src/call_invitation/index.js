@@ -121,7 +121,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   return (
     <View style={styles.container}>
       <NavigationContainer initialRouteName="UserPage">
-        {isInit ? <ZegoCallInvitationDialog /> : <View />}
+        {isInit ? <ZegoCallInvitationDialog showDeclineButton={showDeclineButton}/> : <View />}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}

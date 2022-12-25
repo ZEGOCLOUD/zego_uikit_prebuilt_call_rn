@@ -20,6 +20,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Platform,
+  Switch,
 } from 'react-native';
 
 
@@ -44,6 +45,8 @@ const userName = `user_${userID}`;
 export default function CallWithInvitationPage(props) {
   const [invitees, setInvitees] = useState([]);
   const [zpnState, setZpnState] = useState("")
+  const [showDeclineButton, setShowDeclineButton] = useState(true)
+
   const viewRef = useRef(null);
   const pressHandle = () => {
     viewRef.current.blur();
@@ -102,13 +105,24 @@ export default function CallWithInvitationPage(props) {
               });
             },
           };
-        }
+        },
+        showDeclineButton
       }}
     >
       <TouchableWithoutFeedback onPress={pressHandle}>
         <View style={styles.container}>
           <Text>ZPNs message: {zpnState}</Text>
           <Text>Your userID: {userID}</Text>
+          <Text>Your userName: user_{userID}</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={showDeclineButton ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={() => {
+              setShowDeclineButton(!showDeclineButton)
+            }}
+            value={showDeclineButton}
+          />
           <View style={styles.inputContainer}>
             <TextInput
               ref={viewRef}
