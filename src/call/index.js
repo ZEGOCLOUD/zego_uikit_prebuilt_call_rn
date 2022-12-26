@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
 import { StyleSheet, View } from 'react-native';
-import ZegoUIKit, { ZegoAudioVideoContainer } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
 import ZegoTopMenuBar from './ZegoTopMenuBar';
@@ -183,6 +183,21 @@ export default function ZegoUIKitPrebuiltCall(props) {
             }
         });
     }
+    const sortAudioVideo = (globalAudioVideoUserList) => {
+        if (layout.mode === ZegoLayoutMode.pictureInPicture) {
+            if (globalAudioVideoUserList.length > 1) {
+                const index = globalAudioVideoUserList.findIndex(user => user.userID === userID);
+                if (index !== -1) {
+                    const localUser = globalAudioVideoUserList.splice(index, 1)[0];
+                    globalAudioVideoUserList.splice(1, 0, localUser);
+                }
+            }
+            return globalAudioVideoUserList;
+        } else {
+            // Do not deal with
+            return globalAudioVideoUserList;
+        }
+    }
 
     useEffect(() => {
         const callbackID = 'ZegoUIKitPrebuiltCall' + String(Math.floor(Math.random() * 10000));
@@ -299,6 +314,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
                             showUserNameOnView={showUserNameOnView}
                         />
                     }
+                    sortAudioVideo={sortAudioVideo}
                 />
             </View>
             {isMenubarVisable ?
