@@ -35,9 +35,9 @@ export default function ZegoSendCallInvitationButton(props) {
   });
   const [forceRender, setForceRender] = useState(Date.now());
 
-  const onPress = ({ callID, invitees: successfulInvitees }) => {
+  const onPress = ({errorCode, errorMessage, errorInvitees, invitationID, invitees: successfulInvitees }) => {
     CallInviteStateManage.addInviteData(
-      callID,
+      invitationID,
       localUser.userID,
       successfulInvitees
     );
@@ -49,7 +49,7 @@ export default function ZegoSendCallInvitationButton(props) {
         isVideoCall,
         invitees,
         inviter: localUser.userID,
-        callID,
+        invitationID,
       });
     } else {
       // Jump to call room page
@@ -59,12 +59,12 @@ export default function ZegoSendCallInvitationButton(props) {
         isVideoCall,
         invitees: getInviteeIDList(),
         inviter: localUser.userID,
-        callID,
+        invitationID,
       });
     }
     setForceRender(Date.now());
     if (typeof onPressed === 'function') {
-      onPressed();
+      onPressed(errorCode, errorMessage, errorInvitees);
     }
   };
 

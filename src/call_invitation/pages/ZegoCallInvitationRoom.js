@@ -20,7 +20,7 @@ export default function ZegoCallInvitationRoom(props) {
     requireConfig,
     invitees,
     inviter,
-    callID,
+    invitationID,
   } = route.params;
   const callInvitationData = {
     type: isVideoCall
@@ -34,10 +34,10 @@ export default function ZegoCallInvitationRoom(props) {
     // Determine if the current is Inviter
     if (
       inviter === userID &&
-      CallInviteStateManage.isAutoCancelInvite(callID)
+      CallInviteStateManage.isAutoCancelInvite(invitationID)
     ) {
       ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
-      CallInviteStateManage.updateInviteDataAfterCancel(callID);
+      CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();

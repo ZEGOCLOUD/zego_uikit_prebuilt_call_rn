@@ -13,7 +13,11 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoCallInvitationDialog(props) {
-  const { showDeclineButton = true } = props;
+  const { 
+    showDeclineButton = true,
+    onIncomingCallDeclineButtonPressed,
+    onIncomingCallAcceptButtonPressed,
+  } = props;
 
   const navigation = useNavigation();
   const [isDialogVisable, setIsDialogVisable] = useState(false);
@@ -50,6 +54,9 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const refuseHandle = () => {
+    if (typeof onIncomingCallDeclineButtonPressed == 'function') {
+      onIncomingCallDeclineButtonPressed()
+    }
     CallInviteStateManage.updateInviteDataAfterRejected(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
@@ -57,6 +64,9 @@ export default function ZegoCallInvitationDialog(props) {
     setIsFullScreen(false);
   };
   const acceptHandle = () => {
+    if (typeof onIncomingCallAcceptButtonPressed == 'function') {
+      onIncomingCallAcceptButtonPressed()
+    }
     CallInviteStateManage.updateInviteDataAfterAccepted(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
@@ -90,6 +100,7 @@ export default function ZegoCallInvitationDialog(props) {
             inviter.id,
             JSON.stringify({
               callID: resCallID,
+              reason: 'busy'
             })
           );
           CallInviteStateManage.updateInviteDataAfterRejected(resCallID);

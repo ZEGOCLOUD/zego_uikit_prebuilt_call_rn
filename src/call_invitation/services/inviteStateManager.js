@@ -21,7 +21,6 @@ const CallInviteStateManage = {
   _callIDMap: new Map(), // callID -> state detail
   _onInviteCompletedWithNobodyMap: new Map(),
   _onSomeoneAcceptedInviteMap: new Map(),
-  _onInvitationReceivedMap: new Map(),
   _notifyInviteCompletedWithNobody: (callID) => {
     const stateDetails = CallInviteStateManage._callIDMap.get(callID);
     if (stateDetails) {
@@ -59,7 +58,6 @@ const CallInviteStateManage = {
     CallInviteStateManage._callIDMap.clear();
     CallInviteStateManage._onInviteCompletedWithNobodyMap.clear();
     CallInviteStateManage._onSomeoneAcceptedInviteMap.clear();
-    CallInviteStateManage._onInvitationReceivedMap.clear();
   },
   registerCallback: () => {
     zloginfo('[CallInviteStateManage]registerCallback success');
@@ -136,12 +134,6 @@ const CallInviteStateManage = {
             inviter.id,
             data.invitees.map((invitee) => invitee.userID)
           );
-          // notify
-          Array.from(
-            CallInviteStateManage._onInvitationReceivedMap.values()
-          ).forEach(callback => {
-            callback && callback(callID, type, inviter, data)
-          }) 
         }
       }
     );
@@ -288,18 +280,6 @@ const CallInviteStateManage = {
       }
     }
     return isOn;
-  },
-  onInvitationReceived: (callbackID, callback) => {
-    if (typeof callback !== 'function') {
-      if (callbackID in CallInviteStateManage._onInvitationReceivedMap) {
-        CallInviteStateManage._onInvitationReceivedMap.delete(callbackID);
-      }
-    } else {
-      CallInviteStateManage._onInvitationReceivedMap.set(
-        callbackID,
-        callback
-      );
-    }
   },
   onSomeoneAcceptedInvite: (callbackID, callback) => {
     if (typeof callback !== 'function') {

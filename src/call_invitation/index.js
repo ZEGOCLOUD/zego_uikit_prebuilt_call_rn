@@ -43,6 +43,17 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     innerText = {},
     showDeclineButton = true,
     notifyWhenAppRunningInBackgroundOrQuit = true,
+
+    onIncomingCallDeclineButtonPressed,
+    onIncomingCallAcceptButtonPressed,
+    onOutgoingCallCancelButtonPressed,
+    onIncomingCallReceived,
+    onIncomingCallCanceled,
+    onOutgoingCallAccepted,
+    onOutgoingCallRejected,
+    onOutgoingCallDeclined,
+    onIncomingCallTimeout,
+    onOutgoingCallTimeout
   } = config
 
   const [isInit, setIsInit] = useState(false);
@@ -80,6 +91,63 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
       },
     });
   }
+
+  const _registerCallback = (callbackID) => {
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, ({ callID, invitees, data }) => {
+      if (typeof onOutgoingCallTimeout == 'function') {
+        onOutgoingCallTimeout(callID, invitees)
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
+      const jsonData = data ? JSON.parse(data) : undefined;
+      if (jsonData && jsonData.reason == 'busy') {
+        if (typeof onOutgoingCallRejected == 'function') {
+          onOutgoingCallRejected(callID, invitee)
+        }
+      } else {
+        if (typeof onOutgoingCallDeclined == 'function') {
+          onOutgoingCallDeclined(callID, invitee)
+        }
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ callID, invitee, data }) => {
+      if (typeof onOutgoingCallAccepted == 'function') {
+        onOutgoingCallAccepted(callID, invitee)
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+      if (typeof onIncomingCallReceived == 'function') {
+        onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, data.invitees)
+
+        // Listen and show notification on background
+        showBackgroundNotification(inviter.name, type, data)
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
+      if (typeof onIncomingCallCanceled == 'function') {
+        onIncomingCallCanceled(callID, { userID: inviter.id, userName: inviter.name })
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {
+      if (typeof onIncomingCallTimeout == 'function') {
+        onIncomingCallTimeout(callID, { userID: inviter.id, userName: inviter.name })
+      }
+    }
+    );
+  }
+  const _unregisterCallback = (callbackID) => {
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
+  }
   useEffect(() => {
     // Init inner text helper
     InnerTextHelper.instance().init(innerText);
@@ -102,13 +170,12 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit);
 
 
-    // Listen and show notification on background
     const callbackID = 'ZegoUIKitPrebuiltCallWithInvitation ' + String(Math.floor(Math.random() * 10000));
-    CallInviteStateManage.onInvitationReceived(callbackID, (callID, type, inviter, data) => {
-      showBackgroundNotification(inviter.name, type, data)
-    })
+    _registerCallback(callbackID);
 
     return () => {
+      _unregisterCallback(callbackID);
+
       BellManage.releaseIncomingSound();
       BellManage.releaseOutgoingSound();
       CallInviteStateManage.uninit();
@@ -121,7 +188,11 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   return (
     <View style={styles.container}>
       <NavigationContainer initialRouteName="UserPage">
-        {isInit ? <ZegoCallInvitationDialog showDeclineButton={showDeclineButton}/> : <View />}
+        {isInit ? <ZegoCallInvitationDialog
+          showDeclineButton={showDeclineButton}
+          onIncomingCallDeclineButtonPressed={onIncomingCallDeclineButtonPressed}
+          onIncomingCallAcceptButtonPressed={onIncomingCallAcceptButtonPressed}
+        /> : <View />}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}
@@ -140,6 +211,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
               userName,
               token,
               onRequireNewToken,
+              onOutgoingCallCancelButtonPressed
             }}
           />
           <Stack.Screen
