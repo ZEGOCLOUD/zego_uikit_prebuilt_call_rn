@@ -86,8 +86,8 @@ const GROUP_VOICE_CALL_CONFIG = {
   },
   bottomMenuBarConfig: {
     buttons: [
-      ZegoMenuBarButtonName.hangUpButton,
       ZegoMenuBarButtonName.toggleMicrophoneButton,
+      ZegoMenuBarButtonName.hangUpButton,
       ZegoMenuBarButtonName.switchAudioOutputButton,
     ],
   },
