@@ -47,13 +47,13 @@ export default class ZegoPluginInvitationService {
     // return ZegoSignalingPluginCore.getInstance().logout();
   }
 
-  enableNotifyWhenAppRunningInBackgroundOrQuit(enable) {
+  enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment) {
     this._notifyWhenAppRunningInBackgroundOrQuit = enable;
 
     if (enable) {
       if (Platform.OS === 'ios') {
         ZPNs.getInstance().applyNotificationPermission();
-        ZPNs.enableDebug(true); // TODO
+        ZPNs.enableDebug(isIOSDevelopmentEnvironment);
         ZPNs.getInstance().registerPush();
       } else {
         ZPNs.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });

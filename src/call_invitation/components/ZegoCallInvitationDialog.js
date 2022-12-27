@@ -165,6 +165,11 @@ export default function ZegoCallInvitationDialog(props) {
                     <ZegoRefuseInvitationButton
                       inviterID={inviter.id}
                       onPressed={refuseHandle}
+                      data={JSON.stringify({
+                        inviterID: inviter.id,
+                        reason: 'decline',
+                        callID
+                      })}
                     />
                   </View> : null
                 }
@@ -195,6 +200,11 @@ export default function ZegoCallInvitationDialog(props) {
                   <ZegoRefuseInvitationButton
                     inviterID={inviter.id}
                     onPressed={refuseHandle}
+                    data={JSON.stringify({
+                      inviterID: inviter.id,
+                      reason: 'decline',
+                      callID
+                    })}
                   />
                   <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
                 </View> : null

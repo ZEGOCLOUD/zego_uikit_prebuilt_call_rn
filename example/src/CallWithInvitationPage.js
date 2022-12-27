@@ -22,30 +22,14 @@ import {
   Platform,
   Switch,
 } from 'react-native';
-
-
-function getZPNsMessagePayload(message) {
-  return message.extras['payload']
-}
-
-function getCallID(message) {
-  var payload = JSON.parse(message.extras['payload']);
-
-  return payload['call_id']
-}
-
-var userID = String(Math.floor(Math.random() * 10000));
-if (Platform.OS === "ios") {
-  userID = "654"
-} else {
-  userID = "321"
-}
-const userName = `user_${userID}`;
+import { getDeviceId, getFirstInstallTime } from 'react-native-device-info'
 
 export default function CallWithInvitationPage(props) {
   const [invitees, setInvitees] = useState([]);
   const [zpnState, setZpnState] = useState("")
   const [showDeclineButton, setShowDeclineButton] = useState(true)
+  const [userID, setUserID] = useState('')
+  const [userName, setUserName] = useState('')
 
   const viewRef = useRef(null);
   const pressHandle = () => {
@@ -55,8 +39,16 @@ export default function CallWithInvitationPage(props) {
     setInvitees(value ? value.split(',') : []);
   };
 
+  useEffect(() => {
+    getFirstInstallTime().then(firstInstallTime => {
+      const id = String(firstInstallTime).slice(-5);
+      setUserID(id)
+      setUserName('user_' + id)
+    })
+  }, [])
+
   return (
-    <ZegoUIKitPrebuiltCallWithInvitation
+    userName ? <ZegoUIKitPrebuiltCallWithInvitation
       appID={KeyCenter.appID}
       appSign={KeyCenter.appSign}
       userID={userID}
@@ -106,7 +98,8 @@ export default function CallWithInvitationPage(props) {
             },
           };
         },
-        showDeclineButton
+        showDeclineButton,
+        isIOSDevelopmentEnvironment: false,
       }}
     >
       <TouchableWithoutFeedback onPress={pressHandle}>
@@ -147,7 +140,7 @@ export default function CallWithInvitationPage(props) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </ZegoUIKitPrebuiltCallWithInvitation>
+    </ZegoUIKitPrebuiltCallWithInvitation> : null
   );
 }
 

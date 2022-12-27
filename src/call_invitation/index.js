@@ -43,6 +43,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     innerText = {},
     showDeclineButton = true,
     notifyWhenAppRunningInBackgroundOrQuit = true,
+    isIOSDevelopmentEnvironment = true,
 
     onIncomingCallDeclineButtonPressed,
     onIncomingCallAcceptButtonPressed,
@@ -119,11 +120,11 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     }
     );
     ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+      // Listen and show notification on background
+      showBackgroundNotification(inviter.name, type, data)
+
       if (typeof onIncomingCallReceived == 'function') {
         onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, data.invitees)
-
-        // Listen and show notification on background
-        showBackgroundNotification(inviter.name, type, data)
       }
     }
     );
@@ -167,7 +168,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     );
 
     // Enable offline notification
-    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit);
+    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSDevelopmentEnvironment);
 
 
     const callbackID = 'ZegoUIKitPrebuiltCallWithInvitation ' + String(Math.floor(Math.random() * 10000));

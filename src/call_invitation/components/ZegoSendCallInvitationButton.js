@@ -30,7 +30,9 @@ export default function ZegoSendCallInvitationButton(props) {
   const roomID = `call_${localUser.userID}_${Date.now()}`;
   const data = JSON.stringify({
     call_id: roomID,
-    invitees: getInviteeIDList(),
+    invitees: invitees.map(invitee => {
+      return {user_id: invitee.userID, user_name: invitee.userName}
+    }),
     custom_data: '',
   });
   const [forceRender, setForceRender] = useState(Date.now());
