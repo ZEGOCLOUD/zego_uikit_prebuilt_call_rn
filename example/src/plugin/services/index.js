@@ -105,7 +105,7 @@ export default class ZegoPluginInvitationService {
       config.pushConfig = {
         title: notificationConfig.title ?? "",
         content: notificationConfig.message ?? "",
-        resourcesID: notificationConfig.resourcesID ?? "",
+        resourcesID: notificationConfig.resourceID ?? "",
         payload: data
       };
     }

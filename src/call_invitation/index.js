@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AppState, StyleSheet, View } from 'react-native';
+import { AppState, Platform, StyleSheet, View } from 'react-native';
 import ZegoPrebuiltPlugins from './services/plugins';
 import ZegoCallInvitationDialog from './components/ZegoCallInvitationDialog';
 import ZegoCallInvitationWaiting from './pages/ZegoCallInvitationWaiting';
@@ -31,9 +31,6 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     userName,
     token,
     onRequireNewToken,
-    config = {}
-  } = props;
-  const {
     requireConfig,
     plugins,
     ringtoneConfig = {
@@ -55,7 +52,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     onOutgoingCallDeclined,
     onIncomingCallTimeout,
     onOutgoingCallTimeout
-  } = config
+  } = props;
 
   const [isInit, setIsInit] = useState(false);
 
@@ -70,7 +67,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   const showBackgroundNotification = async (inviterName, type, data) => {
     const count = data.invitees ? data.invitees.length : 0;
 
-    if (AppState.currentState != "background") {
+    if (AppState.currentState != "background" || Platform.OS == 'ios') {
       return;
     }
     notifee.displayNotification({
@@ -188,7 +185,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
 
   return (
     <View style={styles.container}>
-      <NavigationContainer initialRouteName="UserPage">
+      <NavigationContainer initialRouteName='ZegoInnerChildrenPage'>
         {isInit ? <ZegoCallInvitationDialog
           showDeclineButton={showDeclineButton}
           onIncomingCallDeclineButtonPressed={onIncomingCallDeclineButtonPressed}
@@ -198,7 +195,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           <Stack.Screen
             options={{ headerShown: false }}
             headerMode="none"
-            name="UserPage"
+            name='ZegoInnerChildrenPage'
             children={() => props.children}
           />
           <Stack.Screen

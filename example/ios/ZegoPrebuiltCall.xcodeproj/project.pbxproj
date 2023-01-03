@@ -13,7 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		44E033FAA1694F5DC436F9AF /* libPods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F248E7D6FA0CE12D072D160F /* libPods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		86449FAC29503A010012E9A0 /* zego_notification_incoming.caf in Resources */ = {isa = PBXBuildFile; fileRef = 86449FAB29503A010012E9A0 /* zego_notification_incoming.caf */; };
+		86960D2B295C3A3F00961DB7 /* zego_notification_incoming.caf in Resources */ = {isa = PBXBuildFile; fileRef = 86960D2A295C3A3F00961DB7 /* zego_notification_incoming.caf */; };
 		EB7826AC292228050070CB4B /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = EB7826AB292228050070CB4B /* bundle */; };
 		EBF7173729214D7D007F9A50 /* zego_outgoing.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = EBF7173529214D7D007F9A50 /* zego_outgoing.mp3 */; };
 		EBF7173829214D7D007F9A50 /* zego_incoming.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = EBF7173629214D7D007F9A50 /* zego_incoming.mp3 */; };
@@ -44,8 +44,8 @@
 		5709B34CF0A7D63546082F79 /* Pods-ZegoPrebuiltCall.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZegoPrebuiltCall.release.xcconfig"; path = "Target Support Files/Pods-ZegoPrebuiltCall/Pods-ZegoPrebuiltCall.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.debug.xcconfig"; path = "Target Support Files/Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests/Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ZegoPrebuiltCall/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		86449FAB29503A010012E9A0 /* zego_notification_incoming.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = zego_notification_incoming.caf; path = ../../android/app/src/main/res/raw/zego_notification_incoming.caf; sourceTree = "<group>"; };
 		867AE4D129431B950052D2E0 /* ZegoPrebuiltCall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ZegoPrebuiltCall.entitlements; path = ZegoPrebuiltCall/ZegoPrebuiltCall.entitlements; sourceTree = "<group>"; };
+		86960D2A295C3A3F00961DB7 /* zego_notification_incoming.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = zego_notification_incoming.caf; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.release.xcconfig"; path = "Target Support Files/Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests/Pods-ZegoPrebuiltCall-ZegoPrebuiltCallTests.release.xcconfig"; sourceTree = "<group>"; };
 		C897FAA2D52868839D19F3AE /* libPods-ZegoPrebuiltCall.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZegoPrebuiltCall.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB7826AB292228050070CB4B /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
@@ -126,7 +126,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				86449FAB29503A010012E9A0 /* zego_notification_incoming.caf */,
+				86960D2A295C3A3F00961DB7 /* zego_notification_incoming.caf */,
 				EB7826AB292228050070CB4B /* bundle */,
 				EBF7173629214D7D007F9A50 /* zego_incoming.mp3 */,
 				EBF7173529214D7D007F9A50 /* zego_outgoing.mp3 */,
@@ -256,7 +256,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86449FAC29503A010012E9A0 /* zego_notification_incoming.caf in Resources */,
+				86960D2B295C3A3F00961DB7 /* zego_notification_incoming.caf in Resources */,
 				EB7826AC292228050070CB4B /* bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				EBF7173729214D7D007F9A50 /* zego_outgoing.mp3 in Resources */,
@@ -503,7 +503,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZegoPrebuiltCall/ZegoPrebuiltCall.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82BHJ5H89;
+				DEVELOPMENT_TEAM = PN83KX5U85;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ZegoPrebuiltCall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -532,7 +532,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZegoPrebuiltCall/ZegoPrebuiltCall.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82BHJ5H89;
+				DEVELOPMENT_TEAM = PN83KX5U85;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ZegoPrebuiltCall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

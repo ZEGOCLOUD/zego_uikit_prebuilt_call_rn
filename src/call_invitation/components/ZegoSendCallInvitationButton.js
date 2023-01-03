@@ -17,7 +17,7 @@ export default function ZegoSendCallInvitationButton(props) {
     isVideoCall = false,
     timeout = 60,
     onPressed,
-    resourcesID: _resourcesID = ''
+    resourceID: _resourceID = ''
   } = props;
 
   const getInviteeIDList = () => {
@@ -84,7 +84,7 @@ export default function ZegoSendCallInvitationButton(props) {
         data={data}
         timeout={timeout}
         onPressed={onPress}
-        resourcesID={_resourcesID}
+        resourceID={_resourceID}
         notificationTitle={
           InnerTextHelper.instance().getIncomingCallDialogTitle(
             localUser.userName,

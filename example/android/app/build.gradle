@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-// ZIM 文档少了下面一行
+
 apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile

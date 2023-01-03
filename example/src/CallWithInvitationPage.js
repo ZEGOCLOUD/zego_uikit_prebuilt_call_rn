@@ -8,6 +8,7 @@ import {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
 // import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
 
 import ZegoUIKitSignalingPlugin from './plugin/index';
@@ -53,53 +54,32 @@ export default function CallWithInvitationPage(props) {
       appSign={KeyCenter.appSign}
       userID={userID}
       userName={userName}
-      config={{
-        ringtoneConfig: {
-          incomingCallFileName: 'zego_incoming.mp3',
-          outgoingCallFileName: 'zego_outgoing.mp3',
-        },
-        plugins: [ZegoUIKitSignalingPlugin],
-        requireConfig: (data) => {
-          console.warn('requireConfig', data);
-          const config =
-            data.invitees.length > 1
-              ? ZegoInvitationType.videoCall === data.type
-                ? GROUP_VIDEO_CALL_CONFIG
-                : GROUP_VOICE_CALL_CONFIG
-              : ZegoInvitationType.videoCall === data.type
-                ? ONE_ON_ONE_VIDEO_CALL_CONFIG
-                : ONE_ON_ONE_VOICE_CALL_CONFIG;
-          return {
-            ...config,
-            onHangUp: () => {
-              // Custom
-            },
-            onOnlySelfInRoom: () => {
-              // Custom
-            },
-            onHangUpConfirmation: () => {
-              return new Promise((resolve, reject) => {
-                Alert.alert('Leave the call', 'Are your sure to leave the call', [
-                  {
-                    text: 'Cancel',
-                    onPress: () => {
-                      reject();
-                    },
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Confirm',
-                    onPress: () => {
-                      resolve();
-                    },
-                  },
-                ]);
-              });
-            },
-          };
-        },
-        showDeclineButton,
-        isIOSDevelopmentEnvironment: false,
+      ringtoneConfig={{
+        incomingCallFileName: 'zego_incoming.mp3',
+        outgoingCallFileName: 'zego_outgoing.mp3',
+      }}
+      plugins={[ZegoUIKitSignalingPlugin]} // The signaling plug-in used for call invitation must be set here. 
+      requireConfig={(data) => {
+        console.warn('requireConfig', data);
+        const callConfig =
+          data.invitees.length > 1
+            ? ZegoInvitationType.videoCall === data.type
+              ? GROUP_VIDEO_CALL_CONFIG
+              : GROUP_VOICE_CALL_CONFIG
+            : ZegoInvitationType.videoCall === data.type
+              ? ONE_ON_ONE_VIDEO_CALL_CONFIG
+              : ONE_ON_ONE_VOICE_CALL_CONFIG;
+        return {
+          ...callConfig,
+          onOnlySelfInRoom: () => {
+            
+          }
+        };
+      }}
+      showDeclineButton={showDeclineButton}
+      isIOSDevelopmentEnvironment={false}
+      onIncomingCallDeclineButtonPressed={() => {
+        // 跳转页面
       }}
     >
       <TouchableWithoutFeedback onPress={pressHandle}>
@@ -128,14 +108,14 @@ export default function CallWithInvitationPage(props) {
                 return { userID: inviteeID, userName: 'user_' + inviteeID };
               })}
               isVideoCall={false}
-              resourcesID={"zegouikit_call"}
+              resourceID={"zegouikit_call"}
             />
             <ZegoSendCallInvitationButton
               invitees={invitees.map((inviteeID) => {
                 return { userID: inviteeID, userName: 'user_' + inviteeID };
               })}
               isVideoCall={true}
-              resourcesID={"zegouikit_call"}
+              resourceID={"zegouikit_call"}
             />
           </View>
         </View>
