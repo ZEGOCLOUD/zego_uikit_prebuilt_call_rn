@@ -71,16 +71,10 @@ export default function CallWithInvitationPage(props) {
               : ONE_ON_ONE_VOICE_CALL_CONFIG;
         return {
           ...callConfig,
-          onOnlySelfInRoom: () => {
-            
-          }
         };
       }}
       showDeclineButton={showDeclineButton}
       isIOSDevelopmentEnvironment={false}
-      onIncomingCallDeclineButtonPressed={() => {
-        // 跳转页面
-      }}
     >
       <TouchableWithoutFeedback onPress={pressHandle}>
         <View style={styles.container}>

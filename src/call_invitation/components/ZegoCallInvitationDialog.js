@@ -55,7 +55,7 @@ export default function ZegoCallInvitationDialog(props) {
   };
   const refuseHandle = () => {
     if (typeof onIncomingCallDeclineButtonPressed == 'function') {
-      onIncomingCallDeclineButtonPressed()
+      onIncomingCallDeclineButtonPressed(navigation)
     }
     CallInviteStateManage.updateInviteDataAfterRejected(callID);
     BellManage.stopIncomingSound();
@@ -65,7 +65,7 @@ export default function ZegoCallInvitationDialog(props) {
   };
   const acceptHandle = () => {
     if (typeof onIncomingCallAcceptButtonPressed == 'function') {
-      onIncomingCallAcceptButtonPressed()
+      onIncomingCallAcceptButtonPressed(navigation)
     }
     CallInviteStateManage.updateInviteDataAfterAccepted(callID);
     BellManage.stopIncomingSound();

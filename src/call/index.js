@@ -65,13 +65,13 @@ export default function ZegoUIKitPrebuiltCall(props) {
     } = bottomMenuBarConfig;
     const {
         isVisible = true,
-        title:topTitle = userName || '',
-        buttons:topButtons = [],
-        maxCount:topMaxCount = 3,
-        extendButtons:topExtendButtons = [],
-        hideAutomatically:topHideAutomatically = true,
-        hideByClick:topHideByClick = true,
-        style:topStyle = ZegoMenuBarStyle.light,
+        title: topTitle = userName || '',
+        buttons: topButtons = [],
+        maxCount: topMaxCount = 3,
+        extendButtons: topExtendButtons = [],
+        hideAutomatically: topHideAutomatically = true,
+        hideByClick: topHideByClick = true,
+        style: topStyle = ZegoMenuBarStyle.light,
     } = topMenuBarConfig;
     const {
         showMicrophoneState = true,

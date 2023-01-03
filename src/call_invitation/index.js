@@ -7,7 +7,7 @@ import ZegoCallInvitationRoom from './pages/ZegoCallInvitationRoom';
 import CallInviteStateManage from '../call_invitation/services/inviteStateManager';
 import BellManage from '../call_invitation/services/bell';
 import InnerTextHelper from './services/inner_text_helper';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
@@ -22,6 +22,129 @@ notifee.createChannel({
 });
 
 const Stack = createNativeStackNavigator();
+
+function CallEventListener(props) {
+  const navigation = useNavigation();
+  const {
+    notifyWhenAppRunningInBackgroundOrQuit = true,
+    isIOSDevelopmentEnvironment = true,
+
+    onIncomingCallReceived,
+    onIncomingCallCanceled,
+    onOutgoingCallAccepted,
+    onOutgoingCallRejected,
+    onOutgoingCallDeclined,
+    onIncomingCallTimeout,
+    onOutgoingCallTimeout
+  } = props;
+
+
+  const showBackgroundNotification = async (inviterName, type, invitees) => {
+    const count = invitees ? invitees.length : 0;
+
+    if (AppState.currentState != "background" || Platform.OS == 'ios') {
+      return;
+    }
+    notifee.displayNotification({
+      title: InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, count),
+      body: InnerTextHelper.instance().getIncomingCallDialogMessage(type, count),
+      data: {},
+      android: {
+        channelId: 'callinvite',
+        // Launch the app on lock screen
+        fullScreenAction: {
+          // For Android Activity other than the default:
+          id: 'full_screen_body_press',
+          launchActivity: 'default',
+        },
+        pressAction: {
+          id: 'body_press',
+          launchActivity: 'default',
+        },
+      },
+    });
+  }
+
+  const _getInviteesFromData = (data) => {
+    var invitees = JSON.parse(data).invitees
+    return invitees.map((invitee) => {
+      return { userID: invitee.user_id, userName: invitee.user_name }
+    })
+  }
+  const _registerCallback = (callbackID) => {
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, ({ callID, invitees, data }) => {
+      if (typeof onOutgoingCallTimeout == 'function') {
+        onOutgoingCallTimeout(navigation, callID, invitees.map((invitee) => {
+          return { userID: invitee.id, userName: invitee.name }
+        }))
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
+      const jsonData = data ? JSON.parse(data) : undefined;
+      if (jsonData && jsonData.reason == 'busy') {
+        if (typeof onOutgoingCallRejected == 'function') {
+          onOutgoingCallRejected(navigation, callID, { userID: invitee.id, userName: invitee.name })
+        }
+      } else {
+        if (typeof onOutgoingCallDeclined == 'function') {
+          onOutgoingCallDeclined(navigation, callID, { userID: invitee.id, userName: invitee.name })
+        }
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ callID, invitee, data }) => {
+      if (typeof onOutgoingCallAccepted == 'function') {
+        onOutgoingCallAccepted(navigation, callID, { userID: invitee.id, userName: invitee.name })
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+      const invitees = _getInviteesFromData(data)
+      // Listen and show notification on background
+      showBackgroundNotification(inviter.name, type, invitees)
+
+      if (typeof onIncomingCallReceived == 'function') {
+        onIncomingCallReceived(navigation, callID, { userID: inviter.id, userName: inviter.name }, type, invitees)
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
+      if (typeof onIncomingCallCanceled == 'function') {
+        onIncomingCallCanceled(navigation, callID, { userID: inviter.id, userName: inviter.name })
+      }
+    }
+    );
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {
+      if (typeof onIncomingCallTimeout == 'function') {
+        onIncomingCallTimeout(navigation, callID, { userID: inviter.id, userName: inviter.name })
+      }
+    }
+    );
+  }
+  const _unregisterCallback = (callbackID) => {
+    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
+    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
+  }
+  useEffect(() => {
+    // Enable offline notification
+    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSDevelopmentEnvironment);
+
+
+    const callbackID = 'ZegoUIKitPrebuiltCallWithInvitation ' + String(Math.floor(Math.random() * 10000));
+    _registerCallback(callbackID);
+
+    return () => {
+      _unregisterCallback(callbackID);
+    };
+  }, [])
+
+  return null
+}
 
 export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   const {
@@ -64,88 +187,6 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     }
   };
 
-  const showBackgroundNotification = async (inviterName, type, data) => {
-    const count = data.invitees ? data.invitees.length : 0;
-
-    if (AppState.currentState != "background" || Platform.OS == 'ios') {
-      return;
-    }
-    notifee.displayNotification({
-      title: InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, count),
-      body: InnerTextHelper.instance().getIncomingCallDialogMessage(type, count),
-      data: {},
-      android: {
-        channelId: 'callinvite',
-        // Launch the app on lock screen
-        fullScreenAction: {
-          // For Android Activity other than the default:
-          id: 'full_screen_body_press',
-          launchActivity: 'default',
-        },
-        pressAction: {
-          id: 'body_press',
-          launchActivity: 'default',
-        },
-      },
-    });
-  }
-
-  const _registerCallback = (callbackID) => {
-    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, ({ callID, invitees, data }) => {
-      if (typeof onOutgoingCallTimeout == 'function') {
-        onOutgoingCallTimeout(callID, invitees)
-      }
-    }
-    );
-    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
-      const jsonData = data ? JSON.parse(data) : undefined;
-      if (jsonData && jsonData.reason == 'busy') {
-        if (typeof onOutgoingCallRejected == 'function') {
-          onOutgoingCallRejected(callID, invitee)
-        }
-      } else {
-        if (typeof onOutgoingCallDeclined == 'function') {
-          onOutgoingCallDeclined(callID, invitee)
-        }
-      }
-    }
-    );
-    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ callID, invitee, data }) => {
-      if (typeof onOutgoingCallAccepted == 'function') {
-        onOutgoingCallAccepted(callID, invitee)
-      }
-    }
-    );
-    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
-      // Listen and show notification on background
-      showBackgroundNotification(inviter.name, type, data)
-
-      if (typeof onIncomingCallReceived == 'function') {
-        onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, data.invitees)
-      }
-    }
-    );
-    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
-      if (typeof onIncomingCallCanceled == 'function') {
-        onIncomingCallCanceled(callID, { userID: inviter.id, userName: inviter.name })
-      }
-    }
-    );
-    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {
-      if (typeof onIncomingCallTimeout == 'function') {
-        onIncomingCallTimeout(callID, { userID: inviter.id, userName: inviter.name })
-      }
-    }
-    );
-  }
-  const _unregisterCallback = (callbackID) => {
-    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
-    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
-    ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
-    ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
-    ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
-    ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
-  }
   useEffect(() => {
     // Init inner text helper
     InnerTextHelper.instance().init(innerText);
@@ -164,16 +205,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
       }
     );
 
-    // Enable offline notification
-    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSDevelopmentEnvironment);
-
-
-    const callbackID = 'ZegoUIKitPrebuiltCallWithInvitation ' + String(Math.floor(Math.random() * 10000));
-    _registerCallback(callbackID);
-
     return () => {
-      _unregisterCallback(callbackID);
-
       BellManage.releaseIncomingSound();
       BellManage.releaseOutgoingSound();
       CallInviteStateManage.uninit();
@@ -191,6 +223,17 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           onIncomingCallDeclineButtonPressed={onIncomingCallDeclineButtonPressed}
           onIncomingCallAcceptButtonPressed={onIncomingCallAcceptButtonPressed}
         /> : <View />}
+        {isInit ? <CallEventListener
+          notifyWhenAppRunningInBackgroundOrQuit={notifyWhenAppRunningInBackgroundOrQuit}
+          isIOSDevelopmentEnvironment={isIOSDevelopmentEnvironment}
+          onIncomingCallReceived={onIncomingCallReceived}
+          onIncomingCallCanceled={onIncomingCallCanceled}
+          onOutgoingCallAccepted={onOutgoingCallAccepted}
+          onOutgoingCallRejected={onOutgoingCallRejected}
+          onOutgoingCallDeclined={onOutgoingCallDeclined}
+          onIncomingCallTimeout={onIncomingCallTimeout}
+          onOutgoingCallTimeout={onOutgoingCallTimeout}
+        /> : null}
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}

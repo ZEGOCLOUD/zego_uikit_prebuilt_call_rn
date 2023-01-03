@@ -47,16 +47,6 @@ export default function ZegoCallInvitationRoom(props) {
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationRoom ' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
-      if (typeof config.onOnlySelfInRoom === 'function') {
-        // Invite a single
-        if (invitees.length === 1) {
-          CallInviteStateManage.initInviteData();
-          navigation.navigate('ZegoInnerChildrenPage');
-        }
-        config.onOnlySelfInRoom();
-      }
-    });
     if (invitees.length > 1 && inviter === userID) {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
@@ -88,8 +78,20 @@ export default function ZegoCallInvitationRoom(props) {
         ...config,
         onHangUp: () => {
           hangUpHandle();
-          config.onHangUp && config.onHangUp();
+          config.onHangUp && config.onHangUp(navigation);
         },
+        onOnlySelfInRoom: () => {
+          if (typeof config.onOnlySelfInRoom === 'function') {
+            config.onOnlySelfInRoom(navigation);
+          } else {
+            // Invite a single
+            if (invitees.length === 1) {
+              CallInviteStateManage.initInviteData();
+              navigation.navigate('ZegoInnerChildrenPage');
+            }
+          }
+        },
+        onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation(navigation)} : undefined
       }}
       token={token}
       onRequireNewToken={onRequireNewToken}
