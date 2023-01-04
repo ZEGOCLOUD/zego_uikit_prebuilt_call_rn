@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ZegoStartInvitationButton } from '@zegocloud/zego-uikit-rn';
+import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
 import { ZegoInvitationType } from '../services/defines';
 import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
@@ -72,7 +72,7 @@ export default function ZegoSendCallInvitationButton(props) {
 
   return (
     <View style={styles.container}>
-      <ZegoStartInvitationButton
+      <ZegoSendInvitationButton
         icon={icon}
         text={text}
         invitees={getInviteeIDList()}
