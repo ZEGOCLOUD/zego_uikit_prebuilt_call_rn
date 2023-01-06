@@ -182,8 +182,14 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   const handleAppStateChange = (nextAppState) => {
     if (nextAppState === 'active') {
       ZegoPrebuiltPlugins.reconnectIfDisconnected();
+
+      notifee.cancelAllNotifications();
     }
   };
+
+  useEffect(() => {
+    notifee.cancelAllNotifications();
+  }, [])
 
   useEffect(() => {
     // Init inner text helper
