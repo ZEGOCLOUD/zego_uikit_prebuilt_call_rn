@@ -300,14 +300,14 @@ export default class ZegoSignalingPluginCore {
       });
   }
   logout() {
-    // return ZIM.getInstance()
-    //   .logout()
-    //   .then(() => {
-    //     zloginfo('[Core]Logout success.');
-    //     this._resetDataForLogout();
-    //     // live audio room
-    //     ZegoPluginUserInRoomAttributesCore.getInstance()._resetData();
-    //   });
+    return ZIM.getInstance()
+      .logout()
+      .then(() => {
+        zloginfo('[Core]Logout success.');
+        this._resetDataForLogout();
+        // live audio room
+        ZegoPluginUserInRoomAttributesCore.getInstance()._resetData();
+      });
   }
   destroy() {
     ZIM.getInstance().destroy();

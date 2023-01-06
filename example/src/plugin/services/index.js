@@ -44,7 +44,7 @@ export default class ZegoPluginInvitationService {
     );
   }
   logout() {
-    // return ZegoSignalingPluginCore.getInstance().logout();
+    return ZegoSignalingPluginCore.getInstance().logout();
   }
 
   enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment) {

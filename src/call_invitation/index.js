@@ -50,7 +50,7 @@ function CallEventListener(props) {
       body: InnerTextHelper.instance().getIncomingCallDialogMessage(type, count),
       data: {},
       android: {
-        channelId: 'callinvite',
+        channelId: 'zego_uikit_prebuilt_callinvite',
         // Launch the app on lock screen
         fullScreenAction: {
           // For Android Activity other than the default:
@@ -180,10 +180,8 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   const [isInit, setIsInit] = useState(false);
 
   const handleAppStateChange = (nextAppState) => {
-    if (isInit) {
-      if (nextAppState === 'active') {
-        ZegoPrebuiltPlugins.reconnectIfDisconnected();
-      }
+    if (nextAppState === 'active') {
+      ZegoPrebuiltPlugins.reconnectIfDisconnected();
     }
   };
 

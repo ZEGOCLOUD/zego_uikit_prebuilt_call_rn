@@ -61,7 +61,7 @@ const ZegoPrebuiltPlugins = {
     }
   },
   uninit: () => {
-    ZegoUIKit.getSignalingPlugin().logout();
+    // ZegoUIKit.getSignalingPlugin().logout();
     ZegoUIKit.getSignalingPlugin().uninit();
   },
   getLocalUser: () => {
