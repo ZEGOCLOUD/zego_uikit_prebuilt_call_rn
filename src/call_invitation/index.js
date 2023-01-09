@@ -12,20 +12,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 
-notifee.createChannel({
-  id: 'zego_uikit_prebuilt_callinvite',
-  name: 'Call Invite',
-  badge: false,
-  vibration: false,
-  importance: AndroidImportance.HIGH,
-  visibility: AndroidVisibility.PUBLIC,
-});
-
 const Stack = createNativeStackNavigator();
 
 function CallEventListener(props) {
   const navigation = useNavigation();
   const {
+    androidNotificationChannelID = "",
     notifyWhenAppRunningInBackgroundOrQuit = true,
     isIOSDevelopmentEnvironment = true,
 
@@ -50,7 +42,7 @@ function CallEventListener(props) {
       body: InnerTextHelper.instance().getIncomingCallDialogMessage(type, count),
       data: {},
       android: {
-        channelId: 'zego_uikit_prebuilt_callinvite',
+        channelId: androidNotificationChannelID,
         // Launch the app on lock screen
         fullScreenAction: {
           // For Android Activity other than the default:
@@ -164,6 +156,10 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     showDeclineButton = true,
     notifyWhenAppRunningInBackgroundOrQuit = true,
     isIOSDevelopmentEnvironment = true,
+    androidNotificationConfig = {
+      channelID: "CallInvitation",
+      channelName: "CallInvitation",
+    },
 
     onIncomingCallDeclineButtonPressed,
     onIncomingCallAcceptButtonPressed,
@@ -189,6 +185,16 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
 
   useEffect(() => {
     notifee.cancelAllNotifications();
+
+    notifee.createChannel({
+      id: androidNotificationConfig.channelID,
+      name: androidNotificationConfig.channelName,
+      badge: false,
+      vibration: false,
+      importance: AndroidImportance.HIGH,
+      visibility: AndroidVisibility.PUBLIC,
+      sound: ringtoneConfig.incomingCallFileName.split('.')[0]
+    });
   }, [])
 
   useEffect(() => {
@@ -237,6 +243,8 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           onOutgoingCallDeclined={onOutgoingCallDeclined}
           onIncomingCallTimeout={onIncomingCallTimeout}
           onOutgoingCallTimeout={onOutgoingCallTimeout}
+
+          androidNotificationChannelID={androidNotificationConfig.channelID}
         /> : null}
         <Stack.Navigator>
           <Stack.Screen
