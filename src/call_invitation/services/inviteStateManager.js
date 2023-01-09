@@ -132,7 +132,7 @@ const CallInviteStateManage = {
           CallInviteStateManage.addInviteData(
             callID,
             inviter.id,
-            data.invitees.map((invitee) => invitee.userID)
+            data.invitees.map((invitee) => invitee.user_id)
           );
         }
       }
