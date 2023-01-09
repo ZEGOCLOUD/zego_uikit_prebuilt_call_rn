@@ -115,11 +115,14 @@ export default function ZegoCallInvitationWaiting(props) {
       CallInviteStateManage.initInviteData();
       navigation.goBack();
     });
-    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, () => {
-      BellManage.stopOutgoingSound();
-      ZegoUIKit.leaveRoom();
-      CallInviteStateManage.initInviteData();
-      navigation.goBack();
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
+      const callIDs = Array.from(CallInviteStateManage._callIDMap.keys());
+      if (callIDs.includes(data.callID)) {
+        BellManage.stopOutgoingSound();
+        ZegoUIKit.leaveRoom();
+        CallInviteStateManage.initInviteData();
+        navigation.goBack();
+      }
     });
     ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       callbackID,
