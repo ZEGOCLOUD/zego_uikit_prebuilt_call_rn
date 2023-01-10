@@ -11,6 +11,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
+import { zloginfo, zlogwarning } from '../utils/logger';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,13 +19,11 @@ function CallEventListener(props) {
   const navigation = useNavigation();
   const {
     androidNotificationChannelID = "",
-    notifyWhenAppRunningInBackgroundOrQuit = true,
-    isIOSDevelopmentEnvironment = true,
 
     onIncomingCallReceived,
     onIncomingCallCanceled,
     onOutgoingCallAccepted,
-    onOutgoingCallRejected,
+    onOutgoingCallRejectedCauseBusy,
     onOutgoingCallDeclined,
     onIncomingCallTimeout,
     onOutgoingCallTimeout
@@ -75,8 +74,8 @@ function CallEventListener(props) {
     ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
       const jsonData = data ? JSON.parse(data) : undefined;
       if (jsonData && jsonData.reason == 'busy') {
-        if (typeof onOutgoingCallRejected == 'function') {
-          onOutgoingCallRejected(navigation, callID, { userID: invitee.id, userName: invitee.name })
+        if (typeof onOutgoingCallRejectedCauseBusy == 'function') {
+          onOutgoingCallRejectedCauseBusy(navigation, callID, { userID: invitee.id, userName: invitee.name })
         }
       } else {
         if (typeof onOutgoingCallDeclined == 'function') {
@@ -123,9 +122,6 @@ function CallEventListener(props) {
     ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
   }
   useEffect(() => {
-    // Enable offline notification
-    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSDevelopmentEnvironment);
-
 
     const callbackID = 'ZegoUIKitPrebuiltCallWithInvitation ' + String(Math.floor(Math.random() * 10000));
     _registerCallback(callbackID);
@@ -155,7 +151,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     innerText = {},
     showDeclineButton = true,
     notifyWhenAppRunningInBackgroundOrQuit = true,
-    isIOSDevelopmentEnvironment = true,
+    isIOSSandboxEnvironment = true,
     androidNotificationConfig = {
       channelID: "CallInvitation",
       channelName: "CallInvitation",
@@ -167,7 +163,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     onIncomingCallReceived,
     onIncomingCallCanceled,
     onOutgoingCallAccepted,
-    onOutgoingCallRejected,
+    onOutgoingCallRejectedCauseBusy,
     onOutgoingCallDeclined,
     onIncomingCallTimeout,
     onOutgoingCallTimeout
@@ -182,6 +178,15 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
       notifee.cancelAllNotifications();
     }
   };
+
+  useEffect(() => {
+    // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
+    setTimeout(() => {
+      // Enable offline notification
+      ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment);
+      zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment)
+    }, 1000);
+  }, [isInit])
 
   useEffect(() => {
     notifee.cancelAllNotifications();
@@ -234,12 +239,10 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
           onIncomingCallAcceptButtonPressed={onIncomingCallAcceptButtonPressed}
         /> : <View />}
         {isInit ? <CallEventListener
-          notifyWhenAppRunningInBackgroundOrQuit={notifyWhenAppRunningInBackgroundOrQuit}
-          isIOSDevelopmentEnvironment={isIOSDevelopmentEnvironment}
           onIncomingCallReceived={onIncomingCallReceived}
           onIncomingCallCanceled={onIncomingCallCanceled}
           onOutgoingCallAccepted={onOutgoingCallAccepted}
-          onOutgoingCallRejected={onOutgoingCallRejected}
+          onOutgoingCallRejectedCauseBusy={onOutgoingCallRejectedCauseBusy}
           onOutgoingCallDeclined={onOutgoingCallDeclined}
           onIncomingCallTimeout={onIncomingCallTimeout}
           onOutgoingCallTimeout={onOutgoingCallTimeout}

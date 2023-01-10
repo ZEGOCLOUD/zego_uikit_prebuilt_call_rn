@@ -74,7 +74,11 @@ export default function CallWithInvitationPage(props) {
         };
       }}
       showDeclineButton={showDeclineButton}
-      isIOSDevelopmentEnvironment={false}
+      isIOSSandboxEnvironment={false}
+      androidNotificationConfig={{
+        channelID: "ZegoUIKit",
+        channelName: "ZegoUIKit",
+      }}
     >
       <TouchableWithoutFeedback onPress={pressHandle}>
         <View style={styles.container}>
