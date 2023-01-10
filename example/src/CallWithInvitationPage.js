@@ -1,14 +1,17 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ZegoUIKitPrebuiltCallWithInvitation,
-  ZegoStartCallInvitationButton,
+  ZegoSendCallInvitationButton,
   ZegoInvitationType,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
   ONE_ON_ONE_VOICE_CALL_CONFIG,
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
+
+// import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
+
+import ZegoUIKitSignalingPlugin from './plugin/index';
 import KeyCenter from './KeyCenter';
 import {
   View,
@@ -17,13 +20,18 @@ import {
   StyleSheet,
   Alert,
   TouchableWithoutFeedback,
+  Platform,
+  Switch,
 } from 'react-native';
-
-const userID = String(Math.floor(Math.random() * 10000));
-const userName = `user_${userID}`;
+import { getDeviceId, getFirstInstallTime } from 'react-native-device-info'
 
 export default function CallWithInvitationPage(props) {
   const [invitees, setInvitees] = useState([]);
+  const [zpnState, setZpnState] = useState("")
+  const [showDeclineButton, setShowDeclineButton] = useState(true)
+  const [userID, setUserID] = useState('')
+  const [userName, setUserName] = useState('')
+
   const viewRef = useRef(null);
   const pressHandle = () => {
     viewRef.current.blur();
@@ -31,8 +39,17 @@ export default function CallWithInvitationPage(props) {
   const changeTextHandle = value => {
     setInvitees(value ? value.split(',') : []);
   };
+
+  useEffect(() => {
+    getFirstInstallTime().then(firstInstallTime => {
+      const id = String(firstInstallTime).slice(-5);
+      setUserID(id)
+      setUserName('user_' + id)
+    })
+  }, [])
+
   return (
-    <ZegoUIKitPrebuiltCallWithInvitation
+    userName ? <ZegoUIKitPrebuiltCallWithInvitation
       appID={KeyCenter.appID}
       appSign={KeyCenter.appSign}
       userID={userID}
@@ -41,49 +58,38 @@ export default function CallWithInvitationPage(props) {
         incomingCallFileName: 'zego_incoming.mp3',
         outgoingCallFileName: 'zego_outgoing.mp3',
       }}
-      requireConfig={data => {
+      plugins={[ZegoUIKitSignalingPlugin]} // The signaling plug-in used for call invitation must be set here. 
+      requireConfig={(data) => {
         console.warn('requireConfig', data);
-        const config =
+        const callConfig =
           data.invitees.length > 1
             ? ZegoInvitationType.videoCall === data.type
               ? GROUP_VIDEO_CALL_CONFIG
               : GROUP_VOICE_CALL_CONFIG
             : ZegoInvitationType.videoCall === data.type
-            ? ONE_ON_ONE_VIDEO_CALL_CONFIG
-            : ONE_ON_ONE_VOICE_CALL_CONFIG;
+              ? ONE_ON_ONE_VIDEO_CALL_CONFIG
+              : ONE_ON_ONE_VOICE_CALL_CONFIG;
         return {
-          ...config,
-          onHangUp: () => {
-            // Custom
-          },
-          onOnlySelfInRoom: () => {
-            // Custom
-          },
-          onHangUpConfirmation: () => {
-            return new Promise((resolve, reject) => {
-              Alert.alert('Leave the call', 'Are your sure to leave the call', [
-                {
-                  text: 'Cancel',
-                  onPress: () => {
-                    reject();
-                  },
-                  style: 'cancel',
-                },
-                {
-                  text: 'Confirm',
-                  onPress: () => {
-                    resolve();
-                  },
-                },
-              ]);
-            });
-          },
+          ...callConfig,
         };
       }}
-      plugins={[ZegoUIKitSignalingPlugin]}>
+      showDeclineButton={showDeclineButton}
+      isIOSDevelopmentEnvironment={false}
+    >
       <TouchableWithoutFeedback onPress={pressHandle}>
         <View style={styles.container}>
+          <Text>ZPNs message: {zpnState}</Text>
           <Text>Your userID: {userID}</Text>
+          <Text>Your userName: user_{userID}</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={showDeclineButton ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={() => {
+              setShowDeclineButton(!showDeclineButton)
+            }}
+            value={showDeclineButton}
+          />
           <View style={styles.inputContainer}>
             <TextInput
               ref={viewRef}
@@ -91,18 +97,24 @@ export default function CallWithInvitationPage(props) {
               onChangeText={changeTextHandle}
               placeholder="Invitees ID, Separate ids by ','"
             />
-            <ZegoStartCallInvitationButton
-              invitees={invitees}
+            <ZegoSendCallInvitationButton
+              invitees={invitees.map((inviteeID) => {
+                return { userID: inviteeID, userName: 'user_' + inviteeID };
+              })}
               isVideoCall={false}
+              resourceID={"zegouikit_call"}
             />
-            <ZegoStartCallInvitationButton
-              invitees={invitees}
+            <ZegoSendCallInvitationButton
+              invitees={invitees.map((inviteeID) => {
+                return { userID: inviteeID, userName: 'user_' + inviteeID };
+              })}
               isVideoCall={true}
+              resourceID={"zegouikit_call"}
             />
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </ZegoUIKitPrebuiltCallWithInvitation>
+    </ZegoUIKitPrebuiltCallWithInvitation> : null
   );
 }
 

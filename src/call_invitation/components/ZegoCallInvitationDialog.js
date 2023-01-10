@@ -5,6 +5,7 @@ import { ZegoInvitationType } from '../services/defines';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
+import InnerTextHelper from '../services/inner_text_helper'
 
 import ZegoUIKit, {
   ZegoAcceptInvitationButton,
@@ -12,18 +13,27 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoCallInvitationDialog(props) {
+  const { 
+    showDeclineButton = true,
+    onIncomingCallDeclineButtonPressed,
+    onIncomingCallAcceptButtonPressed,
+  } = props;
+
   const navigation = useNavigation();
   const [isDialogVisable, setIsDialogVisable] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [inviteType, setInviteType] = useState(ZegoInvitationType.voiceCall);
-  const [inviterData, setInviterData] = useState({});
+  const [inviter, setInviter] = useState({});
   const [extendData, setExtendData] = useState({});
   const [callID, setCallID] = useState('');
 
-  const getCallTitle = () => {
-    return inviteType === ZegoInvitationType.voiceCall
-      ? 'ZEGO Voice Call'
-      : 'ZEGO Video Call';
+  const getDialogTitle = () => {
+    const count = extendData.invitees ? extendData.invitees.length : 0;
+    return InnerTextHelper.instance().getIncomingCallDialogTitle(inviter.name, inviteType, count);
+  }
+  const getDialogMessage = () => {
+    const count = extendData.invitees ? extendData.invitees.length : 0;
+    return InnerTextHelper.instance().getIncomingCallDialogMessage(inviteType, count)
   };
   const getShotName = (name) => {
     if (!name) {
@@ -44,6 +54,9 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const refuseHandle = () => {
+    if (typeof onIncomingCallDeclineButtonPressed == 'function') {
+      onIncomingCallDeclineButtonPressed(navigation)
+    }
     CallInviteStateManage.updateInviteDataAfterRejected(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
@@ -51,16 +64,19 @@ export default function ZegoCallInvitationDialog(props) {
     setIsFullScreen(false);
   };
   const acceptHandle = () => {
+    if (typeof onIncomingCallAcceptButtonPressed == 'function') {
+      onIncomingCallAcceptButtonPressed(navigation)
+    }
     CallInviteStateManage.updateInviteDataAfterAccepted(callID);
     BellManage.stopIncomingSound();
     BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
-    navigation.navigate('RoomPage', {
+    navigation.navigate('ZegoCallInvitationRoomPage', {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
       invitees: extendData.invitees,
-      inviter: inviterData.id,
+      inviter: inviter.id,
     });
   };
   const pressHandle = () => {
@@ -84,13 +100,14 @@ export default function ZegoCallInvitationDialog(props) {
             inviter.id,
             JSON.stringify({
               callID: resCallID,
+              reason: 'busy'
             })
           );
           CallInviteStateManage.updateInviteDataAfterRejected(resCallID);
         } else {
           setCallID(resCallID);
           setInviteType(type);
-          setInviterData(inviter);
+          setInviter(inviter);
           setExtendData(JSON.parse(data));
           setIsDialogVisable(true);
           BellManage.playIncomingSound();
@@ -134,25 +151,32 @@ export default function ZegoCallInvitationDialog(props) {
               <View style={styles.left}>
                 <View style={styles.avatar}>
                   <Text style={styles.nameLabel}>
-                    {getShotName(inviterData.name)}
+                    {getShotName(inviter.name)}
                   </Text>
                 </View>
                 <View>
-                  <Text style={styles.callName}>{inviterData.name}</Text>
-                  <Text style={styles.callTitle}>{getCallTitle()}</Text>
+                  <Text style={styles.callName}>{getDialogTitle()}</Text>
+                  <Text style={styles.callTitle}>{getDialogMessage()}</Text>
                 </View>
               </View>
               <View style={styles.right}>
-                <View style={styles.refuse}>
-                  <ZegoRefuseInvitationButton
-                    inviterID={inviterData.id}
-                    onPressed={refuseHandle}
-                  />
-                </View>
+                {
+                  showDeclineButton ? <View style={styles.refuse}>
+                    <ZegoRefuseInvitationButton
+                      inviterID={inviter.id}
+                      onPressed={refuseHandle}
+                      data={JSON.stringify({
+                        inviterID: inviter.id,
+                        reason: 'decline',
+                        callID
+                      })}
+                    />
+                  </View> : null
+                }
                 <View style={styles.accept}>
                   <ZegoAcceptInvitationButton
                     icon={getImageSourceByPath()}
-                    inviterID={inviterData.id}
+                    inviterID={inviter.id}
                     onPressed={acceptHandle}
                   />
                 </View>
@@ -164,27 +188,35 @@ export default function ZegoCallInvitationDialog(props) {
             <View style={styles.content}>
               <View style={styles.fullAvatar}>
                 <Text style={styles.fullNameLabel}>
-                  {getShotName(inviterData.name)}
+                  {getShotName(inviter.name)}
                 </Text>
               </View>
-              <Text style={styles.fullCallName}>{inviterData.name}</Text>
-              <Text style={styles.calling}>Calling...</Text>
+              <Text style={styles.fullCallName}>{inviter.name}</Text>
+              <Text style={styles.calling}>{getDialogMessage()}</Text>
             </View>
             <View style={styles.bottomBarContainer}>
-              <View style={styles.fullRefuse}>
-                <ZegoRefuseInvitationButton
-                  inviterID={inviterData.id}
-                  onPressed={refuseHandle}
-                />
-                <Text style={styles.fullRefuseTitle}>Decline</Text>
-              </View>
+              {
+                showDeclineButton ? <View style={styles.fullRefuse}>
+                  <ZegoRefuseInvitationButton
+                    inviterID={inviter.id}
+                    onPressed={refuseHandle}
+                    data={JSON.stringify({
+                      inviterID: inviter.id,
+                      reason: 'decline',
+                      callID
+                    })}
+                  />
+                  <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
+                </View> : null
+              }
+
               <View style={styles.fullAccept}>
                 <ZegoAcceptInvitationButton
                   icon={getImageSourceByPath()}
-                  inviterID={inviterData.id}
+                  inviterID={inviter.id}
                   onPressed={acceptHandle}
                 />
-                <Text style={styles.fullAcceptTitle}>Accept</Text>
+                <Text style={styles.fullAcceptTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton}</Text>
               </View>
             </View>
           </View>

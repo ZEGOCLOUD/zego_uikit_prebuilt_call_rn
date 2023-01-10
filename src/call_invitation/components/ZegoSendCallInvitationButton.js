@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ZegoStartInvitationButton } from '@zegocloud/zego-uikit-rn';
+import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
 import { ZegoInvitationType } from '../services/defines';
 import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
 import { zloginfo } from '../../utils/logger';
 import CallInviteStateManage from '../services/inviteStateManager';
+import InnerTextHelper from '../services/inner_text_helper';
 
-export default function ZegoStartCallInvitationButton(props) {
+export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
   const {
     icon,
@@ -16,57 +17,65 @@ export default function ZegoStartCallInvitationButton(props) {
     isVideoCall = false,
     timeout = 60,
     onPressed,
+    resourceID: _resourceID = ''
   } = props;
+
+  const getInviteeIDList = () => {
+    return invitees.map(invitee => {
+      return invitee.userID
+    });
+  }
+
   const localUser = ZegoPrebuiltPlugins.getLocalUser();
   const roomID = `call_${localUser.userID}_${Date.now()}`;
   const data = JSON.stringify({
     call_id: roomID,
-    invitees: invitees.map((inviteeID) => {
-      return { user_id: inviteeID, user_name: 'user_' + inviteeID };
+    invitees: invitees.map(invitee => {
+      return {user_id: invitee.userID, user_name: invitee.userName}
     }),
     custom_data: '',
   });
-
   const [forceRender, setForceRender] = useState(Date.now());
 
-  const onPress = ({ callID, invitees: successfulInvitees }) => {
+  const onPress = ({errorCode, errorMessage, errorInvitees, invitationID, invitees: successfulInvitees }) => {
     CallInviteStateManage.addInviteData(
-      callID,
+      invitationID,
       localUser.userID,
       successfulInvitees
     );
     if (invitees.length === 1) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
-      navigation.navigate('CallPage', {
+      navigation.navigate('ZegoCallInvitationWaitingPage', {
         roomID,
         isVideoCall,
         invitees,
         inviter: localUser.userID,
-        callID,
+        invitationID,
       });
     } else {
       // Jump to call room page
       zloginfo('Jump to call room page.');
-      navigation.navigate('RoomPage', {
+      navigation.navigate('ZegoCallInvitationRoomPage', {
         roomID,
         isVideoCall,
-        invitees,
+        invitees: getInviteeIDList(),
         inviter: localUser.userID,
-        callID,
+        invitationID,
       });
     }
     setForceRender(Date.now());
     if (typeof onPressed === 'function') {
-      onPressed();
+      onPressed(errorCode, errorMessage, errorInvitees);
     }
   };
+
   return (
     <View style={styles.container}>
-      <ZegoStartInvitationButton
+      <ZegoSendInvitationButton
         icon={icon}
         text={text}
-        invitees={invitees}
+        invitees={getInviteeIDList()}
         type={
           isVideoCall
             ? ZegoInvitationType.videoCall
@@ -75,6 +84,18 @@ export default function ZegoStartCallInvitationButton(props) {
         data={data}
         timeout={timeout}
         onPressed={onPress}
+        resourceID={_resourceID}
+        notificationTitle={
+          InnerTextHelper.instance().getIncomingCallDialogTitle(
+            localUser.userName,
+            isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
+            invitees.length)
+        }
+        notificationMessage={
+          InnerTextHelper.instance().getIncomingCallDialogMessage(
+            isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
+            invitees.length
+          )}
       />
     </View>
   );

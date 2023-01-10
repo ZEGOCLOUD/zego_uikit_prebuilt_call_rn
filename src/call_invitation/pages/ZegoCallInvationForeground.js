@@ -2,10 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoBottomBar from '../../call/ZegoBottomBar';
 import ZegoMenuBarButtonName from '../../call/ZegoMenuBarButtonName';
+import { ZegoInvitationType } from '../services/defines';
+import InnerTextHelper from '../services/inner_text_helper';
 
 export default function ZegoCallInvationForeground(props) {
   const { isVideoCall, invitee, onHangUp } = props;
-  const userName = 'user_' + invitee;
+  const userName = invitee;
+
   const getShotName = (name) => {
     if (!name) {
       return '';
@@ -25,8 +28,12 @@ export default function ZegoCallInvationForeground(props) {
         <View style={styles.avatar}>
           <Text style={styles.nameLabel}>{getShotName(userName)}</Text>
         </View>
-        <Text style={styles.userName}>{userName}</Text>
-        <Text style={styles.calling}>Calling...</Text>
+        <Text style={styles.userName}>{
+          InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
+        }</Text>
+        <Text style={styles.calling}>{
+          InnerTextHelper.instance().getOutgoingCallPageMessage(isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
+        }</Text>
       </View>
       <ZegoBottomBar
         menuBarButtons={[ZegoMenuBarButtonName.hangUpButton]}

@@ -18,13 +18,19 @@ export default function ZegoCallInvitationWaiting(props) {
     userName,
     token,
     onRequireNewToken,
+    onOutgoingCallCancelButtonPressed,
     roomID,
     isVideoCall,
     invitees,
     inviter,
-    callID,
+    invitationID,
   } = route.params;
 
+  const getInviteeIDList = () => {
+    return invitees.map(invitee => {
+      return invitee.userID
+    });
+  }
   const grantPermissions = async (callback) => {
     // Android: Dynamically obtaining device permissions
     if (Platform.OS === 'android') {
@@ -68,9 +74,12 @@ export default function ZegoCallInvitationWaiting(props) {
   };
   const hangUpHandle = () => {
     zloginfo('Leave room on waiting page');
-    if (CallInviteStateManage.isAutoCancelInvite(callID)) {
-      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
-      CallInviteStateManage.updateInviteDataAfterCancel(callID);
+    if (typeof onOutgoingCallCancelButtonPressed == 'function') {
+      onOutgoingCallCancelButtonPressed()
+    }
+    if (CallInviteStateManage.isAutoCancelInvite(invitationID)) {
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(getInviteeIDList());
+      CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();
@@ -106,11 +115,14 @@ export default function ZegoCallInvitationWaiting(props) {
       CallInviteStateManage.initInviteData();
       navigation.goBack();
     });
-    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, () => {
-      BellManage.stopOutgoingSound();
-      ZegoUIKit.leaveRoom();
-      CallInviteStateManage.initInviteData();
-      navigation.goBack();
+    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
+      const callIDs = Array.from(CallInviteStateManage._callIDMap.keys());
+      if (callIDs.includes(data.callID)) {
+        BellManage.stopOutgoingSound();
+        ZegoUIKit.leaveRoom();
+        CallInviteStateManage.initInviteData();
+        navigation.goBack();
+      }
     });
     ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       callbackID,
@@ -118,12 +130,12 @@ export default function ZegoCallInvitationWaiting(props) {
         zloginfo('Jump to call room page.');
         BellManage.stopOutgoingSound();
         ZegoUIKit.leaveRoom().then(() => {
-          navigation.navigate('RoomPage', {
+          navigation.navigate('ZegoCallInvitationRoomPage', {
             roomID,
             isVideoCall,
-            invitees,
+            invitees: getInviteeIDList(),
             inviter,
-            callID,
+            invitationID,
           });
         });
       }
@@ -148,7 +160,7 @@ export default function ZegoCallInvitationWaiting(props) {
           foregroundBuilder={() => (
             <ZegoCallInvationForeground
               isVideoCall={isVideoCall}
-              invitee={invitees[0]}
+              invitee={invitees[0].userName}
               onHangUp={hangUpHandle}
             />
           )}
@@ -156,7 +168,7 @@ export default function ZegoCallInvitationWaiting(props) {
       ) : (
         <ZegoCallInvationForeground
           isVideoCall={isVideoCall}
-          invitee={invitees[0]}
+          invitee={invitees[0].userName}
           onHangUp={hangUpHandle}
         />
       )}

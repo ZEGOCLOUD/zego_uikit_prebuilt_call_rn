@@ -1,4 +1,4 @@
-package com.zegocloud.uikit.rn.zegoprebuiltcall;
+package com.zegocloud.zegouikit.example.prebuiltcall;
 
 import android.app.Application;
 import android.content.Context;
@@ -10,7 +10,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
-import com.zegocloud.uikit.rn.zegoprebuiltcall.newarchitecture.MainApplicationReactNativeHost;
+import com.zegocloud.zegouikit.example.prebuiltcall.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class MainApplication extends Application implements ReactApplication {
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.zegocloud.uikit.rn.zegoprebuiltcall.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("com.zegocloud.zegouikit.example.prebuiltcall.ReactNativeFlipper");
         aClass
             .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
             .invoke(null, context, reactInstanceManager);
