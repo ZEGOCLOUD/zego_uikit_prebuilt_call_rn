@@ -150,7 +150,7 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
     },
     innerText = {},
     showDeclineButton = true,
-    notifyWhenAppRunningInBackgroundOrQuit = true,
+    notifyWhenAppRunningInBackgroundOrQuit = false,
     isIOSSandboxEnvironment = true,
     androidNotificationConfig = {
       channelID: "CallInvitation",
