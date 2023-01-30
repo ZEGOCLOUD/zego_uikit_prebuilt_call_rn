@@ -16,6 +16,7 @@ export default function ZegoSendCallInvitationButton(props) {
     invitees = [],
     isVideoCall = false,
     timeout = 60,
+    onWillPressed,
     onPressed,
     resourceID: _resourceID = ''
   } = props;
@@ -83,6 +84,7 @@ export default function ZegoSendCallInvitationButton(props) {
         }
         data={data}
         timeout={timeout}
+        onWillPressed={onWillPressed}
         onPressed={onPress}
         resourceID={_resourceID}
         notificationTitle={
