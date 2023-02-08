@@ -16,7 +16,7 @@
     "@react-navigation/native-stack": "^6.9.5",
     "@zegocloud/zego-uikit-prebuilt-call-rn": "link: ../",
     "@zegocloud/zego-uikit-rn": "link: ../../../",
-    "@zegocloud/zego-uikit-signaling-plugin-rn": "1.2.6",
+    "@zegocloud/zego-uikit-signaling-plugin-rn": "1.2.7",
     "react": "17.0.2",
     "react-delegate-component": "^1.0.0",
     "react-native": "0.68.5",
