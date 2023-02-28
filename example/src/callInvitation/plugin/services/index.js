@@ -79,7 +79,7 @@ export default class ZegoPluginInvitationService {
       //   setZpnState("throughMessageReceived: " + getCallID(message))
       // })
     } else {
-      ZPNs.getInstance().unregisterPush();
+      // ZPNs.getInstance().unregisterPush();
       // ZPNs.getInstance().off("registered")
       // ZPNs.getInstance().off("notificationArrived")
       // ZPNs.getInstance().off("notificationClicked")

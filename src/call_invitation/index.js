@@ -12,13 +12,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo, zlogwarning } from '../utils/logger';
+import ZegoCallPrebuiltImpl from "../services";
 
 const Stack = createNativeStackNavigator();
 
 function CallEventListener(props) {
   const navigation = useNavigation();
+  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
   const {
-    androidNotificationChannelID = "",
+    androidNotificationConfig = {},
 
     onIncomingCallReceived,
     onIncomingCallCanceled,
@@ -27,7 +29,10 @@ function CallEventListener(props) {
     onOutgoingCallDeclined,
     onIncomingCallTimeout,
     onOutgoingCallTimeout
-  } = props;
+  } = initConfig;
+  const {
+    androidNotificationChannelID = "",
+  } = androidNotificationConfig;
 
 
   const showBackgroundNotification = async (inviterName, type, invitees) => {
@@ -136,96 +141,96 @@ function CallEventListener(props) {
 
 export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
   const {
-    appID,
-    appSign,
-    userID,
-    userName,
-    token,
-    onRequireNewToken,
-    requireConfig,
-    plugins,
-    ringtoneConfig = {
-      incomingCallFileName: 'zego_incoming.mp3',
-      outgoingCallFileName: 'zego_outgoing.mp3',
-    },
-    innerText = {},
+    // appID,
+    // appSign,
+    // userID,
+    // userName,
+    // token,
+    // onRequireNewToken,
+    // requireConfig,
+    // plugins,
+    // ringtoneConfig = {
+    //   incomingCallFileName: 'zego_incoming.mp3',
+    //   outgoingCallFileName: 'zego_outgoing.mp3',
+    // },
+    // innerText = {},
     showDeclineButton = true,
-    notifyWhenAppRunningInBackgroundOrQuit = false,
-    isIOSSandboxEnvironment = true,
-    androidNotificationConfig = {
-      channelID: "CallInvitation",
-      channelName: "CallInvitation",
-    },
+    // notifyWhenAppRunningInBackgroundOrQuit = false,
+    // isIOSSandboxEnvironment = true,
+    // androidNotificationConfig = {
+    //   channelID: "CallInvitation",
+    //   channelName: "CallInvitation",
+    // },
 
-    onIncomingCallDeclineButtonPressed,
-    onIncomingCallAcceptButtonPressed,
-    onOutgoingCallCancelButtonPressed,
-    onIncomingCallReceived,
-    onIncomingCallCanceled,
-    onOutgoingCallAccepted,
-    onOutgoingCallRejectedCauseBusy,
-    onOutgoingCallDeclined,
-    onIncomingCallTimeout,
-    onOutgoingCallTimeout
+    // onIncomingCallDeclineButtonPressed,
+    // onIncomingCallAcceptButtonPressed,
+    // onIncomingCallReceived,
+    // onIncomingCallCanceled,
+    // onOutgoingCallAccepted,
+    // onOutgoingCallRejectedCauseBusy,
+    // onOutgoingCallDeclined,
+    // onIncomingCallTimeout,
+    // onOutgoingCallTimeout
   } = props;
 
   const [isInit, setIsInit] = useState(false);
 
-  const handleAppStateChange = (nextAppState) => {
-    if (nextAppState === 'active') {
-      ZegoPrebuiltPlugins.reconnectIfDisconnected();
+  // const handleAppStateChange = (nextAppState) => {
+  //   if (nextAppState === 'active') {
+  //     ZegoPrebuiltPlugins.reconnectIfDisconnected();
 
-      notifee.cancelAllNotifications();
-    }
-  };
+  //     notifee.cancelAllNotifications();
+  //   }
+  // };
 
-  useEffect(() => {
-    // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
-    setTimeout(() => {
-      // Enable offline notification
-      ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment);
-      zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment)
-    }, 1000);
-  }, [isInit])
+  // useEffect(() => {
+  //   // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
+  //   setTimeout(() => {
+  //     // Enable offline notification
+  //     ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment);
+  //     zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment)
+  //   }, 1000);
+  // }, [isInit])
 
-  useEffect(() => {
-    notifee.cancelAllNotifications();
+  // useEffect(() => {
+  //   notifee.cancelAllNotifications();
 
-    notifee.createChannel({
-      id: androidNotificationConfig.channelID,
-      name: androidNotificationConfig.channelName,
-      badge: false,
-      vibration: false,
-      importance: AndroidImportance.HIGH,
-      visibility: AndroidVisibility.PUBLIC,
-      sound: ringtoneConfig.incomingCallFileName.split('.')[0]
-    });
-  }, [])
+  //   notifee.createChannel({
+  //     id: androidNotificationConfig.channelID,
+  //     name: androidNotificationConfig.channelName,
+  //     badge: false,
+  //     vibration: false,
+  //     importance: AndroidImportance.HIGH,
+  //     visibility: AndroidVisibility.PUBLIC,
+  //     sound: ringtoneConfig.incomingCallFileName.split('.')[0]
+  //   });
+  // }, [])
 
   useEffect(() => {
     // Init inner text helper
-    InnerTextHelper.instance().init(innerText);
+    // InnerTextHelper.instance().init(innerText);
 
-    const subscription = AppState.addEventListener(
-      'change',
-      handleAppStateChange
-    );
-    ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
-      () => {
+    // const subscription = AppState.addEventListener(
+    //   'change',
+    //   handleAppStateChange
+    // );
+    
+    // ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(
+    //   () => {
+        // External initialization
         setIsInit(true);
-        CallInviteStateManage.init();
-        BellManage.initRingtoneConfig(ringtoneConfig);
-        BellManage.initIncomingSound();
-        BellManage.initOutgoingSound();
-      }
-    );
+        // CallInviteStateManage.init();
+        // BellManage.initRingtoneConfig(ringtoneConfig);
+        // BellManage.initIncomingSound();
+        // BellManage.initOutgoingSound();
+    //   }
+    // );
 
     return () => {
-      BellManage.releaseIncomingSound();
-      BellManage.releaseOutgoingSound();
-      CallInviteStateManage.uninit();
-      ZegoPrebuiltPlugins.uninit();
-      subscription.remove();
+      // BellManage.releaseIncomingSound();
+      // BellManage.releaseOutgoingSound();
+      // CallInviteStateManage.uninit();
+      // subscription.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -235,19 +240,19 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
       <NavigationContainer initialRouteName='ZegoInnerChildrenPage'>
         {isInit ? <ZegoCallInvitationDialog
           showDeclineButton={showDeclineButton}
-          onIncomingCallDeclineButtonPressed={onIncomingCallDeclineButtonPressed}
-          onIncomingCallAcceptButtonPressed={onIncomingCallAcceptButtonPressed}
+          // onIncomingCallDeclineButtonPressed={onIncomingCallDeclineButtonPressed}
+          // onIncomingCallAcceptButtonPressed={onIncomingCallAcceptButtonPressed}
         /> : <View />}
         {isInit ? <CallEventListener
-          onIncomingCallReceived={onIncomingCallReceived}
-          onIncomingCallCanceled={onIncomingCallCanceled}
-          onOutgoingCallAccepted={onOutgoingCallAccepted}
-          onOutgoingCallRejectedCauseBusy={onOutgoingCallRejectedCauseBusy}
-          onOutgoingCallDeclined={onOutgoingCallDeclined}
-          onIncomingCallTimeout={onIncomingCallTimeout}
-          onOutgoingCallTimeout={onOutgoingCallTimeout}
+          // onIncomingCallReceived={onIncomingCallReceived}
+          // onIncomingCallCanceled={onIncomingCallCanceled}
+          // onOutgoingCallAccepted={onOutgoingCallAccepted}
+          // onOutgoingCallRejectedCauseBusy={onOutgoingCallRejectedCauseBusy}
+          // onOutgoingCallDeclined={onOutgoingCallDeclined}
+          // onIncomingCallTimeout={onIncomingCallTimeout}
+          // onOutgoingCallTimeout={onOutgoingCallTimeout}
 
-          androidNotificationChannelID={androidNotificationConfig.channelID}
+          // androidNotificationChannelID={androidNotificationConfig.channelID}
         /> : null}
         <Stack.Navigator>
           <Stack.Screen
@@ -260,29 +265,11 @@ export default function ZegoUIKitPrebuiltCallWithInvitation(props) {
             options={{ headerShown: false }}
             name='ZegoCallInvitationWaitingPage'
             component={ZegoCallInvitationWaiting}
-            initialParams={{
-              appID,
-              appSign,
-              userID,
-              userName,
-              token,
-              onRequireNewToken,
-              onOutgoingCallCancelButtonPressed
-            }}
           />
           <Stack.Screen
             options={{ headerShown: false }}
             name='ZegoCallInvitationRoomPage'
             component={ZegoCallInvitationRoom}
-            initialParams={{
-              appID,
-              appSign,
-              userID,
-              userName,
-              token,
-              onRequireNewToken,
-              requireConfig,
-            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

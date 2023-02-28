@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
+import ZegoCallKit, {
   ZegoUIKitPrebuiltCallWithInvitation,
   ZegoSendCallInvitationButton,
   ZegoInvitationType,
@@ -12,7 +12,7 @@ import {
 // import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
 
 import ZegoUIKitSignalingPlugin from './plugin/index';
-import KeyCenter from './KeyCenter';
+import KeyCenter from '../KeyCenter';
 import {
   View,
   Text,
@@ -31,6 +31,7 @@ export default function CallWithInvitationPage(props) {
   const [showDeclineButton, setShowDeclineButton] = useState(true)
   const [userID, setUserID] = useState('')
   const [userName, setUserName] = useState('')
+  const [isInit, setIsInit] = useState(false)
 
   const viewRef = useRef(null);
   const pressHandle = () => {
@@ -45,20 +46,31 @@ export default function CallWithInvitationPage(props) {
       const id = String(firstInstallTime).slice(-5);
       setUserID(id)
       setUserName('user_' + id)
+      // Initialize after the user's own login is complete
+      ZegoCallKit.init(
+        KeyCenter.appID,
+        KeyCenter.appSign,
+        {
+          userID: id,
+          userName: 'user_' + id
+        },
+        {
+          // token: '',
+          // onRequireNewToken: () => '',
+        },
+        [ZegoUIKitSignalingPlugin]).then(() => {
+        // Render the component after successful initialization
+        setIsInit(true);
+      });
     })
   }, [])
 
   return (
-    userName ? <ZegoUIKitPrebuiltCallWithInvitation
-      appID={KeyCenter.appID}
-      appSign={KeyCenter.appSign}
-      userID={userID}
-      userName={userName}
+    isInit ? <ZegoUIKitPrebuiltCallWithInvitation
       ringtoneConfig={{
         incomingCallFileName: 'zego_incoming.mp3',
         outgoingCallFileName: 'zego_outgoing.mp3',
       }}
-      plugins={[ZegoUIKitSignalingPlugin]} // The signaling plug-in used for call invitation must be set here. 
       requireConfig={(data) => {
         console.warn('requireConfig', data);
         const callConfig =

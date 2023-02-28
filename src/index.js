@@ -1,10 +1,14 @@
 import ZegoUIKitPrebuiltCall from './call';
 import ZegoUIKitPrebuiltCallWithInvitation from './call_invitation';
+import ZegoCallInvitationDialog from './call_invitation/components/ZegoCallInvitationDialog';
+import ZegoCallInvitationWaiting from './call_invitation/pages/ZegoCallInvitationWaiting';
+import ZegoCallInvitationRoom from './call_invitation/pages/ZegoCallInvitationRoom';
 import { ZegoInvitationType } from './call_invitation/services/defines';
 import ZegoMenuBarButtonName from './call/ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './call/ZegoMenuBarStyle';
 import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
 import ZegoSendCallInvitationButton from './call_invitation/components/ZegoSendCallInvitationButton';
+import ZegoCallPrebuiltImpl from './services';
 
 const ONE_ON_ONE_VIDEO_CALL_CONFIG = {
   turnOnCameraWhenJoining: true,
@@ -99,16 +103,20 @@ const GROUP_VOICE_CALL_CONFIG = {
   },
 };
 
-export default ZegoUIKitPrebuiltCall;
+export default ZegoCallPrebuiltImpl.getInstance();
 
 export {
+  ZegoUIKitPrebuiltCall,
+  ZegoSendCallInvitationButton,
   ZegoUIKitPrebuiltCallWithInvitation,
+  ZegoCallInvitationDialog,
+  ZegoCallInvitationWaiting,
+  ZegoCallInvitationRoom,
   ZegoMenuBarButtonName,
   ZegoMenuBarStyle,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
   ONE_ON_ONE_VOICE_CALL_CONFIG,
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
-  ZegoSendCallInvitationButton,
   ZegoInvitationType,
 };

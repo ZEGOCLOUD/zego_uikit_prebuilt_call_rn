@@ -8,17 +8,19 @@ import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 import BellManage from '../services/bell';
 import { zloginfo } from '../../utils/logger';
 import CallInviteStateManage from '../services/inviteStateManager';
+import { useNavigation } from '@react-navigation/native';
+import ZegoCallPrebuiltImpl from '../../services';
 
 export default function ZegoCallInvitationWaiting(props) {
-  const { route, navigation } = props;
+  const navigation = useNavigation();
+  const { appID, appSign } = ZegoCallPrebuiltImpl.getInstance().getInitAppInfo();
+  const { userID, userName } = ZegoCallPrebuiltImpl.getInstance().getInitUser();
+  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
+  const { token, onRequireNewToken, onOutgoingCallCancelButtonPressed} = initConfig;
+  console.log('========props', props);
+  const { route } = props;
+  console.log('========props route', route);
   const {
-    appID,
-    appSign,
-    userID,
-    userName,
-    token,
-    onRequireNewToken,
-    onOutgoingCallCancelButtonPressed,
     roomID,
     isVideoCall,
     invitees,

@@ -5,19 +5,19 @@ import BellManage from '../services/bell';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import { useNavigation } from '@react-navigation/native';
+import ZegoCallPrebuiltImpl from '../../services';
 
 export default function ZegoCallInvitationRoom(props) {
-  const { route, navigation } = props;
+  const navigation = useNavigation();
+  const { appID, appSign } = ZegoCallPrebuiltImpl.getInstance().getInitAppInfo();
+  const { userID, userName } = ZegoCallPrebuiltImpl.getInstance().getInitUser();
+  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
+  const { token, onRequireNewToken, requireConfig } = initConfig;
+  const { route } = props;
   const {
-    appID,
-    appSign,
-    userID,
-    userName,
     roomID,
     isVideoCall,
-    token,
-    onRequireNewToken,
-    requireConfig,
     invitees,
     inviter,
     invitationID,
@@ -41,7 +41,8 @@ export default function ZegoCallInvitationRoom(props) {
     }
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();
-    navigation.navigate('ZegoInnerChildrenPage');
+    // navigation.navigate('ZegoInnerChildrenPage');
+    ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
   };
 
   useEffect(() => {
@@ -57,7 +58,8 @@ export default function ZegoCallInvitationRoom(props) {
         zloginfo('Invite completed with nobody');
         BellManage.stopOutgoingSound();
         CallInviteStateManage.initInviteData();
-        navigation.navigate('ZegoInnerChildrenPage');
+        // navigation.navigate('ZegoInnerChildrenPage');
+        ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
       });
     }
     return () => {
@@ -88,7 +90,8 @@ export default function ZegoCallInvitationRoom(props) {
             // Invite a single
             if (invitees.length === 1) {
               CallInviteStateManage.initInviteData();
-              navigation.navigate('ZegoInnerChildrenPage');
+              // navigation.navigate('ZegoInnerChildrenPage');
+              ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
             }
           }
         },
