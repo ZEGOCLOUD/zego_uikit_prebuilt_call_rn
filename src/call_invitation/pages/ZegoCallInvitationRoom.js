@@ -39,8 +39,6 @@ export default function ZegoCallInvitationRoomScreen(props) {
       ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
-    BellManage.stopOutgoingSound();
-    CallInviteStateManage.initInviteData();
     // navigation.navigate('ZegoInnerChildrenPage');
   };
 
@@ -55,8 +53,6 @@ export default function ZegoCallInvitationRoomScreen(props) {
       });
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
         zloginfo('Invite completed with nobody');
-        BellManage.stopOutgoingSound();
-        CallInviteStateManage.initInviteData();
         // navigation.navigate('ZegoInnerChildrenPage');
         typeof config.onHangUp === 'function' && config.onHangUp();
       });
@@ -88,7 +84,6 @@ export default function ZegoCallInvitationRoomScreen(props) {
           } else {
             // Invite a single
             if (invitees.length === 1) {
-              CallInviteStateManage.initInviteData();
               // navigation.navigate('ZegoInnerChildrenPage');
               typeof config.onHangUp === 'function' && config.onHangUp();
             }
