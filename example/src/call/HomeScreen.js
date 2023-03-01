@@ -3,17 +3,17 @@ import { Button, View, StyleSheet, Text, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function HomePage(props) {
+export default function HomeScreen(props) {
     const navigation = useNavigation();
     const onJoinPress = (isVoiceCall) => {
-        navigation.navigate(isVoiceCall ? 'VoiceCallPage' : 'VideoCallPage', {
+        navigation.navigate(isVoiceCall ? 'VoiceCallScreen' : 'VideoCallScreen', {
             userID: userID,
             userName: userID,
             callID: callID,
         })
     }
     const onJoinGroupPress = (isVoiceCall) => {
-        navigation.navigate(isVoiceCall ? 'GroupVoiceCallPage' : 'GroupVideoCallPage', {
+        navigation.navigate(isVoiceCall ? 'GroupVoiceCallScreen' : 'GroupVideoCallScreen', {
             userID: userID,
             userName: userID,
             callID: callID,

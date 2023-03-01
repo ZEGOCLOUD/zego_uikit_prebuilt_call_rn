@@ -1,41 +1,41 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomePage from './HomePage';
-import VideoCallPage from './VideoCallPage';
-import VoiceCallPage from './VoiceCallPage';
-import GroupVideoCallPage from './GroupVideoCallPage';
-import GroupVoiceCallPage from './GroupVoiceCallPage';
+import HomeScreen from './HomeScreen';
+import VideoCallScreen from './VideoCallScreen';
+import VoiceCallScreen from './VoiceCallScreen';
+import GroupVideoCallScreen from './GroupVideoCallScreen';
+import GroupVoiceCallScreen from './GroupVoiceCallScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigation(props) {
   return (
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
         options={{headerShown: false}}
         headerMode="none"
-        name="HomePage"
-        component={HomePage}
+        name="HomeScreen"
+        component={HomeScreen}
       />
       <Stack.Screen
         options={{headerShown: false}}
-        name="VideoCallPage"
-        component={VideoCallPage}
+        name="VideoCallScreen"
+        component={VideoCallScreen}
       />
       <Stack.Screen
         options={{headerShown: false}}
-        name="VoiceCallPage"
-        component={VoiceCallPage}
+        name="VoiceCallScreen"
+        component={VoiceCallScreen}
       />
       <Stack.Screen
         options={{headerShown: false}}
-        name="GroupVideoCallPage"
-        component={GroupVideoCallPage}
+        name="GroupVideoCallScreen"
+        component={GroupVideoCallScreen}
       />
       <Stack.Screen
         options={{headerShown: false}}
-        name="GroupVoiceCallPage"
-        component={GroupVoiceCallPage}
+        name="GroupVoiceCallScreen"
+        component={GroupVoiceCallScreen}
       />
     </Stack.Navigator>
   );

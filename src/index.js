@@ -1,8 +1,7 @@
 import ZegoUIKitPrebuiltCall from './call';
-import ZegoUIKitPrebuiltCallWithInvitation from './call_invitation';
 import ZegoCallInvitationDialog from './call_invitation/components/ZegoCallInvitationDialog';
-import ZegoCallInvitationWaiting from './call_invitation/pages/ZegoCallInvitationWaiting';
-import ZegoCallInvitationRoom from './call_invitation/pages/ZegoCallInvitationRoom';
+import ZegoCallInvitationWaitingScreen from './call_invitation/pages/ZegoCallInvitationWaiting';
+import ZegoCallInvitationRoomScreen from './call_invitation/pages/ZegoCallInvitationRoom';
 import { ZegoInvitationType } from './call_invitation/services/defines';
 import ZegoMenuBarButtonName from './call/ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './call/ZegoMenuBarStyle';
@@ -108,10 +107,9 @@ export default ZegoCallPrebuiltImpl.getInstance();
 export {
   ZegoUIKitPrebuiltCall,
   ZegoSendCallInvitationButton,
-  ZegoUIKitPrebuiltCallWithInvitation,
   ZegoCallInvitationDialog,
-  ZegoCallInvitationWaiting,
-  ZegoCallInvitationRoom,
+  ZegoCallInvitationWaitingScreen,
+  ZegoCallInvitationRoomScreen,
   ZegoMenuBarButtonName,
   ZegoMenuBarStyle,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,

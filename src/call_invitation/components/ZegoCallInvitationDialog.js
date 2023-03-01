@@ -15,10 +15,7 @@ import ZegoCallPrebuiltImpl from "../../services";
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
-  const { onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
-  const { 
-    showDeclineButton = true,
-  } = props;
+  const { showDeclineButton, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
 
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
@@ -74,7 +71,7 @@ export default function ZegoCallInvitationDialog(props) {
     BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
-    navigation.navigate('ZegoCallInvitationRoomPage', {
+    navigation.navigate('ZegoCallInvitationRoomScreen', {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
       invitees: extendData.invitees,

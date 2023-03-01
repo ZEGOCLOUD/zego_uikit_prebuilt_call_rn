@@ -5,11 +5,9 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
 } from 'react-native';
-import ZegoCallKit, { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import {useNavigation} from '@react-navigation/native';
+import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
-export default function MemberListPage(props) {
-  const navigation = useNavigation();
+export default function MemberListScreen(props) {
   const [invitees, setInvitees] = useState([]);
   const viewRef = useRef(null);
   const blankPressedHandle = () => {
@@ -33,26 +31,6 @@ export default function MemberListPage(props) {
       resolve(true);
     })
   };
-
-  useEffect(() => {
-    const callbackID = 'MemberListPage' + String(Math.floor(Math.random() * 10000));
-    ZegoCallKit.onRouteChange(callbackID, ({ name, params }) => {
-      if (name === 'ZegoCallInvitationWaitingPage') {
-        navigation.navigate('ZegoCallInvitationWaitingPage', params);
-        console.log('Jump to call waiting page.');
-      } else if (name === 'ZegoCallInvitationRoomPage') {
-        console.log('Jump to call room page.');
-        navigation.navigate('ZegoCallInvitationRoomPage', params);
-      } else if (name === 'ZegoInnerChildrenPage') {
-        console.log('Jump to custom page.');
-        navigation.navigate('MemberListPage');
-      }
-    });
-    
-    return () => {
-      ZegoCallKit.onRouteChange(callbackID);
-    };
-  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={blankPressedHandle}>

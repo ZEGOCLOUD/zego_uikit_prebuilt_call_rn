@@ -7,7 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { zloginfo } from '../../utils/logger';
 import CallInviteStateManage from '../services/inviteStateManager';
 import InnerTextHelper from '../services/inner_text_helper';
-import ZegoCallPrebuiltImpl from "../../services";
 
 export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
@@ -48,43 +47,23 @@ export default function ZegoSendCallInvitationButton(props) {
     if (invitees.length === 1) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
-      navigation.navigate('ZegoCallInvitationWaitingPage', {
+      navigation.navigate('ZegoCallInvitationWaitingScreen', {
         roomID,
         isVideoCall,
         invitees,
         inviter: localUser.userID,
         invitationID,
       });
-      // ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({
-      //   name: 'ZegoCallInvitationWaitingPage',
-      //   params: {
-      //     roomID,
-      //     isVideoCall,
-      //     invitees,
-      //     inviter: localUser.userID,
-      //     invitationID,
-      //   }
-      // });
     } else {
       // Jump to call room page
       zloginfo('Jump to call room page.');
-      navigation.navigate('ZegoCallInvitationRoomPage', {
+      navigation.navigate('ZegoCallInvitationRoomScreen', {
         roomID,
         isVideoCall,
         invitees: getInviteeIDList(),
         inviter: localUser.userID,
         invitationID,
       });
-      // ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({
-      //   name: 'ZegoCallInvitationRoomPage',
-      //   params: {
-      //     roomID,
-      //     isVideoCall,
-      //     invitees: getInviteeIDList(),
-      //     inviter: localUser.userID,
-      //     invitationID,
-      //   }
-      // });
     }
     setForceRender(Date.now());
     if (typeof onPressed === 'function') {

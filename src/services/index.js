@@ -41,7 +41,7 @@ export default class ZegoCallPrebuiltImpl {
         this.appInfo = { appID, appSign };
         this.localUser = userInfo;
         Object.assign(this.config, config);
-        this.plugins = plugins;
+        this.plugins = plugins || [];
         if (this.isCallInvitation()) {
             // Call invitation
 
@@ -93,12 +93,6 @@ export default class ZegoCallPrebuiltImpl {
                 this.isInit = true;
                 this.notifyInit();
             });
-        } else {
-            // Call
-            return ZegoUIKit.init(appID, appSign, userInfo).then(() => {
-                this.isInit = true;
-                this.notifyInit();
-            })
         }
     }
     uninit() {
@@ -119,21 +113,6 @@ export default class ZegoCallPrebuiltImpl {
     }
     getInitConfig() {
         return this.config;
-    }
-    notifyRouteChange(route) {
-        // route: { name: '', params: {  } }
-        Object.keys(this.onRouteChangeCallbackMap).forEach((callbackID) => {
-            if (this.onRouteChangeCallbackMap[callbackID]) {
-                this.onRouteChangeCallbackMap[callbackID](route);
-            }
-        });
-    }
-    onRouteChange(callbackID, callback) {
-        if (typeof callback !== 'function') {
-            delete this.onRouteChangeCallbackMap[callbackID];
-        } else {
-            this.onRouteChangeCallbackMap[callbackID] = callback;
-        }
     }
     notifyInit() {
         Object.keys(this.onInitCallbackMap).forEach((callbackID) => {

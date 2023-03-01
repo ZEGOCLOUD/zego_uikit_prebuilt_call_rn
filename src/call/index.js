@@ -19,7 +19,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         userName,
         callID,
         config,
-        token,
+        token = '',
         onRequireNewToken,
     } = props;
     const {
@@ -226,7 +226,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     if (appSign) {
                         ZegoUIKit.joinRoom(callID);
                     } else {
-                        ZegoUIKit.joinRoom(callID, token || onRequireNewToken());
+                        ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : '' ));
                     }
                 });
 

@@ -5,11 +5,11 @@ import BellManage from '../services/bell';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import ZegoCallPrebuiltImpl from '../../services';
 
-export default function ZegoCallInvitationRoom(props) {
-  const navigation = useNavigation();
+export default function ZegoCallInvitationRoomScreen(props) {
+  // const navigation = useNavigation();
   const { appID, appSign } = ZegoCallPrebuiltImpl.getInstance().getInitAppInfo();
   const { userID, userName } = ZegoCallPrebuiltImpl.getInstance().getInitUser();
   const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
@@ -42,12 +42,11 @@ export default function ZegoCallInvitationRoom(props) {
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();
     // navigation.navigate('ZegoInnerChildrenPage');
-    ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
   };
 
   useEffect(() => {
     const callbackID =
-      'ZegoCallInvitationRoom ' + String(Math.floor(Math.random() * 10000));
+      'ZegoCallInvitationRoomScreen ' + String(Math.floor(Math.random() * 10000));
     if (invitees.length > 1 && inviter === userID) {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
@@ -59,7 +58,7 @@ export default function ZegoCallInvitationRoom(props) {
         BellManage.stopOutgoingSound();
         CallInviteStateManage.initInviteData();
         // navigation.navigate('ZegoInnerChildrenPage');
-        ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
+        typeof config.onHangUp === 'function' && config.onHangUp();
       });
     }
     return () => {
@@ -81,21 +80,21 @@ export default function ZegoCallInvitationRoom(props) {
         ...config,
         onHangUp: () => {
           hangUpHandle();
-          config.onHangUp && config.onHangUp(navigation);
+          typeof config.onHangUp === 'function' && config.onHangUp();
         },
         onOnlySelfInRoom: () => {
           if (typeof config.onOnlySelfInRoom === 'function') {
-            config.onOnlySelfInRoom(navigation);
+            config.onOnlySelfInRoom();
           } else {
             // Invite a single
             if (invitees.length === 1) {
               CallInviteStateManage.initInviteData();
               // navigation.navigate('ZegoInnerChildrenPage');
-              ZegoCallPrebuiltImpl.getInstance().notifyRouteChange({ name: 'ZegoInnerChildrenPage' });
+              typeof config.onHangUp === 'function' && config.onHangUp();
             }
           }
         },
-        onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation(navigation)} : undefined
+        onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation()} : undefined
       }}
       token={token}
       onRequireNewToken={onRequireNewToken}
