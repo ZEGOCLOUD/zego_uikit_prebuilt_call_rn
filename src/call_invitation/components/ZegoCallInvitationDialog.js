@@ -15,7 +15,7 @@ import ZegoUIKitPrebuiltCallService from "../../services";
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { showDeclineButton, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
+  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
 
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
