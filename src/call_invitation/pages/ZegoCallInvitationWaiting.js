@@ -9,13 +9,13 @@ import BellManage from '../services/bell';
 import { zloginfo } from '../../utils/logger';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { useNavigation } from '@react-navigation/native';
-import ZegoCallPrebuiltImpl from '../../services';
+import ZegoUIKitPrebuiltCallService from '../../services';
 
-export default function ZegoCallInvitationWaitingScreen(props) {
+export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const navigation = useNavigation();
-  const { appID, appSign } = ZegoCallPrebuiltImpl.getInstance().getInitAppInfo();
-  const { userID, userName } = ZegoCallPrebuiltImpl.getInstance().getInitUser();
-  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
+  const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
+  const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
+  const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { token = '', onRequireNewToken, onOutgoingCallCancelButtonPressed} = initConfig;
   console.log('========props', props);
   const { route } = props;
@@ -109,7 +109,7 @@ export default function ZegoCallInvitationWaitingScreen(props) {
   }, []);
   useEffect(() => {
     const callbackID =
-      'ZegoCallInvitationWaitingScreen' + String(Math.floor(Math.random() * 10000));
+      'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
     ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
     ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
       BellManage.stopOutgoingSound();
@@ -132,7 +132,7 @@ export default function ZegoCallInvitationWaitingScreen(props) {
         zloginfo('Jump to call room page.');
         BellManage.stopOutgoingSound();
         ZegoUIKit.leaveRoom().then(() => {
-          navigation.navigate('ZegoCallInvitationRoomScreen', {
+          navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
             roomID,
             isVideoCall,
             invitees: getInviteeIDList(),

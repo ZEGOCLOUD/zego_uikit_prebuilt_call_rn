@@ -47,7 +47,7 @@ export default function ZegoSendCallInvitationButton(props) {
     if (invitees.length === 1) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
-      navigation.navigate('ZegoCallInvitationWaitingScreen', {
+      navigation.navigate('ZegoUIKitPrebuiltCallWaitingScreen', {
         roomID,
         isVideoCall,
         invitees,
@@ -57,7 +57,7 @@ export default function ZegoSendCallInvitationButton(props) {
     } else {
       // Jump to call room page
       zloginfo('Jump to call room page.');
-      navigation.navigate('ZegoCallInvitationRoomScreen', {
+      navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
         roomID,
         isVideoCall,
         invitees: getInviteeIDList(),

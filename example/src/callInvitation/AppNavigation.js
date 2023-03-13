@@ -3,8 +3,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from "./HomeScreen";
 import MemberListScreen from "./MemberListScreen";
 import {
-    ZegoCallInvitationWaitingScreen,
-    ZegoCallInvitationRoomScreen,
+    ZegoUIKitPrebuiltCallWaitingScreen,
+    ZegoUIKitPrebuiltCallInCallScreen,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
@@ -22,13 +22,13 @@ export default function AppNavigation(props) {
             />
             <Stack.Screen
                 options={{ headerShown: false }}
-                name="ZegoCallInvitationWaitingScreen"
-                component={ZegoCallInvitationWaitingScreen}
+                name="ZegoUIKitPrebuiltCallWaitingScreen"
+                component={ZegoUIKitPrebuiltCallWaitingScreen}
             />
             <Stack.Screen
                 options={{ headerShown: false }}
-                name="ZegoCallInvitationRoomScreen"
-                component={ZegoCallInvitationRoomScreen}
+                name="ZegoUIKitPrebuiltCallInCallScreen"
+                component={ZegoUIKitPrebuiltCallInCallScreen}
             />
         </Stack.Navigator>
     );

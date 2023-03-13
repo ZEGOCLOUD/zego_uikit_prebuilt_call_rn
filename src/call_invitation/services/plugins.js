@@ -23,7 +23,7 @@ const _install = (plugins) => {
 };
 
 const ZegoPrebuiltPlugins = {
-  init: (appID, appSign, userInfo, plugins) => {
+  init: (appID, appSign, userID, userName, plugins) => {
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
     _install(plugins);
@@ -34,7 +34,6 @@ const ZegoPrebuiltPlugins = {
         _pluginConnectionState = state;
       }
     );
-    const { userID, userName } = userInfo;
     _appInfo.appID = appID;
     _appInfo.appSign = appSign;
     _localUser.userID = userID;

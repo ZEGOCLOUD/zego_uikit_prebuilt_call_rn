@@ -11,10 +11,10 @@ import ZegoUIKit, {
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
 } from '@zegocloud/zego-uikit-rn';
-import ZegoCallPrebuiltImpl from "../../services";
+import ZegoUIKitPrebuiltCallService from "../../services";
 
 export default function ZegoCallInvitationDialog(props) {
-  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
+  const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { showDeclineButton, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
 
   const navigation = useNavigation();
@@ -71,7 +71,7 @@ export default function ZegoCallInvitationDialog(props) {
     BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
-    navigation.navigate('ZegoCallInvitationRoomScreen', {
+    navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
       roomID: extendData.call_id,
       isVideoCall: inviteType === ZegoInvitationType.videoCall,
       invitees: extendData.invitees,
@@ -84,11 +84,11 @@ export default function ZegoCallInvitationDialog(props) {
   useEffect(() => {
     const callbackID =
         'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
-    ZegoCallPrebuiltImpl.getInstance().onInit(callbackID, () => {
+    ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID, () => {
       setIsInit(true);
     })
     return () => {
-      ZegoCallPrebuiltImpl.getInstance().onInit(callbackID);
+      ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID);
     };
   }, []);
   useEffect(() => {

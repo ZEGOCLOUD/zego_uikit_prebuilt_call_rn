@@ -5,14 +5,14 @@ import BellManage from '../services/bell';
 import CallInviteStateManage from '../services/inviteStateManager';
 import { zloginfo } from '../../utils/logger';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
-// import { useNavigation } from '@react-navigation/native';
-import ZegoCallPrebuiltImpl from '../../services';
+import { useNavigation } from '@react-navigation/native';
+import ZegoUIKitPrebuiltCallService from '../../services';
 
-export default function ZegoCallInvitationRoomScreen(props) {
-  // const navigation = useNavigation();
-  const { appID, appSign } = ZegoCallPrebuiltImpl.getInstance().getInitAppInfo();
-  const { userID, userName } = ZegoCallPrebuiltImpl.getInstance().getInitUser();
-  const initConfig = ZegoCallPrebuiltImpl.getInstance().getInitConfig();
+export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
+  const navigation = useNavigation();
+  const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
+  const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
+  const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { token, onRequireNewToken, requireConfig } = initConfig;
   const { route } = props;
   const {
@@ -44,7 +44,7 @@ export default function ZegoCallInvitationRoomScreen(props) {
 
   useEffect(() => {
     const callbackID =
-      'ZegoCallInvitationRoomScreen ' + String(Math.floor(Math.random() * 10000));
+      'ZegoUIKitPrebuiltCallInCallScreen ' + String(Math.floor(Math.random() * 10000));
     if (invitees.length > 1 && inviter === userID) {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
@@ -54,7 +54,11 @@ export default function ZegoCallInvitationRoomScreen(props) {
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
         zloginfo('Invite completed with nobody');
         // navigation.navigate('ZegoInnerChildrenPage');
-        typeof config.onHangUp === 'function' && config.onHangUp();
+        if (typeof config.onHangUp === 'function') {
+          config.onHangUp();
+        } else {
+          navigation.goBack();
+        }
       });
     }
     return () => {
@@ -76,7 +80,11 @@ export default function ZegoCallInvitationRoomScreen(props) {
         ...config,
         onHangUp: () => {
           hangUpHandle();
-          typeof config.onHangUp === 'function' && config.onHangUp();
+          if (typeof config.onHangUp === 'function') {
+            config.onHangUp();
+          } else {
+            navigation.goBack();
+          }
         },
         onOnlySelfInRoom: () => {
           if (typeof config.onOnlySelfInRoom === 'function') {
@@ -85,7 +93,11 @@ export default function ZegoCallInvitationRoomScreen(props) {
             // Invite a single
             if (invitees.length === 1) {
               // navigation.navigate('ZegoInnerChildrenPage');
-              typeof config.onHangUp === 'function' && config.onHangUp();
+              if (typeof config.onHangUp === 'function') {
+                config.onHangUp();
+              } else {
+                navigation.goBack();
+              }
             }
           }
         },

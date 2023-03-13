@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Button, Alert } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import ZegoCallKit, {
+import ZegoUIKitPrebuiltCallService, {
     ZegoInvitationType,
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
     ONE_ON_ONE_VOICE_CALL_CONFIG,
@@ -19,11 +19,11 @@ export default function HomeScreen(props) {
     const [userName, setUserName] = useState('');
 
     const initHandle = () => {
-        const userInfo = { userID, userName };
-        ZegoCallKit.init(
+        ZegoUIKitPrebuiltCallService.init(
             KeyCenter.appID,
             KeyCenter.appSign,
-            userInfo,
+            userID,
+            userName,
             {
                 token: '',
                 onRequireNewToken: () => '',

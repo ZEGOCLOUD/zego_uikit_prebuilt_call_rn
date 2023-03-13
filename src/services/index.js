@@ -8,7 +8,7 @@ import { AppState } from 'react-native';
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
 
-export default class ZegoCallPrebuiltImpl {
+export default class ZegoUIKitPrebuiltCallService {
     _instance;
     appInfo = {};
     localUser = {};
@@ -32,14 +32,14 @@ export default class ZegoCallPrebuiltImpl {
     onRouteChangeCallbackMap = {};
     constructor() { }
     static getInstance() {
-        return this._instance || (this._instance = new ZegoCallPrebuiltImpl());
+        return this._instance || (this._instance = new ZegoUIKitPrebuiltCallService());
     }
     isCallInvitation() {
         return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
     }
-    init(appID, appSign, userInfo, config = {}, plugins) {
+    init(appID, appSign, userID, userName, config = {}, plugins) {
         this.appInfo = { appID, appSign };
-        this.localUser = userInfo;
+        this.localUser = { userID, userName };
         Object.assign(this.config, config);
         this.plugins = plugins || [];
         if (this.isCallInvitation()) {
@@ -76,7 +76,7 @@ export default class ZegoCallPrebuiltImpl {
                 visibility: AndroidVisibility.PUBLIC,
                 sound: ringtoneConfig.incomingCallFileName.split('.')[0]
             });
-            return ZegoPrebuiltPlugins.init(appID, appSign, userInfo, plugins).then(() => {
+            return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
                 // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
                 setTimeout(() => {
                     // Enable offline notification
