@@ -283,7 +283,7 @@ const CallInviteStateManage = {
   },
   onSomeoneAcceptedInvite: (callbackID, callback) => {
     if (typeof callback !== 'function') {
-      if (callbackID in CallInviteStateManage._onSomeoneAcceptedInviteMap) {
+      if (CallInviteStateManage._onSomeoneAcceptedInviteMap.has(callbackID)) {
         CallInviteStateManage._onSomeoneAcceptedInviteMap.delete(callbackID);
       }
     } else {
@@ -295,7 +295,7 @@ const CallInviteStateManage = {
   },
   onInviteCompletedWithNobody: (callbackID, callback) => {
     if (typeof callback !== 'function') {
-      if (callbackID in CallInviteStateManage._onInviteCompletedWithNobodyMap) {
+      if (CallInviteStateManage._onInviteCompletedWithNobodyMap.has(callbackID)) {
         CallInviteStateManage._onInviteCompletedWithNobodyMap.delete(
           callbackID
         );

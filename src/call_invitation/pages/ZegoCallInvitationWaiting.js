@@ -17,9 +17,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { token = '', onRequireNewToken, onOutgoingCallCancelButtonPressed} = initConfig;
-  console.log('========props', props);
   const { route } = props;
-  console.log('========props route', route);
   const {
     roomID,
     isVideoCall,
@@ -133,6 +131,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         BellManage.stopOutgoingSound();
         ZegoUIKit.leaveRoom().then(() => {
           navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
+            origin: 'ZegoUIKitPrebuiltCallWaitingScreen',
             roomID,
             isVideoCall,
             invitees: getInviteeIDList(),

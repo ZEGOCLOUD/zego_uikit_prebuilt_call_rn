@@ -22,6 +22,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const { token, onRequireNewToken, requireConfig } = initConfig;
   const { route } = props;
   const {
+    origin,
     roomID,
     isVideoCall,
     invitees,
@@ -46,9 +47,10 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     return {
       ...callConfig,
       onOnlySelfInRoom: () => {
+        console.log('requireDefaultConfig onOnlySelfInRoom', data);
         if (data.invitees.length == 1) {
           navigation.goBack();
-          navigation.goBack();
+          origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
         }
       },
     };
@@ -67,6 +69,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   };
 
   useEffect(() => {
+    console.log('ZegoUIKitPrebuiltCallInCallScreen init');
     const callbackID =
       'ZegoUIKitPrebuiltCallInCallScreen ' + String(Math.floor(Math.random() * 10000));
     if (invitees.length > 1 && inviter === userID) {
@@ -82,17 +85,18 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
           config.onHangUp();
         } else {
           navigation.goBack();
-          invitees.length === 1 && navigation.goBack();
+          origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
         }
       });
     }
     return () => {
+      console.log('ZegoUIKitPrebuiltCallInCallScreen destroy');
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BellManage.stopOutgoingSound();
       CallInviteStateManage.initInviteData();
     };
-  });
+  }, []);
 
   return (
     <ZegoUIKitPrebuiltCall
@@ -109,10 +113,11 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
             config.onHangUp();
           } else {
             navigation.goBack();
-            invitees.length === 1 && navigation.goBack();
+            origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
           }
         },
         onOnlySelfInRoom: () => {
+          console.log('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
           if (typeof config.onOnlySelfInRoom === 'function') {
             config.onOnlySelfInRoom();
           } else {
@@ -123,12 +128,12 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
                 config.onHangUp();
               } else {
                 navigation.goBack();
-                invitees.length === 1 && navigation.goBack();
+                origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
               }
             }
           }
         },
-        onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation()} : undefined
+        onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation()} : undefined,
       }}
       token={token}
       onRequireNewToken={onRequireNewToken}

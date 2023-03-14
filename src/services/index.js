@@ -38,6 +38,9 @@ export default class ZegoUIKitPrebuiltCallService {
         return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
     }
     init(appID, appSign, userID, userName, plugins, config = {}) {
+        if (this.isInit) {
+            return Promise.resolve();
+        }
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
         Object.assign(this.config, config);
@@ -96,13 +99,15 @@ export default class ZegoUIKitPrebuiltCallService {
         }
     }
     uninit() {
-        if (this.isCallInvitation() && this.isInit) {
-            ZegoPrebuiltPlugins.uninit();
-            BellManage.releaseIncomingSound();
-            BellManage.releaseOutgoingSound();
-            CallInviteStateManage.uninit();
-            this.subscription.remove();
-            OffineCallEventListener.getInstance().uninit();
+        if (this.isInit) {
+            if (this.isCallInvitation()) {
+                ZegoPrebuiltPlugins.uninit();
+                BellManage.releaseIncomingSound();
+                BellManage.releaseOutgoingSound();
+                CallInviteStateManage.uninit();
+                this.subscription.remove();
+                OffineCallEventListener.getInstance().uninit();
+            }
         }
     }
     getInitUser() {
