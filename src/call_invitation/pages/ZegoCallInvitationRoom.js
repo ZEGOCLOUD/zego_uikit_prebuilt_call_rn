@@ -7,6 +7,12 @@ import { zloginfo } from '../../utils/logger';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { useNavigation } from '@react-navigation/native';
 import ZegoUIKitPrebuiltCallService from '../../services';
+import {
+  ONE_ON_ONE_VIDEO_CALL_CONFIG,
+  ONE_ON_ONE_VOICE_CALL_CONFIG,
+  GROUP_VIDEO_CALL_CONFIG,
+  GROUP_VOICE_CALL_CONFIG,
+} from '../../services/defines';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -28,8 +34,26 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       : ZegoInvitationType.voiceCall,
     invitees,
   };
-  const config = requireConfig(callInvitationData);
-
+  const requireDefaultConfig = (data) => {
+    const callConfig =
+      data.invitees.length > 1
+        ? ZegoInvitationType.videoCall === data.type
+          ? GROUP_VIDEO_CALL_CONFIG
+          : GROUP_VOICE_CALL_CONFIG
+        : ZegoInvitationType.videoCall === data.type
+          ? ONE_ON_ONE_VIDEO_CALL_CONFIG
+          : ONE_ON_ONE_VOICE_CALL_CONFIG;
+    return {
+      ...callConfig,
+      onOnlySelfInRoom: () => {
+        if (data.invitees.length == 1) {
+          navigation.goBack();
+          navigation.goBack();
+        }
+      },
+    };
+  };
+  const config = typeof requireConfig === 'function' ? requireConfig(callInvitationData) : requireDefaultConfig(callInvitationData);
   const hangUpHandle = () => {
     // Determine if the current is Inviter
     if (
@@ -58,6 +82,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
           config.onHangUp();
         } else {
           navigation.goBack();
+          invitees.length === 1 && navigation.goBack();
         }
       });
     }
@@ -84,6 +109,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
             config.onHangUp();
           } else {
             navigation.goBack();
+            invitees.length === 1 && navigation.goBack();
           }
         },
         onOnlySelfInRoom: () => {
@@ -97,6 +123,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
                 config.onHangUp();
               } else {
                 navigation.goBack();
+                invitees.length === 1 && navigation.goBack();
               }
             }
           }

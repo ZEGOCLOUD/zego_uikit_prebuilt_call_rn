@@ -24,57 +24,13 @@ export default function HomeScreen(props) {
             KeyCenter.appSign,
             userID,
             userName,
+            [ZegoUIKitSignalingPlugin],
             {
                 token: '',
                 onRequireNewToken: () => '',
                 ringtoneConfig: {
                     incomingCallFileName: 'zego_incoming.mp3',
                     outgoingCallFileName: 'zego_outgoing.mp3',
-                },
-                requireConfig: (data) => {
-                    console.log('[Demo]requireConfig', data);
-                    const callConfig =
-                        data.invitees.length > 1
-                            ? ZegoInvitationType.videoCall === data.type
-                                ? GROUP_VIDEO_CALL_CONFIG
-                                : GROUP_VOICE_CALL_CONFIG
-                            : ZegoInvitationType.videoCall === data.type
-                                ? ONE_ON_ONE_VIDEO_CALL_CONFIG
-                                : ONE_ON_ONE_VOICE_CALL_CONFIG;
-                    return {
-                        ...callConfig,
-                        onHangUp: () => {
-                            console.log('[Demo]onHangUp');
-                            navigation.navigate('MemberListScreen');
-                        },
-                        onOnlySelfInRoom: () => {
-                            console.log('[Demo]onOnlySelfInRoom');
-                            navigation.navigate('MemberListScreen');
-                        },
-                        onHangUpConfirmation: () => {
-                            console.log('[Demo]onHangUpConfirmation');
-                            return new Promise((resolve, reject) => {
-                                Alert.alert(
-                                    "Leave the call",
-                                    "Are your sure to leave the call",
-                                    [
-                                        {
-                                            text: "Cancel",
-                                            onPress: () => {
-                                                reject();
-                                            },
-                                            style: "cancel"
-                                        },
-                                        {
-                                            text: "Confirm", onPress: () => {
-                                                resolve();
-                                            }
-                                        }
-                                    ]
-                                );
-                            })
-                        },
-                    };
                 },
                 innerText: {},
                 showDeclineButton: true,
@@ -111,8 +67,7 @@ export default function HomeScreen(props) {
                 onOutgoingCallTimeout: (callID, invitees) => {
                     console.log('[Demo]onOutgoingCallTimeout', callID, invitees);
                 },
-            },
-            [ZegoUIKitSignalingPlugin]).then(() => {
+            }).then(() => {
             console.log('[Demo]init success!');
             // Go to the invitation page
             navigation.navigate('MemberListScreen');

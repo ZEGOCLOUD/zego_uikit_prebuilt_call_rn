@@ -37,7 +37,7 @@ export default class ZegoUIKitPrebuiltCallService {
     isCallInvitation() {
         return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
     }
-    init(appID, appSign, userID, userName, config = {}, plugins) {
+    init(appID, appSign, userID, userName, plugins, config = {}) {
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
         Object.assign(this.config, config);
