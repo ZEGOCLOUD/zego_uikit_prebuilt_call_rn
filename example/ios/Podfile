@@ -20,6 +20,8 @@ target 'ZegoPrebuiltCall' do
   )
 
 
+  pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
+
   target 'ZegoPrebuiltCallTests' do
     inherit! :complete
     # Pods for testing

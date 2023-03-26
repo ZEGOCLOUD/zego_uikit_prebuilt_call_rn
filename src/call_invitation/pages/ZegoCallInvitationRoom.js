@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import ZegoUIKitPrebuiltCall from '../../call';
 import { ZegoInvitationType } from '../services/defines';
 import BellManage from '../services/bell';
-import CallInviteStateManage from '../services/inviteStateManager';
+import CallInviteStateManage from '../services/invite_state_manager';
 import { zloginfo } from '../../utils/logger';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { useNavigation } from '@react-navigation/native';

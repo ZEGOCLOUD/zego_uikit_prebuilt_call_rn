@@ -67,3 +67,4 @@ lib/
 
 npm
 example/src/KeyCenter.js
+example/.watchman-cookie*

@@ -4,8 +4,16 @@ import { zlogerror, zloginfo } from '../utils/logger';
 import ZPNs from 'zego-zpns-react-native';
 import { Platform, } from 'react-native';
 
+ZPNs.getInstance().on('throughMessageReceived', message => {
+  zloginfo('ZPNs throughMessageReceived: ', message)
+  var dataObj = JSON.parse(message.extras.payload);
+  ZegoPluginInvitationService.getInstance().getOfflineDataHandler()(dataObj)
+})
+
 export default class ZegoPluginInvitationService {
   static shared;
+  _offlineDataHandler;
+
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
       this._notifyWhenAppRunningInBackgroundOrQuit = true;
@@ -19,6 +27,13 @@ export default class ZegoPluginInvitationService {
     }
     return ZegoPluginInvitationService.shared;
   }
+  setOfflineDataHandler(handler) {
+    this._offlineDataHandler = handler;
+  }
+  getOfflineDataHandler() {
+    return this._offlineDataHandler;
+  }
+
   getZIMInstance() {
     return ZegoSignalingPluginCore.getInstance().getZIMInstance();
   }
@@ -57,7 +72,7 @@ export default class ZegoPluginInvitationService {
         ZPNs.getInstance().registerPush();
       } else {
         ZPNs.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });
-        
+
         ZPNs.getInstance().registerPush();
       }
 
@@ -88,7 +103,7 @@ export default class ZegoPluginInvitationService {
 
   }
   sendInvitation(inviterName, invitees, timeout, type, data, notificationConfig) {
-    
+
     // invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
       zlogerror('[Service]Send invitees is empty.');
@@ -100,7 +115,7 @@ export default class ZegoPluginInvitationService {
       type,
       data,
     });
-    
+
     if (this._notifyWhenAppRunningInBackgroundOrQuit) {
       config.pushConfig = {
         title: notificationConfig.title ?? "",
@@ -166,6 +181,7 @@ export default class ZegoPluginInvitationService {
     );
     return ZegoSignalingPluginCore.getInstance().accept(callID, config);
   }
+
   onConnectionStateChanged(callbackID, callback) {
     ZegoSignalingPluginCore.getInstance().onConnectionStateChanged(
       callbackID,

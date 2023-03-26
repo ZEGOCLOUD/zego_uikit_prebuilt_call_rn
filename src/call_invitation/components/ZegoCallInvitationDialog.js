@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
-import CallInviteStateManage from '../services/inviteStateManager';
+import CallInviteStateManage from '../services/invite_state_manager';
 import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
 import InnerTextHelper from '../services/inner_text_helper'
+import CallInviteHelper from '../services/call_invite_helper'
 
 import ZegoUIKit, {
   ZegoAcceptInvitationButton,
@@ -15,7 +16,7 @@ import ZegoUIKitPrebuiltCallService from "../../services";
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed} = initConfig;
+  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed } = initConfig;
 
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
@@ -52,45 +53,56 @@ export default function ZegoCallInvitationDialog(props) {
       return require('../resources/button_call_video_accept.png');
     }
   };
-  const refuseHandle = () => {
+  const onRefuseCallback = () => {
     if (typeof onIncomingCallDeclineButtonPressed == 'function') {
       onIncomingCallDeclineButtonPressed(navigation)
     }
-    CallInviteStateManage.updateInviteDataAfterRejected(callID);
-    BellManage.stopIncomingSound();
-    BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
+  }
+  const refuseHandle = () => {
+    CallInviteHelper.getInstance().refuseCall(callID)
   };
-  const acceptHandle = () => {
+  const onAccectCallback = (data) => {
+    console.log("############++++++++++++++=======++++==+=+=+=++=+=+=+===----", data)
     if (typeof onIncomingCallAcceptButtonPressed == 'function') {
       onIncomingCallAcceptButtonPressed(navigation)
     }
-    CallInviteStateManage.updateInviteDataAfterAccepted(callID);
-    BellManage.stopIncomingSound();
-    BellManage.cancleVirate();
     setIsDialogVisable(false);
     setIsFullScreen(false);
+
     navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
-      roomID: extendData.call_id,
-      isVideoCall: inviteType === ZegoInvitationType.videoCall,
-      invitees: extendData.invitees,
-      inviter: inviter.id,
+      roomID: data.call_id,
+      isVideoCall: data.type === ZegoInvitationType.videoCall,
+      invitees: data.invitees,
+      inviter: data.inviter.id,
     });
+  }
+  const acceptHandle = () => {
+    CallInviteHelper.getInstance().acceptCall(callID, {...extendData, inviteType, inviter});
   };
   const pressHandle = () => {
     setIsFullScreen(true);
   };
   useEffect(() => {
+    console.log('ZegoCallInvitationDialog ######################## create')
+    console.log("##########&&&&&&&&&&&&&&&&&&&&&&&===================", CallInviteHelper.getInstance().getOfflineData())
     const callbackID =
-        'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
+      'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
     ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID, () => {
       setIsInit(true);
     })
+    CallInviteHelper.getInstance().onCallAccepted(callbackID, onAccectCallback);
+    CallInviteHelper.getInstance().onCallRefused(callbackID, onRefuseCallback);
+
     return () => {
+      console.log('ZegoCallInvitationDialog ######################## destroy')
       ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID);
+      CallInviteHelper.getInstance().onCallAccepted(callbackID);
+      CallInviteHelper.getInstance().onCallRefused(callbackID);
     };
   }, []);
+
   useEffect(() => {
     if (isInit) {
       console.log('########Register callbacks after init');
@@ -98,9 +110,10 @@ export default function ZegoCallInvitationDialog(props) {
         'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
         callbackID,
-        ({ callID: resCallID, type, inviter, data }) => {
-          const onCall = CallInviteStateManage.isOncall(resCallID);
+        ({ callID: invitationID, type, inviter, data }) => {
+          const onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
+
           if (onCall || onRoom) {
             zloginfo(
               `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
@@ -109,19 +122,27 @@ export default function ZegoCallInvitationDialog(props) {
             ZegoUIKit.getSignalingPlugin().refuseInvitation(
               inviter.id,
               JSON.stringify({
-                callID: resCallID,
+                callID: invitationID,
                 reason: 'busy'
               })
             );
-            CallInviteStateManage.updateInviteDataAfterRejected(resCallID);
+            CallInviteStateManage.updateInviteDataAfterRejected(invitationID);
           } else {
-            setCallID(resCallID);
-            setInviteType(type);
-            setInviter(inviter);
-            setExtendData(JSON.parse(data));
-            setIsDialogVisable(true);
-            BellManage.playIncomingSound();
-            BellManage.vibrate();
+            const offlineData = CallInviteHelper.getInstance().getOfflineData();
+            const currentData = JSON.parse(data);
+            if (offlineData && offlineData.call_id === currentData.call_id && offlineData.inviter.id === currentData.inviter.id) {
+              CallInviteHelper.getInstance().acceptCall(invitationID, CallInviteHelper.getInstance().getOfflineData())
+              ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, undefined)
+              CallInviteHelper.getInstance().setOfflineData(undefined)
+            } else {
+              setCallID(invitationID);
+              setInviteType(type);
+              setInviter(inviter);
+              setExtendData(JSON.parse(data));
+              setIsDialogVisable(true);
+              BellManage.playIncomingSound();
+              BellManage.vibrate();
+            }
           }
         }
       );

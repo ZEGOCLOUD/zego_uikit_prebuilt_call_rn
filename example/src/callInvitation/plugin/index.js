@@ -31,6 +31,9 @@ export default class ZegoUIKitSignalingPlugin {
   getPluginType() {
     return this._signaling;
   }
+  setOfflineDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setOfflineDataHandler(handler)
+  }
   invoke(method, params) {
     switch (method) {
       case 'init':

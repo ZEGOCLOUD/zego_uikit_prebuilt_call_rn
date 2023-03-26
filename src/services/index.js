@@ -1,9 +1,9 @@
 import ZegoPrebuiltPlugins from "../call_invitation/services/plugins";
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
-import CallInviteStateManage from '../call_invitation/services/inviteStateManager';
+import CallInviteStateManage from '../call_invitation/services/invite_state_manager';
 import BellManage from '../call_invitation/services/bell';
 import InnerTextHelper from '../call_invitation/services/inner_text_helper';
-import OffineCallEventListener from '../call_invitation/services/offline_call_event_listener';
+import OfflineCallEventListener from '../call_invitation/services/offline_call_event_listener';
 import { AppState } from 'react-native';
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
@@ -33,6 +33,10 @@ export default class ZegoUIKitPrebuiltCallService {
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new ZegoUIKitPrebuiltCallService());
+    }
+    usingSystemCallUI(signalingPlugin) {
+        zloginfo('usingSystemCallUI: ', signalingPlugin)
+        OfflineCallEventListener.getInstance().usingSystemCallUI(signalingPlugin)
     }
     isCallInvitation() {
         return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
@@ -87,7 +91,7 @@ export default class ZegoUIKitPrebuiltCallService {
                     zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment)
                 }, 1000);
 
-                OffineCallEventListener.getInstance().init(this.config);
+                OfflineCallEventListener.getInstance().init(this.config);
 
                 CallInviteStateManage.init();
                 BellManage.initRingtoneConfig(ringtoneConfig);
@@ -106,7 +110,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 BellManage.releaseOutgoingSound();
                 CallInviteStateManage.uninit();
                 this.subscription.remove();
-                OffineCallEventListener.getInstance().uninit();
+                OfflineCallEventListener.getInstance().uninit();
             }
         }
     }

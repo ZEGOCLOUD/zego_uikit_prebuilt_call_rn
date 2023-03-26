@@ -7,7 +7,7 @@ import ZegoUIKit, {
 import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 import BellManage from '../services/bell';
 import { zloginfo } from '../../utils/logger';
-import CallInviteStateManage from '../services/inviteStateManager';
+import CallInviteStateManage from '../services/invite_state_manager';
 import { useNavigation } from '@react-navigation/native';
 import ZegoUIKitPrebuiltCallService from '../../services';
 
