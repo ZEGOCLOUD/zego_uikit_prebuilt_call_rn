@@ -4,7 +4,7 @@ import { zlogerror, zloginfo } from '../utils/logger';
 import ZPNs from 'zego-zpns-react-native';
 import { Platform, } from 'react-native';
 
-ZPNs.getInstance().on('throughMessageReceived', message => {
+ZPNs.setBackgroundMessageHandler(message => {
   zloginfo('ZPNs throughMessageReceived: ', message)
   var dataObj = JSON.parse(message.extras.payload);
   ZegoPluginInvitationService.getInstance().getOfflineDataHandler()(dataObj)
