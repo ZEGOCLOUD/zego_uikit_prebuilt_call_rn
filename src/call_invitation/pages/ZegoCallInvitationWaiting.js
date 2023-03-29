@@ -116,7 +116,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       navigation.goBack();
     });
     ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
-      const callIDs = Array.from(CallInviteStateManage._callIDMap.keys());
+      const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
       if (callIDs.includes(data.callID)) {
         BellManage.stopOutgoingSound();
         ZegoUIKit.leaveRoom();
