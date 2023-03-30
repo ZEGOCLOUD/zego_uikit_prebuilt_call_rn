@@ -1,12 +1,12 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo } from '../utils/logger';
-import ZPNs from 'zego-zpns-react-native';
+import ZPNs, { CallKit } from 'zego-zpns-react-native';
 import { Platform, } from 'react-native';
 
 ZPNs.getInstance().on('throughMessageReceived', message => {
   zloginfo('ZPNs throughMessageReceived: ', message)
-  var dataObj = JSON.parse(message.extras.payload);
+  const dataObj = JSON.parse(message.extras.payload);
   ZegoPluginInvitationService.getInstance().getOfflineDataHandler()(dataObj)
 })
 
@@ -67,19 +67,21 @@ export default class ZegoPluginInvitationService {
 
     if (enable) {
       if (Platform.OS === 'ios') {
+        const CXProviderConfiguration = { localizedName: 'My app name' };
+        CallKit.setInitConfiguration(CXProviderConfiguration);
         ZPNs.getInstance().applyNotificationPermission();
         ZPNs.enableDebug(isIOSDevelopmentEnvironment);
-        ZPNs.getInstance().registerPush();
+        ZPNs.getInstance().registerPush({ enableIOSVoIP: true });
       } else {
         ZPNs.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });
 
-        ZPNs.getInstance().registerPush();
+        ZPNs.getInstance().registerPush({ enableIOSVoIP: true });
       }
 
 
-      // ZPNs.getInstance().on("registered", (message) => {
-      //   console.log("@@@@@@@@@@@@@@@@>>>>>>>>>>>>>>>############", message)
-      // })
+      ZPNs.getInstance().on("registered", (message) => {
+        console.log("@@@@@@@@@@@@@@@@>>>>>>>>>>>>>>>############", message)
+      })
 
       // ZPNs.getInstance().on("notificationArrived", (message) => {
       //   console.log("@@@@@@@@@@@@@@@@notificationArrived>>>>>>>>>>>>>>>############", getCallID(message))
@@ -95,7 +97,7 @@ export default class ZegoPluginInvitationService {
       // })
     } else {
       // ZPNs.getInstance().unregisterPush();
-      // ZPNs.getInstance().off("registered")
+      ZPNs.getInstance().off("registered")
       // ZPNs.getInstance().off("notificationArrived")
       // ZPNs.getInstance().off("notificationClicked")
       // ZPNs.getInstance().off("throughMessageReceived")

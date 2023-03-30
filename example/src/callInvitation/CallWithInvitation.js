@@ -59,11 +59,13 @@ const onUserLogin = async (userID, userName) => {
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Step 1: Config React Navigation
 export default function App() {
     useEffect(() => {
-        // CallKit.getInstance().on("didReceiveIncomingPushWithPayload", function (payload, uuid) {
-        //     // 拉起通话界面
-        //     var CXCallUpdate = {};
-        //     CallKit.getInstance().reportIncomingCall(CXCallUpdate, uuid);
-        // });
+        console.log('######### init app');
+        CallKit.getInstance().on("didReceiveIncomingPush", function (extras, uuid) {
+            console.log('#########didReceiveIncomingPush', extras, uuid);
+            // 拉起通话界面
+            // var CXCallUpdate = {};
+            // CallKit.getInstance().reportIncomingCall(CXCallUpdate, uuid);
+        });
     }, [])
 
 
