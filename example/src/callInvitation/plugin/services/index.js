@@ -1,7 +1,7 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo } from '../utils/logger';
-import ZPNs, { CallKit } from 'zego-zpns-react-native';
+import ZPNs, { CallKit, CXCallEndedReason } from 'zego-zpns-react-native';
 import { Platform, } from 'react-native';
 
 ZPNs.getInstance().on('throughMessageReceived', message => {
@@ -13,6 +13,9 @@ ZPNs.getInstance().on('throughMessageReceived', message => {
 export default class ZegoPluginInvitationService {
   static shared;
   _offlineDataHandler;
+  _incomingPushDataHandler;
+  _answerCallHandler;
+  _endCallHandler;
 
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
@@ -33,7 +36,27 @@ export default class ZegoPluginInvitationService {
   getOfflineDataHandler() {
     return this._offlineDataHandler;
   }
-
+  setIncomingPushDataHandler(handler) {
+    this._incomingPushDataHandler = handler;
+  }
+  onAnswerCall(handler) {
+    this._answerCallHandler = handler;
+  }
+  onEndCall(handler) {
+    this._endCallHandler = handler;
+  }
+  getIncomingPushDataHandler() {
+    return this._incomingPushDataHandler;
+  }
+  getAnswerCallHandle() {
+    return this._answerCallHandler;
+  }
+  getEndCallHandle() {
+    return this._endCallHandler;
+  }
+  reportCallEnded(uuid) {
+    return CallKit.getInstance().reportCallEnded(CXCallEndedReason.AnsweredElsewhere, uuid);
+  }
   getZIMInstance() {
     return ZegoSignalingPluginCore.getInstance().getZIMInstance();
   }
@@ -95,6 +118,51 @@ export default class ZegoPluginInvitationService {
       //   console.log("@@@@@@@@@@@@@@@@throughMessageReceived>>>>>>>>>>>>>>>############", getCallID(message))
       //   setZpnState("throughMessageReceived: " + getCallID(message))
       // })
+
+      CallKit.getInstance().on("didReceiveIncomingPush", (extras, uuid) => {
+        console.log('#########didReceiveIncomingPush', extras, uuid);
+        let { payload } = extras;
+        const dataObj = payload ? JSON.parse(payload) : {};
+        ZegoPluginInvitationService.getInstance().getIncomingPushDataHandler()(dataObj, uuid);
+      });
+      CallKit.getInstance().on("providerDidReset", () => {
+        console.log('#########providerDidReset');
+      });
+      CallKit.getInstance().on("providerDidBegin", () => {
+        console.log('#########providerDidBegin');
+      });
+      CallKit.getInstance().on("didActivateAudioSession", () => {
+        console.log('#########didActivateAudioSession');
+      });
+      CallKit.getInstance().on("didDeactivateAudioSession", () => {
+        console.log('#########didDeactivateAudioSession');
+      });
+      CallKit.getInstance().on("timedOutPerformingAction", (action) => {
+        console.log('#########timedOutPerformingAction', action);
+      });
+      CallKit.getInstance().on("performStartCallAction", (action) => {
+        console.log('#########performStartCallAction', action);
+      });
+      CallKit.getInstance().on("performAnswerCallAction", (action) => {
+        console.log('#########performAnswerCallAction', action);
+        ZegoPluginInvitationService.getInstance().getAnswerCallHandle()()
+      });
+      CallKit.getInstance().on("performEndCallAction", (action) => {
+        console.log('#########performEndCallAction', action);
+        ZegoPluginInvitationService.getInstance().getEndCallHandle()()
+      });
+      CallKit.getInstance().on("performSetHeldCallAction", (action) => {
+        console.log('#########performSetHeldCallAction', action);
+      });
+      CallKit.getInstance().on("performSetMutedCallAction", (action) => {
+        console.log('#########performSetMutedCallAction', action);
+      });
+      CallKit.getInstance().on("performSetGroupCallAction", (action) => {
+        console.log('#########performSetGroupCallAction', action);
+      });
+      CallKit.getInstance().on("performPlayDTMFCallAction", (action) => {
+        console.log('#########performPlayDTMFCallAction', action);
+      });
     } else {
       // ZPNs.getInstance().unregisterPush();
       ZPNs.getInstance().off("registered")

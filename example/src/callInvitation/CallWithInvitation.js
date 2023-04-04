@@ -12,8 +12,6 @@ import ZegoUIKitPrebuiltCallService, {
     ZegoCallInvitationDialog, ZegoUIKitPrebuiltCallWaitingScreen, ZegoUIKitPrebuiltCallInCallScreen, ZegoSendCallInvitationButton,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
-import { CallKit } from 'zego-zpns-react-native';
-
 const Stack = createNativeStackNavigator();
 
 
@@ -58,17 +56,6 @@ const onUserLogin = async (userID, userName) => {
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Step 1: Config React Navigation
 export default function App() {
-    useEffect(() => {
-        console.log('######### init app');
-        CallKit.getInstance().on("didReceiveIncomingPush", function (extras, uuid) {
-            console.log('#########didReceiveIncomingPush', extras, uuid);
-            // 拉起通话界面
-            // var CXCallUpdate = {};
-            // CallKit.getInstance().reportIncomingCall(CXCallUpdate, uuid);
-        });
-    }, [])
-
-
     return (
         <NavigationContainer >
 

@@ -32,7 +32,19 @@ export default class ZegoUIKitSignalingPlugin {
     return this._signaling;
   }
   setOfflineDataHandler(handler) {
-    ZegoPluginInvitationService.getInstance().setOfflineDataHandler(handler)
+    ZegoPluginInvitationService.getInstance().setOfflineDataHandler(handler);
+  }
+  setIncomingPushDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setIncomingPushDataHandler(handler);
+  }
+  onAnswerCall(handler) {
+    ZegoPluginInvitationService.getInstance().onAnswerCall(handler);
+  }
+  onEndCall(handler) {
+    ZegoPluginInvitationService.getInstance().onEndCall(handler);
+  }
+  reportCallEnded(uuid) {
+    ZegoPluginInvitationService.getInstance().reportCallEnded(uuid);
   }
   invoke(method, params) {
     switch (method) {
