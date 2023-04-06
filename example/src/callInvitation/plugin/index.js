@@ -31,20 +31,20 @@ export default class ZegoUIKitSignalingPlugin {
   getPluginType() {
     return this._signaling;
   }
-  setOfflineDataHandler(handler) {
-    ZegoPluginInvitationService.getInstance().setOfflineDataHandler(handler);
+  setAndroidOfflineDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setAndroidOfflineDataHandler(handler);
   }
-  setIncomingPushDataHandler(handler) {
-    ZegoPluginInvitationService.getInstance().setIncomingPushDataHandler(handler);
+  setIOSOfflineDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setIOSOfflineDataHandler(handler);
   }
-  onAnswerCall(handler) {
-    ZegoPluginInvitationService.getInstance().onAnswerCall(handler);
+  onCallKitAnswerCall(handler) {
+    ZegoPluginInvitationService.getInstance().onCallKitAnswerCall(handler);
   }
-  onEndCall(handler) {
-    ZegoPluginInvitationService.getInstance().onEndCall(handler);
+  onCallKitEndCall(handler) {
+    ZegoPluginInvitationService.getInstance().onCallKitEndCall(handler);
   }
-  reportCallEnded(uuid) {
-    ZegoPluginInvitationService.getInstance().reportCallEnded(uuid);
+  reportCallKitCallEnded(uuid) {
+    ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid);
   }
   invoke(method, params) {
     switch (method) {

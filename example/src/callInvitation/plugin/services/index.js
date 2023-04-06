@@ -7,15 +7,15 @@ import { Platform, } from 'react-native';
 ZPNs.setBackgroundMessageHandler(message => {
   zloginfo('ZPNs throughMessageReceived: ', message)
   const dataObj = JSON.parse(message.extras.payload);
-  ZegoPluginInvitationService.getInstance().getOfflineDataHandler()(dataObj)
+  ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
 })
 
 export default class ZegoPluginInvitationService {
   static shared;
-  _offlineDataHandler;
-  _incomingPushDataHandler;
-  _answerCallHandler;
-  _endCallHandler;
+  _androidOfflineDataHandler;
+  _iOSOfflineDataHandler;
+  _callKitAnswerCallHandler;
+  _callKitEndCallHandler;
 
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
@@ -30,31 +30,31 @@ export default class ZegoPluginInvitationService {
     }
     return ZegoPluginInvitationService.shared;
   }
-  setOfflineDataHandler(handler) {
-    this._offlineDataHandler = handler;
+  setAndroidOfflineDataHandler(handler) {
+    this._androidOfflineDataHandler = handler;
   }
-  getOfflineDataHandler() {
-    return this._offlineDataHandler;
+  getAndroidOfflineDataHandler() {
+    return this._androidOfflineDataHandler;
   }
-  setIncomingPushDataHandler(handler) {
-    this._incomingPushDataHandler = handler;
+  setIOSOfflineDataHandler(handler) {
+    this._iOSOfflineDataHandler = handler;
   }
-  onAnswerCall(handler) {
-    this._answerCallHandler = handler;
+  onCallKitAnswerCall(handler) {
+    this._callKitAnswerCallHandler = handler;
   }
-  onEndCall(handler) {
-    this._endCallHandler = handler;
+  onCallKitEndCall(handler) {
+    this._callKitEndCallHandler = handler;
   }
-  getIncomingPushDataHandler() {
-    return this._incomingPushDataHandler;
+  getIOSOfflineDataHandler() {
+    return this._iOSOfflineDataHandler;
   }
   getAnswerCallHandle() {
-    return this._answerCallHandler;
+    return this._callKitAnswerCallHandler;
   }
   getEndCallHandle() {
-    return this._endCallHandler;
+    return this._callKitEndCallHandler;
   }
-  reportCallEnded(uuid) {
+  reportCallKitCallEnded(uuid) {
     return CallKit.getInstance().reportCallEnded(CXCallEndedReason.AnsweredElsewhere, uuid);
   }
   getZIMInstance() {
@@ -123,7 +123,7 @@ export default class ZegoPluginInvitationService {
         console.log('#########didReceiveIncomingPush', extras, uuid);
         let { payload } = extras;
         const dataObj = payload ? JSON.parse(payload) : {};
-        ZegoPluginInvitationService.getInstance().getIncomingPushDataHandler()(dataObj, uuid);
+        ZegoPluginInvitationService.getInstance().getIOSOfflineDataHandler()(dataObj, uuid);
       });
       CallKit.getInstance().on("providerDidReset", () => {
         console.log('#########providerDidReset');

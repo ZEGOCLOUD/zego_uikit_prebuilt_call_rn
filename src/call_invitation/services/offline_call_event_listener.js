@@ -37,7 +37,7 @@ export default class OfflineCallEventListener {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
     usingSystemCallUI(signalingPlugin) {
-        signalingPlugin.getInstance().setOfflineDataHandler((data) => {
+        signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
             console.log('OfflineDataHandler: ', data)
 
 
@@ -61,12 +61,12 @@ export default class OfflineCallEventListener {
             RNCallKeep.displayIncomingCall(data.call_id, data.inviter.id, data.inviter.name, 'generic', true);
         })
 
-        signalingPlugin.getInstance().setIncomingPushDataHandler((data, callUUID) => {
-            console.log('#####setIncomingPushDataHandler1111: ', data, AppState.currentState);
+        signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
+            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState);
             // This cannot be written in the answer call, dialog cannot get
-            signalingPlugin.getInstance().onAnswerCall(() => {
-                console.log('#####onAnswerCall2222', data, callUUID, this._currentCallData);
-                signalingPlugin.getInstance().reportCallEnded(callUUID);
+            signalingPlugin.getInstance().onCallKitAnswerCall(() => {
+                console.log('#####onCallKitAnswerCall2222', data, callUUID, this._currentCallData);
+                signalingPlugin.getInstance().reportCallKitCallEnded(callUUID);
                 CallInviteHelper.getInstance().setOfflineData(data);
 
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
@@ -76,8 +76,8 @@ export default class OfflineCallEventListener {
                     ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
                 }
             });
-            signalingPlugin.getInstance().onEndCall(() => {
-                console.log('######onEndCall', callUUID, this._currentCallData);
+            signalingPlugin.getInstance().onCallKitEndCall(() => {
+                console.log('######onCallKitEndCall', callUUID, this._currentCallData);
                 if (this._currentCallData && this._currentCallData.inviter) {
                     ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined).then(() => {
                         CallInviteHelper.getInstance().refuseCall(callUUID);
