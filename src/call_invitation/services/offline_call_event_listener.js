@@ -66,7 +66,7 @@ export default class OfflineCallEventListener {
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onAnswerCall(() => {
                 console.log('#####onAnswerCall2222', data, callUUID, this._currentCallData);
-                // signalingPlugin.getInstance().reportCallEnded(callUUID);
+                signalingPlugin.getInstance().reportCallEnded(callUUID);
                 CallInviteHelper.getInstance().setOfflineData(data);
 
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
