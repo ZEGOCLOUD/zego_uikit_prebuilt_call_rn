@@ -7,9 +7,9 @@ import CallInviteHelper from './call_invite_helper'
 
 const rnCallKeepPptions = {
     ios: {
-        appName: 'My app name',
+        appName: 'My app', // required
         handleType: 'generic',
-        includesCallsInRecents: false
+        includesCallsInRecents: false,
     },
     android: {
         alertTitle: 'Permissions required',
@@ -62,7 +62,7 @@ export default class OfflineCallEventListener {
         })
 
         signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
-            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState);
+            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState, this.config.appName);
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onCallKitAnswerCall(() => {
                 console.log('#####onCallKitAnswerCall2222', data, callUUID, this._currentCallData);
@@ -92,6 +92,13 @@ export default class OfflineCallEventListener {
         this.registerCallback();
 
         // Setup for background invitation
+        if (config.appName) {
+            rnCallKeepPptions.ios.appName = config.appName;
+            rnCallKeepPptions.android.foregroundService.channelName = 
+                rnCallKeepPptions.android.foregroundService.channelName.replace('my app', config.appName);
+            rnCallKeepPptions.android.foregroundService.notificationTitle = 
+                rnCallKeepPptions.android.foregroundService.notificationTitle.replace('My app', config.appName);
+        }
         RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
 
         RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {

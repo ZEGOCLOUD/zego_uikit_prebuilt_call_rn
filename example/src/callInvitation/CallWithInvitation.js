@@ -51,6 +51,7 @@ const onUserLogin = async (userID, userName) => {
                 channelID: "ZegoUIKit",
                 channelName: "ZegoUIKit",
             },
+            appName: 'Tilince',
         });
 }
 

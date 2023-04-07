@@ -61,7 +61,7 @@ export default class ZegoUIKitSignalingPlugin {
           params.userName
         );
       case 'enableNotifyWhenAppRunningInBackgroundOrQuit':
-        return ZegoPluginInvitationService.getInstance().enableNotifyWhenAppRunningInBackgroundOrQuit(params.enable, params.isIOSDevelopmentEnvironment)
+        return ZegoPluginInvitationService.getInstance().enableNotifyWhenAppRunningInBackgroundOrQuit(params.enable, params.isIOSDevelopmentEnvironment, params.appName)
       case 'logout':
         return ZegoPluginInvitationService.getInstance().logout();
       case 'sendInvitation':

@@ -24,6 +24,7 @@ export default class ZegoUIKitPrebuiltCallService {
         },
         notifyWhenAppRunningInBackgroundOrQuit: false,
         isIOSSandboxEnvironment: true,
+        appName: 'My App',
     };
     plugins = [];
     isInit = false;
@@ -58,6 +59,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 androidNotificationConfig,
                 notifyWhenAppRunningInBackgroundOrQuit,
                 isIOSSandboxEnvironment,
+                appName,
             } = this.config;
             // Init inner text helper
             InnerTextHelper.instance().init(innerText);
@@ -87,7 +89,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
                 setTimeout(() => {
                     // Enable offline notification
-                    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment);
+                    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, appName);
                     zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment)
                 }, 1000);
 

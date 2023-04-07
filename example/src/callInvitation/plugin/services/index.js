@@ -85,12 +85,12 @@ export default class ZegoPluginInvitationService {
     return ZegoSignalingPluginCore.getInstance().logout();
   }
 
-  enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment) {
+  enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment, appName) {
     this._notifyWhenAppRunningInBackgroundOrQuit = enable;
 
     if (enable) {
       if (Platform.OS === 'ios') {
-        const CXProviderConfiguration = { localizedName: 'My app name' };
+        const CXProviderConfiguration = { localizedName: appName };
         CallKit.setInitConfiguration(CXProviderConfiguration);
         ZPNs.getInstance().applyNotificationPermission();
         ZPNs.enableDebug(isIOSDevelopmentEnvironment);
