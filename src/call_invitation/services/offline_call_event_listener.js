@@ -92,6 +92,8 @@ export default class OfflineCallEventListener {
         this.registerCallback();
 
         // Setup for background invitation
+        if (!config.notifyWhenAppRunningInBackgroundOrQuit) return;
+
         if (config.appName) {
             rnCallKeepPptions.ios.appName = config.appName;
             rnCallKeepPptions.android.foregroundService.channelName = 
@@ -99,6 +101,7 @@ export default class OfflineCallEventListener {
             rnCallKeepPptions.android.foregroundService.notificationTitle = 
                 rnCallKeepPptions.android.foregroundService.notificationTitle.replace('My app', config.appName);
         }
+
         RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
 
         RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
@@ -202,6 +205,7 @@ export default class OfflineCallEventListener {
 
         const {
             androidNotificationConfig,
+            notifyWhenAppRunningInBackgroundOrQuit,
         } = this.config;
 
         if (AppState.currentState != "background" || Platform.OS == 'ios') {
@@ -212,7 +216,7 @@ export default class OfflineCallEventListener {
         if (Platform.OS === "android" && parseInt(Platform.constants['Release']) < 8) {
             shouldUseRNCallKeep = false;
         }
-        if (shouldUseRNCallKeep) {
+        if (shouldUseRNCallKeep && notifyWhenAppRunningInBackgroundOrQuit) {
             RNCallKeep.displayIncomingCall(callID, inviterName, inviterName, 'generic', true);
         } else {
             notifee.displayNotification({
