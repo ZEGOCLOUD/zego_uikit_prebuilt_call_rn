@@ -36,7 +36,7 @@ export default class OfflineCallEventListener {
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
-    usingSystemCallUI(signalingPlugin) {
+    useSystemCallingUI(signalingPlugin) {
         signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
             console.log('OfflineDataHandler: ', data)
 

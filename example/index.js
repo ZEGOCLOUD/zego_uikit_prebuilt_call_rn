@@ -5,6 +5,6 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import ZegoUIKitSignalingPlugin from './src/callInvitation/plugin';
 
-ZegoUIKitPrebuiltCallService.usingSystemCallUI(ZegoUIKitSignalingPlugin);
+ZegoUIKitPrebuiltCallService.useSystemCallingUI(ZegoUIKitSignalingPlugin);
 
 AppRegistry.registerComponent(appName, () => App);
