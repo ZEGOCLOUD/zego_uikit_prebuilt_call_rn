@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import KeyCenter from '../KeyCenter';
@@ -51,7 +51,6 @@ const onUserLogin = async (userID, userName) => {
                 channelID: "ZegoUIKit",
                 channelName: "ZegoUIKit",
             },
-            appName: 'Tilince',
         });
 }
 

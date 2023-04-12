@@ -2,6 +2,7 @@ import CallInviteStateManage from './invite_state_manager';
 import BellManage from './bell';
 
 export default class CallInviteHelper {
+    _currentCallUUID;
     _instance;
     _offlineData;
     onAcceptCallbackMap = {};
@@ -17,6 +18,12 @@ export default class CallInviteHelper {
     }
     getOfflineData() {
         return this._offlineData
+    }
+    setCurrentCallUUID(callUUID) {
+        this._currentCallUUID = callUUID;
+    }
+    getCurrentCallUUID() {
+        return this._currentCallUUID;
     }
     acceptCall(callID, data) {
         CallInviteStateManage.updateInviteDataAfterAccepted(callID);

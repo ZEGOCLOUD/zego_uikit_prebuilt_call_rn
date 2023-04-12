@@ -1,9 +1,10 @@
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
-import { AppState, Platform, NativeModules, AppRegistry } from 'react-native';
+import { AppState, Platform, NativeModules, NativeEventEmitter, AppRegistry } from 'react-native';
 import notifee from '@notifee/react-native';
 import InnerTextHelper from '../services/inner_text_helper';
-import RNCallKeep from 'react-native-callkeep'
-import CallInviteHelper from './call_invite_helper'
+import RNCallKeep from 'react-native-callkeep';
+import CallInviteHelper from './call_invite_helper';
+import GetAppName from 'react-native-get-app-name';
 
 const rnCallKeepPptions = {
     ios: {
@@ -31,14 +32,23 @@ export default class OfflineCallEventListener {
     callbackID = 'OfflineCallEventListener ' + String(Math.floor(Math.random() * 10000));
     config = {};
     _currentCallData = {};
+    _signalingPlugin;
 
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
+    getSignalingPlugin() {
+        return this._signalingPlugin;
+    }
     useSystemCallingUI(signalingPlugin) {
+        this._signalingPlugin = signalingPlugin;
+        GetAppName.getAppName((appName) => {
+            console.log("[useSystemCallingUI]Here is your app name:", appName)    
+            this.updateAppName(appName);
+        })
         signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
-            console.log('OfflineDataHandler: ', data)
+            console.log('OfflineDataHandler: ', data, rnCallKeepPptions);
 
 
             // It need to be setup again for offline call
@@ -62,11 +72,16 @@ export default class OfflineCallEventListener {
         })
 
         signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
-            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState, this.config.appName);
+            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState);
+            CallInviteHelper.getInstance().setCurrentCallUUID(callUUID);
             // This cannot be written in the answer call, dialog cannot get
-            signalingPlugin.getInstance().onCallKitAnswerCall(() => {
+            signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
+                // The report succeeds regardless of the direct service scenario
+                action.fulfill();
                 console.log('#####onCallKitAnswerCall2222', data, callUUID, this._currentCallData);
-                signalingPlugin.getInstance().reportCallKitCallEnded(callUUID);
+                // if (AppState.currentState !== 'background') {
+                //     signalingPlugin.getInstance().reportCallKitCallEnded(callUUID);
+                // }
                 CallInviteHelper.getInstance().setOfflineData(data);
 
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
@@ -76,7 +91,9 @@ export default class OfflineCallEventListener {
                     ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
                 }
             });
-            signalingPlugin.getInstance().onCallKitEndCall(() => {
+            signalingPlugin.getInstance().onCallKitEndCall((action) => {
+                // The report succeeds regardless of the direct service scenario
+                action.fulfill();
                 console.log('######onCallKitEndCall', callUUID, this._currentCallData);
                 if (this._currentCallData && this._currentCallData.inviter) {
                     ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined).then(() => {
@@ -87,20 +104,12 @@ export default class OfflineCallEventListener {
         });
     }
     init(config) {
-        console.log('######OfflineCallEventListener init');
+        console.log('######OfflineCallEventListener init', config);
         this.config = config;
         this.registerCallback();
 
         // Setup for background invitation
         if (!config.notifyWhenAppRunningInBackgroundOrQuit) return;
-
-        if (config.appName) {
-            rnCallKeepPptions.ios.appName = config.appName;
-            rnCallKeepPptions.android.foregroundService.channelName = 
-                rnCallKeepPptions.android.foregroundService.channelName.replace('my app', config.appName);
-            rnCallKeepPptions.android.foregroundService.notificationTitle = 
-                rnCallKeepPptions.android.foregroundService.notificationTitle.replace('My app', config.appName);
-        }
 
         RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
 
@@ -121,6 +130,10 @@ export default class OfflineCallEventListener {
             CallInviteHelper.getInstance().refuseCall(callUUID);
             ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined)
         });
+
+        // AppState.addEventListener('change', nextState => {
+        //     console.log('nextState', nextState);
+        // });
     }
     uninit() {
         console.log('######OfflineCallEventListener uninit');
@@ -193,6 +206,15 @@ export default class OfflineCallEventListener {
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
         ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
+    }
+    updateAppName(appName) {
+        if (appName) {
+            rnCallKeepPptions.ios.appName = appName;
+            rnCallKeepPptions.android.foregroundService.channelName = 
+                rnCallKeepPptions.android.foregroundService.channelName.replace('my app', appName);
+            rnCallKeepPptions.android.foregroundService.notificationTitle = 
+                rnCallKeepPptions.android.foregroundService.notificationTitle.replace('My app', appName);
+        }
     }
     getInviteesFromData(data) {
         const invitees = JSON.parse(data).invitees;

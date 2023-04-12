@@ -13,6 +13,8 @@ import {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
 } from '../../services/defines';
+import CallInviteHelper from '../services/call_invite_helper';
+import OfflineCallEventListener from '../services/offline_call_event_listener';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -56,7 +58,15 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     };
   };
   const config = typeof requireConfig === 'function' ? requireConfig(callInvitationData) : requireDefaultConfig(callInvitationData);
+  const callEndHandle = () => {
+    const signalingPlugin = OfflineCallEventListener.getInstance().getSignalingPlugin();
+    const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
+    if (signalingPlugin && currentCallUUID) {
+      signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID);
+    }
+  };
   const hangUpHandle = () => {
+    callEndHandle();
     // Determine if the current is Inviter
     if (
       inviter === userID &&
@@ -117,6 +127,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
           }
         },
         onOnlySelfInRoom: () => {
+          callEndHandle();
           console.log('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
           if (typeof config.onOnlySelfInRoom === 'function') {
             config.onOnlySelfInRoom();

@@ -139,29 +139,35 @@ export default class ZegoPluginInvitationService {
       });
       CallKit.getInstance().on("timedOutPerformingAction", (action) => {
         console.log('#########timedOutPerformingAction', action);
+        action.fulfill();
       });
       CallKit.getInstance().on("performStartCallAction", (action) => {
         console.log('#########performStartCallAction', action);
+        action.fulfill();
       });
       CallKit.getInstance().on("performAnswerCallAction", (action) => {
         console.log('#########performAnswerCallAction', action);
-        ZegoPluginInvitationService.getInstance().getAnswerCallHandle()()
+        ZegoPluginInvitationService.getInstance().getAnswerCallHandle()(action);
       });
       CallKit.getInstance().on("performEndCallAction", (action) => {
         console.log('#########performEndCallAction', action);
-        ZegoPluginInvitationService.getInstance().getEndCallHandle()()
+        ZegoPluginInvitationService.getInstance().getEndCallHandle()(action);
       });
       CallKit.getInstance().on("performSetHeldCallAction", (action) => {
         console.log('#########performSetHeldCallAction', action);
+        action.fulfill();
       });
       CallKit.getInstance().on("performSetMutedCallAction", (action) => {
         console.log('#########performSetMutedCallAction', action);
+        action.fulfill();
       });
       CallKit.getInstance().on("performSetGroupCallAction", (action) => {
         console.log('#########performSetGroupCallAction', action);
+        action.fulfill();
       });
       CallKit.getInstance().on("performPlayDTMFCallAction", (action) => {
         console.log('#########performPlayDTMFCallAction', action);
+        action.fulfill();
       });
     } else {
       // ZPNs.getInstance().unregisterPush();
