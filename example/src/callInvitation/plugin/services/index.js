@@ -90,7 +90,10 @@ export default class ZegoPluginInvitationService {
 
     if (enable) {
       if (Platform.OS === 'ios') {
-        const CXProviderConfiguration = { localizedName: appName };
+        const CXProviderConfiguration = {
+          localizedName: appName,
+          // iconTemplateImageName: "AppIcon",
+        };
         CallKit.setInitConfiguration(CXProviderConfiguration);
         ZPNs.getInstance().applyNotificationPermission();
         ZPNs.enableDebug(isIOSDevelopmentEnvironment);

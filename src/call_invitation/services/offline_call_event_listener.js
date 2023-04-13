@@ -87,7 +87,7 @@ export default class OfflineCallEventListener {
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
                 if (this._currentCallData && this._currentCallData.inviter) {
                     // If you kill the application, you do not need to process it, and this value is also empty
-                    CallInviteHelper.getInstance().acceptCall(callUUID, this._currentCallData);
+                    CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
                     ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
                 }
             });
@@ -97,7 +97,7 @@ export default class OfflineCallEventListener {
                 console.log('######onCallKitEndCall', callUUID, this._currentCallData);
                 if (this._currentCallData && this._currentCallData.inviter) {
                     ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined).then(() => {
-                        CallInviteHelper.getInstance().refuseCall(callUUID);
+                        CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
                     });
                 }
             })
@@ -123,11 +123,11 @@ export default class OfflineCallEventListener {
 
             console.log('Answer call on background mode: ', callUUID, this._currentCallData)
             // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
-            CallInviteHelper.getInstance().acceptCall(callUUID, this._currentCallData);
+            CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
             ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
         });
         RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-            CallInviteHelper.getInstance().refuseCall(callUUID);
+            CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
             ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined)
         });
 
@@ -179,6 +179,7 @@ export default class OfflineCallEventListener {
                 ...JSON.parse(data),
                 type,
                 inviter,
+                callID,
             }
             const invitees = this.getInviteesFromData(data)
             // Listen and show notification on background
