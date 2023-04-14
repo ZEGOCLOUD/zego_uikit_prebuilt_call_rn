@@ -129,7 +129,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       ({ invitee, data }) => {
         zloginfo('Jump to call room page.');
         BellManage.stopOutgoingSound();
-        ZegoUIKit.leaveRoom().then(() => {
+        // ZegoUIKit.leaveRoom().then(() => {
           navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
             origin: 'ZegoUIKitPrebuiltCallWaitingScreen',
             roomID,
@@ -138,7 +138,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
             inviter,
             invitationID,
           });
-        });
+        // });
       }
     );
     return () => {
