@@ -5,6 +5,7 @@ import InnerTextHelper from '../services/inner_text_helper';
 import RNCallKeep from 'react-native-callkeep';
 import CallInviteHelper from './call_invite_helper';
 import GetAppName from 'react-native-get-app-name';
+import { zloginfo } from '../../utils/logger';
 
 const rnCallKeepPptions = {
     ios: {
@@ -72,34 +73,39 @@ export default class OfflineCallEventListener {
         })
 
         signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
-            console.log('#####setIOSOfflineDataHandler1111: ', data, AppState.currentState);
+            CallInviteHelper.getInstance().setOfflineData(undefined)
+            zloginfo("setIOSOfflineDataHandler", data)
             CallInviteHelper.getInstance().setCurrentCallUUID(callUUID);
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
+                zloginfo("onCallKitAnswerCall", data)
                 // The report succeeds regardless of the direct service scenario
                 action.fulfill();
-                console.log('#####onCallKitAnswerCall2222', data, callUUID, this._currentCallData);
                 // if (AppState.currentState !== 'background') {
                 //     signalingPlugin.getInstance().reportCallKitCallEnded(callUUID);
                 // }
                 CallInviteHelper.getInstance().setOfflineData(data);
 
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
-                if (this._currentCallData && this._currentCallData.inviter) {
+                if (data && data.inviter) {
                     // If you kill the application, you do not need to process it, and this value is also empty
-                    CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
-                    ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
+                    if (this._currentCallData && this._currentCallData.callID) {
+                        CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, data);
+                        ZegoUIKit.getSignalingPlugin().acceptInvitation(data.inviter.id, undefined)
+                        this._currentCallData = {}
+                    }
                 }
             });
             signalingPlugin.getInstance().onCallKitEndCall((action) => {
                 // The report succeeds regardless of the direct service scenario
                 action.fulfill();
-                console.log('######onCallKitEndCall', callUUID, this._currentCallData);
-                if (this._currentCallData && this._currentCallData.inviter) {
-                    ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined).then(() => {
-                        CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
-                    });
-                }
+                console.log('######onCallKitEndCall', callUUID);
+                // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
+                // if (data && data.inviter) {
+                //     ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, undefined).then(() => {
+                //         CallInviteHelper.getInstance().refuseCall(data.callID);
+                //     });
+                // }
             })
         });
     }

@@ -64,7 +64,7 @@ export default function ZegoCallInvitationDialog(props) {
     CallInviteHelper.getInstance().refuseCall(callID)
   };
   const onAccectCallback = (data) => {
-    console.log("############++++++++++++++=======++++==+=+=+=++=+=+=+===----", data)
+    zloginfo("onAccectCallback", data.call_id, data.inviter.id)
     if (typeof onIncomingCallAcceptButtonPressed == 'function') {
       onIncomingCallAcceptButtonPressed(navigation)
     }
@@ -113,8 +113,9 @@ export default function ZegoCallInvitationDialog(props) {
         ({ callID: invitationID, type, inviter, data }) => {
           const onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
+          const offlineData = CallInviteHelper.getInstance().getOfflineData();
 
-          if (onCall || onRoom) {
+          if (onCall || (!offlineData && onRoom)) {
             zloginfo(
               `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
             );
@@ -128,10 +129,10 @@ export default function ZegoCallInvitationDialog(props) {
             );
             CallInviteStateManage.updateInviteDataAfterRejected(invitationID);
           } else {
-            const offlineData = CallInviteHelper.getInstance().getOfflineData();
             const currentData = JSON.parse(data);
+
             if (offlineData && offlineData.call_id === currentData.call_id && offlineData.inviter.id === currentData.inviter.id) {
-              CallInviteHelper.getInstance().acceptCall(invitationID, CallInviteHelper.getInstance().getOfflineData())
+              CallInviteHelper.getInstance().acceptCall(invitationID, offlineData)
               ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, undefined)
               CallInviteHelper.getInstance().setOfflineData(undefined)
             } else {
