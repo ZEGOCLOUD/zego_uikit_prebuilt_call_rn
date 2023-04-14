@@ -101,11 +101,14 @@ export default class OfflineCallEventListener {
                 action.fulfill();
                 console.log('######onCallKitEndCall', callUUID);
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
-                // if (data && data.inviter) {
-                //     ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, undefined).then(() => {
-                //         CallInviteHelper.getInstance().refuseCall(data.callID);
-                //     });
-                // }
+                if (data && data.inviter) {
+                    if (this._currentCallData && this._currentCallData.callID) {
+                        ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, undefined).then(() => {
+                            CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
+                            this._currentCallData = {}
+                        });
+                    }
+                }
             })
         });
     }
