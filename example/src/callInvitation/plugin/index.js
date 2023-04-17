@@ -31,6 +31,21 @@ export default class ZegoUIKitSignalingPlugin {
   getPluginType() {
     return this._signaling;
   }
+  setAndroidOfflineDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setAndroidOfflineDataHandler(handler);
+  }
+  setIOSOfflineDataHandler(handler) {
+    ZegoPluginInvitationService.getInstance().setIOSOfflineDataHandler(handler);
+  }
+  onCallKitAnswerCall(handler) {
+    ZegoPluginInvitationService.getInstance().onCallKitAnswerCall(handler);
+  }
+  onCallKitEndCall(handler) {
+    ZegoPluginInvitationService.getInstance().onCallKitEndCall(handler);
+  }
+  reportCallKitCallEnded(uuid) {
+    ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid);
+  }
   invoke(method, params) {
     switch (method) {
       case 'init':
@@ -46,7 +61,7 @@ export default class ZegoUIKitSignalingPlugin {
           params.userName
         );
       case 'enableNotifyWhenAppRunningInBackgroundOrQuit':
-        return ZegoPluginInvitationService.getInstance().enableNotifyWhenAppRunningInBackgroundOrQuit(params.enable, params.isIOSDevelopmentEnvironment)
+        return ZegoPluginInvitationService.getInstance().enableNotifyWhenAppRunningInBackgroundOrQuit(params.enable, params.isIOSDevelopmentEnvironment, params.appName)
       case 'logout':
         return ZegoPluginInvitationService.getInstance().logout();
       case 'sendInvitation':
@@ -171,8 +186,14 @@ export default class ZegoUIKitSignalingPlugin {
         );
         break;
       // RoomProperties
-      case 'roomPropertiesUpdated':
-        ZegoPluginRoomPropertiesService.getInstance().onRoomPropertiesUpdated(
+      case 'roomPropertyUpdated':
+        ZegoPluginRoomPropertiesService.getInstance().onRoomPropertyUpdated(
+          callbackID,
+          callback
+        );
+        break;
+      case 'inRoomTextMessageReceived':
+        ZegoPluginRoomPropertiesService.getInstance().onInRoomTextMessageReceived(
           callbackID,
           callback
         );

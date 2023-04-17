@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import ZegoUIKitPrebuiltCall, { GROUP_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
-import KeyCenter from './KeyCenter';
+import { ZegoUIKitPrebuiltCall, GROUP_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
+import KeyCenter from '../KeyCenter';
 
-export default function VideoCallPage(props) {
+export default function VideoCallScreen(props) {
     const { route } = props;
     const { params } = route;
     const { userID, userName, callID } = params;
@@ -21,8 +21,8 @@ export default function VideoCallPage(props) {
 
                 config={{
                     ...GROUP_VIDEO_CALL_CONFIG,
-                    onOnlySelfInRoom: () => { props.navigation.navigate('HomePage') },
-                    onHangUp: () => { props.navigation.navigate('HomePage') },
+                    onOnlySelfInRoom: () => { props.navigation.navigate('HomeScreen') },
+                    onHangUp: () => { props.navigation.navigate('HomeScreen') },
                     onHangUpConfirmation: () => {
                         return new Promise((resolve, reject) => {
                             Alert.alert(

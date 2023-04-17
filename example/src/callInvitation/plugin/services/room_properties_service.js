@@ -62,8 +62,14 @@ export default class ZegoPluginRoomPropertiesService {
   queryRoomProperties() {
     return ZegoPluginRoomPropertiesCore.getInstance().queryRoomProperties();
   }
-  onRoomPropertiesUpdated(callbackID, callback) {
-    ZegoPluginRoomPropertiesCore.getInstance().onRoomPropertiesUpdated(
+  onRoomPropertyUpdated(callbackID, callback) {
+    ZegoPluginRoomPropertiesCore.getInstance().onRoomPropertyUpdated(
+      callbackID,
+      callback
+    );
+  }
+  onInRoomTextMessageReceived(callbackID, callback) {
+    ZegoPluginRoomPropertiesCore.getInstance().onInRoomTextMessageReceived(
       callbackID,
       callback
     );

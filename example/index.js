@@ -1,10 +1,10 @@
-/**
- * @format
- */
+import { AppRegistry } from 'react-native';
+import App from './src/callInvitation/CallWithInvitation';
+import { name as appName } from './app.json';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import ZegoUIKitSignalingPlugin from './src/callInvitation/plugin';
 
-import {AppRegistry} from 'react-native';
-import App from './src/App';
-import CallWithInvitationPage from './src/CallWithInvitationPage';
-import {name as appName} from './app.json';
+ZegoUIKitPrebuiltCallService.useSystemCallingUI(ZegoUIKitSignalingPlugin);
 
-AppRegistry.registerComponent(appName, () => CallWithInvitationPage);
+AppRegistry.registerComponent(appName, () => App);

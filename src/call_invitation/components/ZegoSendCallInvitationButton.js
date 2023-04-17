@@ -5,7 +5,7 @@ import { ZegoInvitationType } from '../services/defines';
 import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
 import { zloginfo } from '../../utils/logger';
-import CallInviteStateManage from '../services/inviteStateManager';
+import CallInviteStateManage from '../services/invite_state_manager';
 import InnerTextHelper from '../services/inner_text_helper';
 
 export default function ZegoSendCallInvitationButton(props) {
@@ -34,6 +34,8 @@ export default function ZegoSendCallInvitationButton(props) {
     invitees: invitees.map(invitee => {
       return {user_id: invitee.userID, user_name: invitee.userName}
     }),
+    type: isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
+    inviter: {id: localUser.userID, name: localUser.userName},
     custom_data: '',
   });
   const [forceRender, setForceRender] = useState(Date.now());
@@ -47,7 +49,7 @@ export default function ZegoSendCallInvitationButton(props) {
     if (invitees.length === 1) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
-      navigation.navigate('ZegoCallInvitationWaitingPage', {
+      navigation.navigate('ZegoUIKitPrebuiltCallWaitingScreen', {
         roomID,
         isVideoCall,
         invitees,
@@ -57,7 +59,7 @@ export default function ZegoSendCallInvitationButton(props) {
     } else {
       // Jump to call room page
       zloginfo('Jump to call room page.');
-      navigation.navigate('ZegoCallInvitationRoomPage', {
+      navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
         roomID,
         isVideoCall,
         invitees: getInviteeIDList(),

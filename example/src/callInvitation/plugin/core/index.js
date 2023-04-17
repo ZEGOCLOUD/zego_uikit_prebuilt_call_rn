@@ -19,6 +19,7 @@ export default class ZegoSignalingPluginCore {
   _onCallInvitationRejectedCallbackMap = {};
   _onCallInvitationTimeoutCallbackMap = {};
   _onCallInviteesAnsweredTimeoutCallbackMap = {};
+  _currentInvitationID = ''
   constructor() {
     if (!ZegoSignalingPluginCore.shared) {
       zloginfo('[Core]ZegoSignalingPluginCore successful instantiation.');
@@ -65,7 +66,14 @@ export default class ZegoSignalingPluginCore {
           timeout,
           extendedData
         );
+        if (this._currentInvitationID == callID) {
+          return
+        } else {
+          this._currentInvitationID = callID
+        }
         this._callIDUsers.set(callID, inviter);
+        console.log('ZIM.getInstance().onCallInvitationReceived', callID, extendedData)
+        
         const notifyData = { callID, inviter: { id: inviter } };
         if (extendedData) {
           const extendedMap = JSON.parse(extendedData);

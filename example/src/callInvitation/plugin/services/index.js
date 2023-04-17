@@ -1,11 +1,22 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo } from '../utils/logger';
-import ZPNs from 'zego-zpns-react-native';
+import ZPNs, { CallKit, CXCallEndedReason } from 'zego-zpns-react-native';
 import { Platform, } from 'react-native';
+
+ZPNs.setBackgroundMessageHandler(message => {
+  zloginfo('ZPNs throughMessageReceived: ', message)
+  const dataObj = JSON.parse(message.extras.payload);
+  ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
+})
 
 export default class ZegoPluginInvitationService {
   static shared;
+  _androidOfflineDataHandler;
+  _iOSOfflineDataHandler;
+  _callKitAnswerCallHandler;
+  _callKitEndCallHandler;
+
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
       this._notifyWhenAppRunningInBackgroundOrQuit = true;
@@ -18,6 +29,33 @@ export default class ZegoPluginInvitationService {
       ZegoPluginInvitationService.shared = new ZegoPluginInvitationService();
     }
     return ZegoPluginInvitationService.shared;
+  }
+  setAndroidOfflineDataHandler(handler) {
+    this._androidOfflineDataHandler = handler;
+  }
+  getAndroidOfflineDataHandler() {
+    return this._androidOfflineDataHandler;
+  }
+  setIOSOfflineDataHandler(handler) {
+    this._iOSOfflineDataHandler = handler;
+  }
+  onCallKitAnswerCall(handler) {
+    this._callKitAnswerCallHandler = handler;
+  }
+  onCallKitEndCall(handler) {
+    this._callKitEndCallHandler = handler;
+  }
+  getIOSOfflineDataHandler() {
+    return this._iOSOfflineDataHandler;
+  }
+  getAnswerCallHandle() {
+    return this._callKitAnswerCallHandler;
+  }
+  getEndCallHandle() {
+    return this._callKitEndCallHandler;
+  }
+  reportCallKitCallEnded(uuid) {
+    return CallKit.getInstance().reportCallEnded(CXCallEndedReason.AnsweredElsewhere, uuid);
   }
   getZIMInstance() {
     return ZegoSignalingPluginCore.getInstance().getZIMInstance();
@@ -47,24 +85,29 @@ export default class ZegoPluginInvitationService {
     return ZegoSignalingPluginCore.getInstance().logout();
   }
 
-  enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment) {
+  enableNotifyWhenAppRunningInBackgroundOrQuit(enable, isIOSDevelopmentEnvironment, appName) {
     this._notifyWhenAppRunningInBackgroundOrQuit = enable;
 
     if (enable) {
       if (Platform.OS === 'ios') {
+        const CXProviderConfiguration = {
+          localizedName: appName,
+          iconTemplateImageName: "AppIcon",
+        };
+        CallKit.setInitConfiguration(CXProviderConfiguration);
         ZPNs.getInstance().applyNotificationPermission();
         ZPNs.enableDebug(isIOSDevelopmentEnvironment);
-        ZPNs.getInstance().registerPush();
+        ZPNs.getInstance().registerPush({ enableIOSVoIP: true });
       } else {
         ZPNs.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });
-        
-        ZPNs.getInstance().registerPush();
+
+        ZPNs.getInstance().registerPush({ enableIOSVoIP: true });
       }
 
 
-      // ZPNs.getInstance().on("registered", (message) => {
-      //   console.log("@@@@@@@@@@@@@@@@>>>>>>>>>>>>>>>############", message)
-      // })
+      ZPNs.getInstance().on("registered", (message) => {
+        console.log("@@@@@@@@@@@@@@@@>>>>>>>>>>>>>>>############", message)
+      })
 
       // ZPNs.getInstance().on("notificationArrived", (message) => {
       //   console.log("@@@@@@@@@@@@@@@@notificationArrived>>>>>>>>>>>>>>>############", getCallID(message))
@@ -78,9 +121,60 @@ export default class ZegoPluginInvitationService {
       //   console.log("@@@@@@@@@@@@@@@@throughMessageReceived>>>>>>>>>>>>>>>############", getCallID(message))
       //   setZpnState("throughMessageReceived: " + getCallID(message))
       // })
+
+      CallKit.getInstance().on("didReceiveIncomingPush", (extras, uuid) => {
+        console.log('#########didReceiveIncomingPush', extras, uuid);
+        let { payload } = extras;
+        const dataObj = payload ? JSON.parse(payload) : {};
+        ZegoPluginInvitationService.getInstance().getIOSOfflineDataHandler()(dataObj, uuid);
+      });
+      CallKit.getInstance().on("providerDidReset", () => {
+        console.log('#########providerDidReset');
+      });
+      CallKit.getInstance().on("providerDidBegin", () => {
+        console.log('#########providerDidBegin');
+      });
+      CallKit.getInstance().on("didActivateAudioSession", () => {
+        console.log('#########didActivateAudioSession');
+      });
+      CallKit.getInstance().on("didDeactivateAudioSession", () => {
+        console.log('#########didDeactivateAudioSession');
+      });
+      CallKit.getInstance().on("timedOutPerformingAction", (action) => {
+        console.log('#########timedOutPerformingAction', action);
+        action.fulfill();
+      });
+      CallKit.getInstance().on("performStartCallAction", (action) => {
+        console.log('#########performStartCallAction', action);
+        action.fulfill();
+      });
+      CallKit.getInstance().on("performAnswerCallAction", (action) => {
+        console.log('#########performAnswerCallAction', action);
+        ZegoPluginInvitationService.getInstance().getAnswerCallHandle()(action);
+      });
+      CallKit.getInstance().on("performEndCallAction", (action) => {
+        console.log('#########performEndCallAction', action);
+        ZegoPluginInvitationService.getInstance().getEndCallHandle()(action);
+      });
+      CallKit.getInstance().on("performSetHeldCallAction", (action) => {
+        console.log('#########performSetHeldCallAction', action);
+        action.fulfill();
+      });
+      CallKit.getInstance().on("performSetMutedCallAction", (action) => {
+        console.log('#########performSetMutedCallAction', action);
+        action.fulfill();
+      });
+      CallKit.getInstance().on("performSetGroupCallAction", (action) => {
+        console.log('#########performSetGroupCallAction', action);
+        action.fulfill();
+      });
+      CallKit.getInstance().on("performPlayDTMFCallAction", (action) => {
+        console.log('#########performPlayDTMFCallAction', action);
+        action.fulfill();
+      });
     } else {
-      ZPNs.getInstance().unregisterPush();
-      // ZPNs.getInstance().off("registered")
+      // ZPNs.getInstance().unregisterPush();
+      ZPNs.getInstance().off("registered")
       // ZPNs.getInstance().off("notificationArrived")
       // ZPNs.getInstance().off("notificationClicked")
       // ZPNs.getInstance().off("throughMessageReceived")
@@ -88,7 +182,7 @@ export default class ZegoPluginInvitationService {
 
   }
   sendInvitation(inviterName, invitees, timeout, type, data, notificationConfig) {
-    
+
     // invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
       zlogerror('[Service]Send invitees is empty.');
@@ -100,7 +194,7 @@ export default class ZegoPluginInvitationService {
       type,
       data,
     });
-    
+
     if (this._notifyWhenAppRunningInBackgroundOrQuit) {
       config.pushConfig = {
         title: notificationConfig.title ?? "",
@@ -157,7 +251,7 @@ export default class ZegoPluginInvitationService {
     const callID =
       ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
     if (!callID) {
-      zlogerror('[Service]Call id corresponding to the inviterID is empty.');
+      zloginfo('[Service]Call id corresponding to the inviterID is empty.', inviterID, data);
       return Promise.reject(new ZegoPluginResult());
     }
     const config = { extendedData: data };
@@ -166,6 +260,7 @@ export default class ZegoPluginInvitationService {
     );
     return ZegoSignalingPluginCore.getInstance().accept(callID, config);
   }
+
   onConnectionStateChanged(callbackID, callback) {
     ZegoSignalingPluginCore.getInstance().onConnectionStateChanged(
       callbackID,
