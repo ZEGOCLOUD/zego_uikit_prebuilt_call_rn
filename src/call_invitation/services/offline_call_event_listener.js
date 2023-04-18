@@ -4,7 +4,7 @@ import notifee from '@notifee/react-native';
 import InnerTextHelper from '../services/inner_text_helper';
 import RNCallKeep from 'react-native-callkeep';
 import CallInviteHelper from './call_invite_helper';
-import GetAppName from 'react-native-get-app-name';
+// import GetAppName from 'react-native-get-app-name';
 import { zloginfo } from '../../utils/logger';
 
 const rnCallKeepPptions = {
@@ -44,10 +44,10 @@ export default class OfflineCallEventListener {
     }
     useSystemCallingUI(signalingPlugin) {
         this._signalingPlugin = signalingPlugin;
-        GetAppName.getAppName((appName) => {
-            console.log("[useSystemCallingUI]Here is your app name:", appName)    
-            this.updateAppName(appName);
-        })
+        // GetAppName.getAppName((appName) => {
+            // console.log("[useSystemCallingUI]Here is your app name:", appName)    
+            // this.updateAppName(appName);
+        // })
         signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
             console.log('OfflineDataHandler: ', data, rnCallKeepPptions);
 

@@ -7,7 +7,7 @@ import OfflineCallEventListener from '../call_invitation/services/offline_call_e
 import { AppState } from 'react-native';
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
-import GetAppName from 'react-native-get-app-name';
+// import GetAppName from 'react-native-get-app-name';
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -46,10 +46,10 @@ export default class ZegoUIKitPrebuiltCallService {
         if (this.isInit) {
             return Promise.resolve();
         }
-        GetAppName.getAppName((appName) => {
-            console.log("[init]Here is your app name:", appName)    
-            this.config.appName = appName;
-        })
+        // GetAppName.getAppName((appName) => {
+            // console.log("[init]Here is your app name:", appName)    
+            // this.config.appName = appName;
+        // })
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
         Object.assign(this.config, config);
@@ -92,7 +92,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
                 setTimeout(() => {
                     // Enable offline notification
-                    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName || '');
+                    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName || 'My app');
                     zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
                 }, 1000);
 
