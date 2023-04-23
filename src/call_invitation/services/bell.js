@@ -20,7 +20,7 @@ const BellManage = {
     BellManage._outgoingCallFileName = ringtoneConfig.outgoingCallFileName;
   },
   initIncomingSound: () => {
-    Sound.setCategory('Playback');
+    // Sound.setCategory('Playback');
     return new Promise((resolve, reject) => {
       BellManage._whooshIncoming = new Sound(
         BellManage._incomingCallFileName,
