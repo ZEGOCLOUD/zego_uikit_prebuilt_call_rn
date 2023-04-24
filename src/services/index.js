@@ -35,9 +35,8 @@ export default class ZegoUIKitPrebuiltCallService {
     static getInstance() {
         return this._instance || (this._instance = new ZegoUIKitPrebuiltCallService());
     }
-    useSystemCallingUI(signalingPlugin) {
-        zloginfo('useSystemCallingUI: ', signalingPlugin)
-        OfflineCallEventListener.getInstance().useSystemCallingUI(signalingPlugin)
+    useSystemCallingUI(plugins) {
+        OfflineCallEventListener.getInstance().useSystemCallingUI(plugins);
     }
     isCallInvitation() {
         return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
