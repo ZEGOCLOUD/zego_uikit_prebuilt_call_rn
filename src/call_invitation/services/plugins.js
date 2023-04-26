@@ -75,6 +75,9 @@ const ZegoPrebuiltPlugins = {
   getAppInfo: () => {
     return _appInfo;
   },
+  getZIMKitPlugin: () => {
+    return ZIMKitPlugin;
+  },
 };
 
 export default ZegoPrebuiltPlugins;

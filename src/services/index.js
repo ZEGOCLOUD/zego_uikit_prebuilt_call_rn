@@ -26,7 +26,6 @@ export default class ZegoUIKitPrebuiltCallService {
         notifyWhenAppRunningInBackgroundOrQuit: false,
         isIOSSandboxEnvironment: true,
     };
-    plugins = [];
     isInit = false;
     subscription = null;
     onInitCallbackMap = {};
@@ -41,9 +40,6 @@ export default class ZegoUIKitPrebuiltCallService {
     useSystemCallingUI(plugins) {
         OfflineCallEventListener.getInstance().useSystemCallingUI(plugins);
     }
-    isCallInvitation() {
-        return Object.prototype.toString.call(this.plugins) === '[object Array]' && this.plugins.length;
-    }
     init(appID, appSign, userID, userName, plugins, config = {}) {
         if (this.isInit) {
             return Promise.resolve();
@@ -55,70 +51,65 @@ export default class ZegoUIKitPrebuiltCallService {
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
         Object.assign(this.config, config);
-        this.plugins = plugins || [];
-        if (this.isCallInvitation()) {
-            // Call invitation
 
-            const {
-                ringtoneConfig,
-                innerText,
-                androidNotificationConfig,
-                notifyWhenAppRunningInBackgroundOrQuit,
-                isIOSSandboxEnvironment,
-            } = this.config;
-            // Init inner text helper
-            InnerTextHelper.instance().init(innerText);
-            // Monitor application status
-            this.subscription = AppState.addEventListener(
-                'change',
-                (nextAppState) => {
-                    if (nextAppState === 'active') {
-                        ZegoPrebuiltPlugins.reconnectIfDisconnected();
-                  
-                        notifee.cancelAllNotifications();
-                    }
+        // Call invitation
+        const {
+            ringtoneConfig,
+            innerText,
+            androidNotificationConfig,
+            notifyWhenAppRunningInBackgroundOrQuit,
+            isIOSSandboxEnvironment,
+        } = this.config;
+        // Init inner text helper
+        InnerTextHelper.instance().init(innerText);
+        // Monitor application status
+        this.subscription = AppState.addEventListener(
+            'change',
+            (nextAppState) => {
+                if (nextAppState === 'active') {
+                    ZegoPrebuiltPlugins.reconnectIfDisconnected();
+                
+                    notifee.cancelAllNotifications();
                 }
-            );
-            // Notifee create
-            notifee.cancelAllNotifications();
-            notifee.createChannel({
-                id: androidNotificationConfig.channelID,
-                name: androidNotificationConfig.channelName,
-                badge: false,
-                vibration: false,
-                importance: AndroidImportance.HIGH,
-                visibility: AndroidVisibility.PUBLIC,
-                sound: ringtoneConfig.incomingCallFileName.split('.')[0]
-            });
-            return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
-                // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
-                setTimeout(() => {
-                    // Enable offline notification
-                    ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName || 'My app');
-                    zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
-                }, 1000);
+            }
+        );
+        // Notifee create
+        notifee.cancelAllNotifications();
+        notifee.createChannel({
+            id: androidNotificationConfig.channelID,
+            name: androidNotificationConfig.channelName,
+            badge: false,
+            vibration: false,
+            importance: AndroidImportance.HIGH,
+            visibility: AndroidVisibility.PUBLIC,
+            sound: ringtoneConfig.incomingCallFileName.split('.')[0]
+        });
+        return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
+            // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
+            setTimeout(() => {
+                // Enable offline notification
+                ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName || 'My app');
+                zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
+            }, 1000);
 
-                OfflineCallEventListener.getInstance().init(this.config);
+            OfflineCallEventListener.getInstance().init(this.config);
 
-                CallInviteStateManage.init();
-                BellManage.initRingtoneConfig(ringtoneConfig);
-                BellManage.initIncomingSound();
-                BellManage.initOutgoingSound();
-                this.isInit = true;
-                this.notifyInit();
-            });
-        }
+            CallInviteStateManage.init();
+            BellManage.initRingtoneConfig(ringtoneConfig);
+            BellManage.initIncomingSound();
+            BellManage.initOutgoingSound();
+            this.isInit = true;
+            this.notifyInit();
+        });
     }
     uninit() {
         if (this.isInit) {
-            if (this.isCallInvitation()) {
-                ZegoPrebuiltPlugins.uninit();
-                BellManage.releaseIncomingSound();
-                BellManage.releaseOutgoingSound();
-                CallInviteStateManage.uninit();
-                this.subscription.remove();
-                OfflineCallEventListener.getInstance().uninit();
-            }
+            ZegoPrebuiltPlugins.uninit();
+            BellManage.releaseIncomingSound();
+            BellManage.releaseOutgoingSound();
+            CallInviteStateManage.uninit();
+            this.subscription.remove();
+            OfflineCallEventListener.getInstance().uninit();
         }
     }
     getInitUser() {

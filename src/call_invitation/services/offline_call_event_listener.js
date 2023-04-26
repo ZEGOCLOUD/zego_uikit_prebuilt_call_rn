@@ -38,7 +38,7 @@ export default class OfflineCallEventListener {
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
-    useSystemCallingUI(plugins) {
+    useSystemCallingUI(plugins = []) {
         // GetAppName.getAppName((appName) => {
             // console.log("[useSystemCallingUI]Here is your app name:", appName)    
             // this.updateAppName(appName);
