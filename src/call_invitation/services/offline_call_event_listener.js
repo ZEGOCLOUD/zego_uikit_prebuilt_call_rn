@@ -33,21 +33,21 @@ export default class OfflineCallEventListener {
     callbackID = 'OfflineCallEventListener ' + String(Math.floor(Math.random() * 10000));
     config = {};
     _currentCallData = {};
-    _signalingPlugin;
 
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
-    getSignalingPlugin() {
-        return this._signalingPlugin;
-    }
-    useSystemCallingUI(signalingPlugin) {
-        this._signalingPlugin = signalingPlugin;
+    useSystemCallingUI(plugins = []) {
         // GetAppName.getAppName((appName) => {
             // console.log("[useSystemCallingUI]Here is your app name:", appName)    
             // this.updateAppName(appName);
         // })
+        ZegoUIKit.installPlugins(plugins);
+        const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
+
+        signalingPlugin.getInstance().setBackgroundMessageHandler();       
+
         signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
             console.log('OfflineDataHandler: ', data, rnCallKeepPptions);
 

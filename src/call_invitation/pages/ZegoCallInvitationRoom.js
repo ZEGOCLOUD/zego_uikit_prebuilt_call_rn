@@ -59,7 +59,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   };
   const config = typeof requireConfig === 'function' ? requireConfig(callInvitationData) : requireDefaultConfig(callInvitationData);
   const callEndHandle = () => {
-    const signalingPlugin = OfflineCallEventListener.getInstance().getSignalingPlugin();
+    const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
     const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
     if (signalingPlugin && currentCallUUID) {
       signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID);

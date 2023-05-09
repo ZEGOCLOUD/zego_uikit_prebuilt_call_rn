@@ -1,5 +1,4 @@
 import ZegoUIKit, {
-  ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from '../../utils/logger';
@@ -7,19 +6,21 @@ import { zloginfo } from '../../utils/logger';
 const _appInfo = {};
 const _localUser = {};
 let _pluginConnectionState;
+let ZIMKitPlugin = null;
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
-  Object.values(ZegoUIKitPluginType).forEach((pluginType) => {
-    const plugin = ZegoUIKit.getPlugin(pluginType);
-    plugin &&
-      ZegoUIKit.getPlugin(pluginType)
-        .getVersion()
-        .then((pluginVersion) => {
-          zloginfo(
-            `[Plugins] install success, pluginType: ${pluginType}, version: ${pluginVersion}`
-          );
-        });
-  });
+  plugins.forEach(plugin => {
+    if (plugin.ZIMKit) {
+      zloginfo('[Plugins] install ZIMKit success.');
+      ZIMKitPlugin = plugin;
+    } else if (plugin.default && typeof plugin.default.getModuleName === 'function') {
+      const temp = plugin.default.getModuleName();
+      if (temp === 'ZIMKit') {
+        zloginfo('[Plugins] install ZIMKit success.');
+        ZIMKitPlugin = plugin;
+      }
+    }
+  })
 };
 
 const ZegoPrebuiltPlugins = {
@@ -73,6 +74,9 @@ const ZegoPrebuiltPlugins = {
   },
   getAppInfo: () => {
     return _appInfo;
+  },
+  getZIMKitPlugin: () => {
+    return ZIMKitPlugin;
   },
 };
 

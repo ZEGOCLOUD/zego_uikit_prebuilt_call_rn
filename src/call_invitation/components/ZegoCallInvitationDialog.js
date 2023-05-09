@@ -85,8 +85,6 @@ export default function ZegoCallInvitationDialog(props) {
     setIsFullScreen(true);
   };
   useEffect(() => {
-    console.log('ZegoCallInvitationDialog ######################## create')
-    console.log("##########&&&&&&&&&&&&&&&&&&&&&&&===================", CallInviteHelper.getInstance().getOfflineData())
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
     ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID, () => {
@@ -96,7 +94,6 @@ export default function ZegoCallInvitationDialog(props) {
     CallInviteHelper.getInstance().onCallRefused(callbackID, onRefuseCallback);
 
     return () => {
-      console.log('ZegoCallInvitationDialog ######################## destroy')
       ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID);
       CallInviteHelper.getInstance().onCallAccepted(callbackID);
       CallInviteHelper.getInstance().onCallRefused(callbackID);
