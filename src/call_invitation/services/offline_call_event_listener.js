@@ -44,7 +44,7 @@ export default class OfflineCallEventListener {
             // this.updateAppName(appName);
         // })
         ZegoUIKit.installPlugins(plugins);
-        signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
+        const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
 
         signalingPlugin.getInstance().setBackgroundMessageHandler();       
 
