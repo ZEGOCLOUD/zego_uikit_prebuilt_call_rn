@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
@@ -6,6 +6,7 @@ import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/
 import KeyCenter from '../KeyCenter';
 
 export default function VideoCallScreen(props) {
+    const prebuiltRef = useRef();
     const { route } = props;
     const { params } = route;
     const { userID, userName, callID } = params;
@@ -13,6 +14,7 @@ export default function VideoCallScreen(props) {
     return (
         <View style={styles.container}>
             <ZegoUIKitPrebuiltCall
+                ref={prebuiltRef}
                 appID={KeyCenter.appID}
                 appSign={KeyCenter.appSign}
                 userID={userID}
@@ -22,7 +24,10 @@ export default function VideoCallScreen(props) {
                 config={{
                     ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
                     onOnlySelfInRoom: () => { props.navigation.navigate('HomeScreen') },
-                    onHangUp: () => { props.navigation.navigate('HomeScreen') },
+                    onHangUp: (duration) => {
+                        console.log('########VideoCallScreen onHangUp', duration);
+                        props.navigation.navigate('HomeScreen');
+                    },
                     onHangUpConfirmation: () => {
                         return new Promise((resolve, reject) => {
                             Alert.alert(
@@ -44,6 +49,15 @@ export default function VideoCallScreen(props) {
                                 ]
                             );
                         })
+                    },
+                    durationConfig: {
+                        isVisible: true,
+                        onDurationUpdate: (duration) => {
+                            console.log('########VideoCallScreen onDurationUpdate', duration);
+                            if (duration > 10) {
+                                prebuiltRef.current.hangUp(false);
+                            }
+                        }
                     }
                 }}
             />

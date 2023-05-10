@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
@@ -9,9 +9,10 @@ import ZegoTopMenuBar from './ZegoTopMenuBar';
 import ZegoCallMemberList from './ZegoCallMemberList';
 import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
+import { durationFormat } from "../utils";
 
 
-export default function ZegoUIKitPrebuiltCall(props) {
+function ZegoUIKitPrebuiltCall(props, ref) {
     const {
         appID,
         appSign,
@@ -40,6 +41,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         onHangUp,
         onHangUpConfirmation,
         onOnlySelfInRoom,
+        durationConfig = {},
     } = config;
     const {
         showMicrophoneStateOnView = true,
@@ -78,12 +80,22 @@ export default function ZegoUIKitPrebuiltCall(props) {
         showCameraState = true,
         itemBuilder,
     } = memberListConfig;
+    const {
+        isVisible: isDurationVisible = true,
+        onDurationUpdate,
+    } = durationConfig;
 
+    const [duration, setDuration] = useState(0);
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     var hideCountdown = 5;
     var hideCountdownOnTopMenu = 5;
+
+    const callTiming = useRef();
+    const callTimingTimer = useRef();
+  
+    const debounce = useRef();
 
     const onFullPageTouch = () => {
         hideCountdown = 5;
@@ -198,6 +210,44 @@ export default function ZegoUIKitPrebuiltCall(props) {
             return globalAudioVideoUserList;
         }
     }
+    const startCallTimingTimer = () => {
+        if (!isDurationVisible) return;
+        if (callTimingTimer.current) {
+            // Avoid double timing
+        } else {
+            console.log('########startCallTimingTimer');
+            callTiming.current = 0;
+            callTimingTimer.current = setInterval(() => {
+                callTiming.current += 1;
+                setDuration(callTiming.current);
+                typeof onDurationUpdate === 'function' && onDurationUpdate(callTiming.current);
+            }, 1000);
+        }
+    };
+    const initCallTimingTimer = () => {
+        console.log('########initCallTimingTimer');
+        clearInterval(callTimingTimer.current);
+        callTimingTimer.current = null;
+        callTiming.current = 0;
+    }
+
+    useImperativeHandle(ref, () => ({
+        hangUp: (showConfirmation = false) => {
+            if (debounce.current) return;
+            if (!showConfirmation) {
+                debounce.current = true;
+                typeof onHangUp == 'function' && onHangUp(callTiming.current);
+                debounce.current = false;
+            } else {
+                debounce.current = true;
+                const temp = onHangUpConfirmation || showLeaveAlert;
+                temp().then(() => {
+                    typeof onHangUp == 'function' && onHangUp(callTiming.current);
+                    debounce.current = false;
+                });
+            }
+        }
+    }));
 
     useEffect(() => {
         const callbackID = 'ZegoUIKitPrebuiltCall' + String(Math.floor(Math.random() * 10000));
@@ -228,12 +278,14 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     } else {
                         ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : '' ));
                     }
+                    startCallTimingTimer();
                 });
 
             });
 
         return () => {
             ZegoUIKit.leaveRoom();
+            initCallTimingTimer();
         }
     }, []);
 
@@ -285,13 +337,20 @@ export default function ZegoUIKitPrebuiltCall(props) {
 
     return (
         <View style={[styles.container, styles.fillParent]} >
+            {
+                isDurationVisible ? <View style={styles.timingContainer}>
+                    <Text style={styles.timing}>{durationFormat(duration)}</Text>
+                </View> : null
+            }
             {isVisible && isTopMenubarVisable ?
                 <ZegoTopMenuBar
                     menuTitle={topTitle}
                     menuBarButtonsMaxCount={topMaxCount}
                     menuBarButtons={topButtons}
                     menuBarExtendedButtons={topExtendButtons}
-                    onHangUp={onHangUp}
+                    onHangUp={() => {
+                        onHangUp(callTiming.current);
+                    }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
@@ -322,7 +381,9 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     menuBarButtonsMaxCount={maxCount}
                     menuBarButtons={buttons}
                     menuBarExtendedButtons={extendButtons}
-                    onHangUp={onHangUp}
+                    onHangUp={() => {
+                        onHangUp(callTiming.current);
+                    }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
@@ -344,6 +405,8 @@ export default function ZegoUIKitPrebuiltCall(props) {
     );
 }
 
+export default forwardRef(ZegoUIKitPrebuiltCall);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -362,4 +425,12 @@ const styles = StyleSheet.create({
         right: 0,
         top: 0,
     },
+    timingContainer: {
+        position: 'absolute',
+        top: 6,
+        zIndex: 11,
+    },
+    timing: {
+        color: 'white',
+    }
 });
