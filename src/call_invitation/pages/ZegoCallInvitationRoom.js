@@ -57,7 +57,10 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       },
     };
   };
-  const config = typeof requireConfig === 'function' ? requireConfig(callInvitationData) : requireDefaultConfig(callInvitationData);
+  const config = typeof requireConfig === 'function' ? {
+    ...requireDefaultConfig(callInvitationData),
+    ...requireConfig(callInvitationData)
+  } : requireDefaultConfig(callInvitationData);
   const callEndHandle = () => {
     const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
     const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
@@ -117,26 +120,26 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       callID={roomID}
       config={{
         ...config,
-        onHangUp: () => {
+        onHangUp: (duration) => {
           hangUpHandle();
           if (typeof config.onHangUp === 'function') {
-            config.onHangUp();
+            config.onHangUp(duration);
           } else {
             navigation.goBack();
             origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
           }
         },
-        onOnlySelfInRoom: () => {
+        onOnlySelfInRoom: (duration) => {
           callEndHandle();
           console.log('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
           if (typeof config.onOnlySelfInRoom === 'function') {
-            config.onOnlySelfInRoom();
+            config.onOnlySelfInRoom(duration);
           } else {
             // Invite a single
             if (invitees.length === 1) {
               // navigation.navigate('ZegoInnerChildrenPage');
               if (typeof config.onHangUp === 'function') {
-                config.onHangUp();
+                config.onHangUp(duration);
               } else {
                 navigation.goBack();
                 origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();

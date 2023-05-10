@@ -10,6 +10,7 @@ import ZegoCallMemberList from './ZegoCallMemberList';
 import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
 import { durationFormat } from "../utils";
+import TimingHelper from "../call_invitation/services/timing_helper";
 
 
 function ZegoUIKitPrebuiltCall(props, ref) {
@@ -220,6 +221,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             callTimingTimer.current = setInterval(() => {
                 callTiming.current += 1;
                 setDuration(callTiming.current);
+                TimingHelper.getInstance().setDuration(callTiming.current);
                 typeof onDurationUpdate === 'function' && onDurationUpdate(callTiming.current);
             }, 1000);
         }
@@ -253,7 +255,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         const callbackID = 'ZegoUIKitPrebuiltCall' + String(Math.floor(Math.random() * 10000));
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom();
+                onOnlySelfInRoom(callTiming.current);
             }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);

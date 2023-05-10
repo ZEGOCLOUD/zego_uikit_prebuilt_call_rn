@@ -33,7 +33,7 @@ const getUserInfo = async () => {
     }
 }
 
-const onUserLogin = async (userID, userName) => {
+const onUserLogin = async (userID, userName, props) => {
     return ZegoUIKitPrebuiltCallService.init(
         KeyCenter.appID,
         KeyCenter.appSign,
@@ -51,7 +51,25 @@ const onUserLogin = async (userID, userName) => {
                 channelID: "ZegoUIKit",
                 channelName: "ZegoUIKit",
             },
-        });
+            requireConfig: (data) => {
+                return {
+                    onHangUp: (duration) => {
+                        console.log('########CallWithInvitation onHangUp', duration);
+                        props.navigation.navigate('HomeScreen');
+                    },
+                    durationConfig: {
+                        isVisible: true,
+                        onDurationUpdate: (duration) => {
+                            console.log('########CallWithInvitation onDurationUpdate', duration);
+                            if (duration > 5) {
+                                ZegoUIKitPrebuiltCallService.hangUp(true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    );
 }
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Step 1: Config React Navigation
@@ -101,7 +119,7 @@ function LoginScreen(props) {
         storeUserInfo({ userID, userName })
 
         // Init the call service
-        onUserLogin(userID, userName).then(() => {
+        onUserLogin(userID, userName, props).then(() => {
             // Jump to HomeScreen to make new call
             navigation.navigate('HomeScreen', { userID });
         })
@@ -129,7 +147,7 @@ function LoginScreen(props) {
 }
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Step 3: Configure the "ZegoSendCallInvitationButton" to enable making calls. 
-function HomeScreen({ route, navigation }) {
+function HomeScreen(props) {
     const [userID, setUserID] = useState('')
     const [invitees, setInvitees] = useState([]);
     const viewRef = useRef(null);
@@ -146,10 +164,10 @@ function HomeScreen({ route, navigation }) {
         getUserInfo().then((info) => {
             if (info) {
                 setUserID(info.userID)
-                onUserLogin(info.userID, info.userName)
+                onUserLogin(info.userID, info.userName, props)
             } else {
                 //  Back to the login screen if not login before
-                navigation.navigate('LoginScreen');
+                props.navigation.navigate('LoginScreen');
             }
         })
     }, [])
@@ -181,7 +199,7 @@ function HomeScreen({ route, navigation }) {
                     />
                 </View>
                 <View style={{ width: 220, marginTop: 100 }}>
-                    <Button title='Back To Login Screen' onPress={() => { navigation.navigate('LoginScreen') }}></Button>
+                    <Button title='Back To Login Screen' onPress={() => { props.navigation.navigate('LoginScreen') }}></Button>
                 </View>
             </View>
         </TouchableWithoutFeedback>

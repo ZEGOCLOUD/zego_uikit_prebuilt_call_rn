@@ -8,6 +8,7 @@ import { AppState } from 'react-native';
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
 // import GetAppName from 'react-native-get-app-name';
+import TimingHelper from "../call_invitation/services/timing_helper";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -133,6 +134,28 @@ export default class ZegoUIKitPrebuiltCallService {
             delete this.onInitCallbackMap[callbackID];
         } else {
             this.onInitCallbackMap[callbackID] = callback;
+        }
+    }
+    hangUp(showConfirmation = false) {
+        const debounce = TimingHelper.getInstance().getDebounce();
+        const config = this.config.requireConfig ? this.config.requireConfig() : {};
+        const { onHangUp, onHangUpConfirmation, hangUpConfirmInfo } = config;
+        console.log(111111);
+        if (debounce) return;
+        console.log(222222);
+        if (!showConfirmation) {
+            const duration = TimingHelper.getInstance().getDuration();
+            TimingHelper.getInstance().setDebounce(true);
+            typeof onHangUp == 'function' && onHangUp(duration);
+            TimingHelper.getInstance().setDebounce(false);
+        } else {
+            TimingHelper.getInstance().setDebounce(true);
+            const temp = onHangUpConfirmation || TimingHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
+            temp().then(() => {
+                const duration = TimingHelper.getInstance().getDuration();
+                typeof onHangUp == 'function' && onHangUp(duration);
+                TimingHelper.getInstance().setDebounce(false);
+            });
         }
     }
 }
