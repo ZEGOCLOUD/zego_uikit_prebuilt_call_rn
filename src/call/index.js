@@ -231,6 +231,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         clearInterval(callTimingTimer.current);
         callTimingTimer.current = null;
         callTiming.current = 0;
+        setDuration(0);
     }
 
     useImperativeHandle(ref, () => ({
