@@ -140,19 +140,26 @@ export default class ZegoUIKitPrebuiltCallService {
         const debounce = TimingHelper.getInstance().getDebounce();
         const config = this.config.requireConfig ? this.config.requireConfig() : {};
         const { onHangUp, onHangUpConfirmation, hangUpConfirmInfo } = config;
-        console.log(111111);
         if (debounce) return;
-        console.log(222222);
         if (!showConfirmation) {
             const duration = TimingHelper.getInstance().getDuration();
             TimingHelper.getInstance().setDebounce(true);
-            typeof onHangUp == 'function' && onHangUp(duration);
+            if (typeof onHangUp == 'function') {
+                onHangUp(duration);
+            } else {
+                TimingHelper.getInstance().notifyAutoJump();
+            }
             TimingHelper.getInstance().setDebounce(false);
         } else {
             TimingHelper.getInstance().setDebounce(true);
             const temp = onHangUpConfirmation || TimingHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
             temp().then(() => {
                 const duration = TimingHelper.getInstance().getDuration();
+                if (typeof onHangUp == 'function') {
+                    onHangUp(duration);
+                } else {
+                    TimingHelper.getInstance().notifyAutoJump();
+                }
                 typeof onHangUp == 'function' && onHangUp(duration);
                 TimingHelper.getInstance().setDebounce(false);
             });

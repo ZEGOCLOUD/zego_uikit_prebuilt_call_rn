@@ -58,7 +58,7 @@ export default class TimingHelper {
             }
         });
     }
-    notifyAudoJump() {
+    notifyAutoJump() {
         Object.keys(this._onAutoJumpCallbackMap).forEach((callbackID) => {
             if (this._onAutoJumpCallbackMap[callbackID]) {
                 this._onAutoJumpCallbackMap[callbackID]();
