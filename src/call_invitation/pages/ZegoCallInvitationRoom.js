@@ -15,6 +15,7 @@ import {
 } from '../../services/defines';
 import CallInviteHelper from '../services/call_invite_helper';
 import OfflineCallEventListener from '../services/offline_call_event_listener';
+import TimingHelper from '../services/timing_helper';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -49,7 +50,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     return {
       ...callConfig,
       onOnlySelfInRoom: () => {
-        console.log('requireDefaultConfig onOnlySelfInRoom', data);
+        zloginfo('requireDefaultConfig onOnlySelfInRoom', data);
         if (data.invitees.length == 1) {
           navigation.goBack();
           origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
@@ -82,7 +83,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   };
 
   useEffect(() => {
-    console.log('ZegoUIKitPrebuiltCallInCallScreen init');
+    zloginfo('ZegoUIKitPrebuiltCallInCallScreen init');
     const callbackID =
       'ZegoUIKitPrebuiltCallInCallScreen ' + String(Math.floor(Math.random() * 10000));
     if (invitees.length > 1 && inviter === userID) {
@@ -102,8 +103,16 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
         }
       });
     }
+    TimingHelper.getInstance().onAutoJump(callbackID, () => {
+      zloginfo('########onAutoJump#########', origin, invitees.length);
+      hangUpHandle();
+
+      navigation.goBack();
+      origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
+    });
     return () => {
-      console.log('ZegoUIKitPrebuiltCallInCallScreen destroy');
+      zloginfo('ZegoUIKitPrebuiltCallInCallScreen destroy');
+      TimingHelper.getInstance().onAutoJump(callbackID);
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BellManage.stopOutgoingSound();
@@ -131,7 +140,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
         },
         onOnlySelfInRoom: (duration) => {
           callEndHandle();
-          console.log('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
+          zloginfo('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
           if (typeof config.onOnlySelfInRoom === 'function') {
             config.onOnlySelfInRoom(duration);
           } else {

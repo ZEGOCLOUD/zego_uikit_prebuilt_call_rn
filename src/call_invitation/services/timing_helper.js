@@ -4,6 +4,7 @@ export default class TimingHelper {
     _instance;
     _duration = 0;
     _debounce = false;
+    _onAutoJumpCallbackMap = {};
 
     constructor() { }
     static getInstance() {
@@ -56,5 +57,19 @@ export default class TimingHelper {
                 resolve();
             }
         });
+    }
+    notifyAudoJump() {
+        Object.keys(this._onAutoJumpCallbackMap).forEach((callbackID) => {
+            if (this._onAutoJumpCallbackMap[callbackID]) {
+                this._onAutoJumpCallbackMap[callbackID]();
+            }
+        });
+    }
+    onAutoJump(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            delete this._onAutoJumpCallbackMap[callbackID];
+        } else {
+            this._onAutoJumpCallbackMap[callbackID] = callback;
+        }
     }
 }
