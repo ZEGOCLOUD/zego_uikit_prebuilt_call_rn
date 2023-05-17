@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Text } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
@@ -341,9 +341,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     return (
         <View style={[styles.container, styles.fillParent]} >
             {
-                isDurationVisible ? <View style={styles.timingContainer}>
+                isDurationVisible ? <SafeAreaView style={styles.timingContainer}>
                     <Text style={styles.timing}>{durationFormat(duration)}</Text>
-                </View> : null
+                </SafeAreaView>: null
             }
             {isVisible && isTopMenubarVisable ?
                 <ZegoTopMenuBar
