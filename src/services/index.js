@@ -9,6 +9,7 @@ import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-na
 import { zloginfo } from '../utils/logger';
 // import GetAppName from 'react-native-get-app-name';
 import TimingHelper from "../call_invitation/services/timing_helper";
+import MinimizingHelper from "../call/services/minimizing_helper";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -164,5 +165,8 @@ export default class ZegoUIKitPrebuiltCallService {
                 TimingHelper.getInstance().setDebounce(false);
             });
         }
+    }
+    minimizeWindow () {
+        MinimizingHelper.getInstance().minimizeWindow();
     }
 }
