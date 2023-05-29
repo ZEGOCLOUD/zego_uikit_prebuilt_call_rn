@@ -23,6 +23,7 @@ export default function ZegoBottomBar(props) {
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
         onMorePress,
+        onSwitchCamera,
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -37,7 +38,7 @@ export default function ZegoBottomBar(props) {
             case ZegoMenuBarButtonName.switchAudioOutputButton:
                 return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
             case ZegoMenuBarButtonName.switchCameraButton:
-                return <ZegoSwitchCameraButton key={3} />
+                return <ZegoSwitchCameraButton key={3} onPress={onSwitchCamera}/>
         }
     }
     const getDisplayButtons = () => {

@@ -9,7 +9,12 @@ import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 
 import ZegoUIKitPrebuiltCallService, {
-    ZegoCallInvitationDialog, ZegoUIKitPrebuiltCallWaitingScreen, ZegoUIKitPrebuiltCallInCallScreen, ZegoSendCallInvitationButton,
+    ZegoCallInvitationDialog,
+    ZegoUIKitPrebuiltCallWaitingScreen,
+    ZegoUIKitPrebuiltCallInCallScreen,
+    ZegoSendCallInvitationButton,
+    ZegoMenuBarButtonName,
+    ZegoUIKitPrebuiltCallFloatingMinimizedView,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
@@ -58,14 +63,27 @@ const onUserLogin = async (userID, userName, props) => {
                         props.navigation.navigate('HomeScreen');
                     },
                     durationConfig: {
-                        isVisible: true,
+                        isVisible: false,
                         onDurationUpdate: (duration) => {
                             console.log('########CallWithInvitation onDurationUpdate', duration);
-                            if (duration > 5) {
+                            if (duration === 10 * 60) {
                                 ZegoUIKitPrebuiltCallService.hangUp(true);
                             }
                         }
-                    }
+                    },
+                    topMenuBarConfig: {
+                        buttons: [
+                            ZegoMenuBarButtonName.minimizingButton,
+                        ],
+                    },
+                    onWindowMinimized: () => {
+                        console.log('[Demo]CallInvitation onWindowMinimized');
+                        props.navigation.navigate('HomeScreen');
+                    },
+                    onWindowMaximized: () => {
+                        console.log('[Demo]CallInvitation onWindowMaximized');
+                        props.navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen');
+                    },
                 }
             }
         }
@@ -103,6 +121,7 @@ export default function App() {
                 />
 
             </Stack.Navigator>
+            <ZegoUIKitPrebuiltCallFloatingMinimizedView />
         </NavigationContainer>);
 }
 

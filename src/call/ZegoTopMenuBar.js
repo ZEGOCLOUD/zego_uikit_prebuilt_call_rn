@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, TouchableWithoutFeedback, SafeAreaView, StyleSheet } from "react-native";
 import ZegoMenuBarButtonName from "./ZegoMenuBarButtonName";
 import ZegoMemberButton from "./ZegoMemberButton";
+import ZegoMinimizingButton from "./ZegoMinimizingButton";
 import {
     ZegoLeaveButton,
     ZegoSwitchAudioOutputButton,
@@ -18,6 +19,7 @@ export default function ZegoTopBar(props) {
         menuBarExtendedButtons,
         onHangUp,
         onHangUpConfirmation,
+        onSwitchCamera,
         onOpenCallMemberList,
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
@@ -35,9 +37,11 @@ export default function ZegoTopBar(props) {
             case ZegoMenuBarButtonName.switchAudioOutputButton:
                 return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
             case ZegoMenuBarButtonName.switchCameraButton:
-                return <ZegoSwitchCameraButton key={3} />
+                return <ZegoSwitchCameraButton key={3} onPress={onSwitchCamera}/>
             case ZegoMenuBarButtonName.showMemberListButton:
                 return <ZegoMemberButton key={5} onPressed={onOpenCallMemberList}/>
+            case ZegoMenuBarButtonName.minimizingButton:
+                return <ZegoMinimizingButton key={6} />
         }
     };
     const getDisplayButtons = () => {

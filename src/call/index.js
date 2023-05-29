@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
 import { StyleSheet, View, SafeAreaView, Text } from 'react-native';
@@ -11,9 +11,13 @@ import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
 import { durationFormat } from "../utils";
 import TimingHelper from "../call_invitation/services/timing_helper";
-
+import MinimizingHelper from "./services/minimizing_helper";
+import PrebuiltHelper from "./services/prebuilt_helper";
 
 function ZegoUIKitPrebuiltCall(props, ref) {
+    const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+    !isMinimizeSwitch && MinimizingHelper.getInstance().notifyEntryNormal();
+    
     const {
         appID,
         appSign,
@@ -24,12 +28,19 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         token = '',
         onRequireNewToken,
     } = props;
+
+    MinimizingHelper.getInstance().setInitParams(appID, appSign, userID, userName, callID, {
+        ...config,
+        token,
+        onRequireNewToken,
+    });
+
     const {
         audioVideoViewConfig = {},
 
-        turnOnCameraWhenJoining = true,
-        turnOnMicrophoneWhenJoining = true,
-        useSpeakerWhenJoining = true,
+        // turnOnCameraWhenJoining = true,
+        // turnOnMicrophoneWhenJoining = true,
+        // useSpeakerWhenJoining = true,
 
         bottomMenuBarConfig = {},
         topMenuBarConfig = {},
@@ -86,18 +97,47 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         onDurationUpdate,
     } = durationConfig;
 
-    const [duration, setDuration] = useState(0);
+    const stateData = useRef(PrebuiltHelper.getInstance().getStateData());
+
+    const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || false);
+    const [turnOnCameraWhenJoining, setTurnOnCameraWhenJoining] = 
+        useState(
+        stateData.current.turnOnCameraWhenJoining !== undefined ?
+            stateData.current.turnOnCameraWhenJoining :
+            (config.turnOnCameraWhenJoining));
+    const [turnOnMicrophoneWhenJoining, setTurnOnMicrophoneWhenJoining] = 
+        useState(
+        stateData.current.turnOnMicrophoneWhenJoining !== undefined ?
+            stateData.current.turnOnMicrophoneWhenJoining :
+            (config.turnOnMicrophoneWhenJoining));
+    const [useSpeakerWhenJoining, setUseSpeakerWhenJoining] = 
+        useState(
+        stateData.current.useSpeakerWhenJoining !== undefined ?
+            stateData.current.useSpeakerWhenJoining :
+            (config.useSpeakerWhenJoining));
+
+    const [duration, setDuration] = useState(stateData.current.duration || 0);
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     var hideCountdown = 5;
     var hideCountdownOnTopMenu = 5;
 
-    const callTiming = useRef();
-    const callTimingTimer = useRef();
+    // The cache is used for the next clear
+    const callTimingTimer = useRef(stateData.current.callTimingTimer || null);
   
-    const debounce = useRef();
+    const debounce = useRef(false);
 
+    if (stateData.current.callbackID) {
+        stateData.current.callbackID  = 'ZegoUIKitPrebuiltCall' +
+        String(Math.floor(Math.random() * 10000));
+      }
+    const callbackID = stateData.current.callbackID;
+
+    const isPageInBackground = () => {
+        const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+        return isMinimize;
+    }
     const onFullPageTouch = () => {
         hideCountdown = 5;
         hideCountdownOnTopMenu = 5;
@@ -117,7 +157,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         } else {
             setTopIsMenubarVidable(true);
         }
-    }
+    };
     const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
         if (Platform.OS === 'android') {
@@ -158,7 +198,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         } else if (callback) {
             callback();
         }
-    }
+    };
     // Default operation for click the leave button
     const showLeaveAlert = () => {
         return new Promise((resolve, reject) => {
@@ -195,7 +235,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 resolve();
             }
         });
-    }
+    };
     const sortAudioVideo = (globalAudioVideoUserList) => {
         if (layout.mode === ZegoLayoutMode.pictureInPicture) {
             if (globalAudioVideoUserList.length > 1) {
@@ -210,28 +250,35 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             // Do not deal with
             return globalAudioVideoUserList;
         }
-    }
-    const startCallTimingTimer = () => {
-        if (!isDurationVisible) return;
-        if (callTimingTimer.current) {
-            // Avoid double timing
-        } else {
-            console.log('########startCallTimingTimer');
-            callTiming.current = 0;
-            callTimingTimer.current = setInterval(() => {
-                callTiming.current += 1;
-                setDuration(callTiming.current);
-                TimingHelper.getInstance().setDuration(callTiming.current);
-                typeof onDurationUpdate === 'function' && onDurationUpdate(callTiming.current);
-            }, 1000);
-        }
     };
-    const initCallTimingTimer = () => {
-        console.log('########initCallTimingTimer');
+    const startCallTimingTimer = useCallback(() => {
+        if (!isDurationVisible) return;
+        clearInterval(callTimingTimer.current);
+        callTimingTimer.current = setInterval(() => {
+            stateData.current.duration = stateData.current.duration || 0;
+            stateData.current.duration += 1;
+            setDuration(stateData.current.duration);
+            TimingHelper.getInstance().setDuration(stateData.current.duration);
+            typeof onDurationUpdate === 'function' && onDurationUpdate(stateData.current.duration);
+        }, 1000);
+        stateData.current.callTimingTimer = callTimingTimer.current;
+    }, []);
+    const initCallTimingTimer = useCallback(() => {
         clearInterval(callTimingTimer.current);
         callTimingTimer.current = null;
-        callTiming.current = 0;
-        setDuration(0);
+    }, []);
+    const onOpenCallMemberList = () => {
+        setIsCallMemberListVisable(true);
+    };
+    const onCloseCallMemberList = () => {
+        setIsCallMemberListVisable(false);
+    };
+    const onSwitchCamera = () => {
+        console.log('onSwitchCamera', isFrontCamera);
+        // Default rear camera
+        const result = !isFrontCamera;
+        stateData.current.isFrontCamera = result;
+        setIsFrontCamera(result);
     }
 
     useImperativeHandle(ref, () => ({
@@ -239,41 +286,66 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             if (debounce.current) return;
             if (!showConfirmation) {
                 debounce.current = true;
-                typeof onHangUp == 'function' && onHangUp(callTiming.current);
+                typeof onHangUp == 'function' && onHangUp(stateData.current.duration);
                 debounce.current = false;
             } else {
                 debounce.current = true;
                 const temp = onHangUpConfirmation || showLeaveAlert;
                 temp().then(() => {
-                    typeof onHangUp == 'function' && onHangUp(callTiming.current);
+                    typeof onHangUp == 'function' && onHangUp(stateData.current.duration);
                     debounce.current = false;
                 });
             }
-        }
+        },
+        minimizeWindow: () => {
+            MinimizingHelper.getInstance().minimizeWindow();
+        },
     }));
 
     useEffect(() => {
-        const callbackID = 'ZegoUIKitPrebuiltCall' + String(Math.floor(Math.random() * 10000));
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom(callTiming.current);
+                onOnlySelfInRoom(stateData.current.duration);
             }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
-        return () => {
+        ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {
+            if (targetUserID === userID) {
+                stateData.current.turnOnMicrophoneWhenJoining = !!isOn;
+            }
+        });
+        ZegoUIKit.onCameraOn(callbackID, (targetUserID, isOn) => {
+            if (targetUserID === userID) {
+                stateData.current.turnOnCameraWhenJoining = !!isOn;
+            }
+        });
+        ZegoUIKit.onAudioOutputDeviceChanged(callbackID, (type) => {
+            stateData.current.useSpeakerWhenJoining = (type === 0);
+        });
+        PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
+            ZegoUIKit.leaveRoom();
             ZegoUIKit.onOnlySelfInRoom(callbackID);
             ZegoUIKit.onRequireNewToken(callbackID);
-        }
-    }, []);
-    useEffect(() => {
+
+            initCallTimingTimer();
+            PrebuiltHelper.getInstance().clearState();
+            PrebuiltHelper.getInstance().clearRouteParams();
+            PrebuiltHelper.getInstance().clearNotify();
+
+            MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
+            MinimizingHelper.getInstance().notifyEntryNormal();
+        })
+
         ZegoUIKit.init(
             appID,
             appSign,
             { userID: userID, userName: userName }).then(() => {
+                MinimizingHelper.getInstance().notifyPrebuiltInit();
 
                 ZegoUIKit.turnCameraOn('', turnOnCameraWhenJoining);
                 ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
+                ZegoUIKit.useFrontFacingCamera(isFrontCamera);
 
                 grantPermissions(() => {
                     if (appSign) {
@@ -286,9 +358,20 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             });
 
+        // Initialize after use
+        MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
         return () => {
-            ZegoUIKit.leaveRoom();
-            initCallTimingTimer();
+            const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+            if (!isMinimizeSwitch) {
+                ZegoUIKit.leaveRoom();
+                ZegoUIKit.onOnlySelfInRoom(callbackID);
+                ZegoUIKit.onRequireNewToken(callbackID);
+
+                initCallTimingTimer();
+                PrebuiltHelper.getInstance().clearState();
+                PrebuiltHelper.getInstance().clearRouteParams();
+                PrebuiltHelper.getInstance().clearNotify();
+            }
         }
     }, []);
 
@@ -309,15 +392,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             }
         }, [delay]);
     }
-
-    function onOpenCallMemberList() {
-        setIsCallMemberListVisable(true);
-    }
-
-    function onCloseCallMemberList() {
-        setIsCallMemberListVisable(false);
-    }
-
     useInterval(() => {
         hideCountdown--;
         if (hideCountdown <= 0) {
@@ -327,7 +401,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             }
         }
     }, 1000);
-
     useInterval(() => {
         hideCountdownOnTopMenu--;
         if (hideCountdownOnTopMenu <= 0) {
@@ -352,13 +425,14 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     menuBarButtons={topButtons}
                     menuBarExtendedButtons={topExtendButtons}
                     onHangUp={() => {
-                        onHangUp(callTiming.current);
+                        onHangUp(stateData.current.duration);
                     }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                     useSpeakerWhenJoining={useSpeakerWhenJoining}
                     onOpenCallMemberList={onOpenCallMemberList}
+                    onSwitchCamera={onSwitchCamera}
                 /> : <View />
             }
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
@@ -366,6 +440,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     audioVideoConfig={{
                         showSoundWavesInAudioMode: showSoundWavesInAudioMode,
                         useVideoViewAspectFill: useVideoViewAspectFill,
+                        cacheAudioVideoUserList: isMinimizeSwitch ?
+                            ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
+                            null
                     }}
                     layout={layout}
                     foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
@@ -385,13 +462,14 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     menuBarButtons={buttons}
                     menuBarExtendedButtons={extendButtons}
                     onHangUp={() => {
-                        onHangUp(callTiming.current);
+                        onHangUp(stateData.current.duration);
                     }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                     useSpeakerWhenJoining={useSpeakerWhenJoining}
                     onMorePress={() => { hideCountdown = 5; }}
+                    onSwitchCamera={onSwitchCamera}
                 /> :
                 <View />
             }

@@ -100,4 +100,5 @@ export {
     ONE_ON_ONE_VOICE_CALL_CONFIG,
     GROUP_VIDEO_CALL_CONFIG,
     GROUP_VOICE_CALL_CONFIG,
+    ZegoMenuBarButtonName,
 }

@@ -2,7 +2,11 @@ import React, { useRef } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { ZegoUIKitPrebuiltCall, GROUP_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
+import {
+    ZegoUIKitPrebuiltCall,
+    GROUP_VIDEO_CALL_CONFIG,
+    ZegoMenuBarButtonName,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn'
 import KeyCenter from '../KeyCenter';
 
 export default function VideoCallScreen(props) {
@@ -54,11 +58,29 @@ export default function VideoCallScreen(props) {
                         isVisible: false,
                         onDurationUpdate: (duration) => {
                             console.log('########VideoCallScreen onDurationUpdate', duration);
-                            if (duration > 10) {
+                            if (duration === 10 * 60) {
                                 prebuiltRef.current.hangUp(false);
                             }
                         }
-                    }
+                    },
+                    topMenuBarConfig: {
+                        buttons: [
+                            ZegoMenuBarButtonName.showMemberListButton,
+                            ZegoMenuBarButtonName.minimizingButton,
+                        ],
+                    },
+                    onWindowMinimized: () => {
+                        console.log('[Demo]VideoCallScreen onWindowMinimized');
+                        props.navigation.navigate('HomeScreen');
+                    },
+                    onWindowMaximized: () => {
+                        console.log('[Demo]VideoCallScreen onWindowMaximized');
+                        props.navigation.navigate('VideoCallScreen', {
+                          userID: userID,
+                          userName: userName,
+                          callID: callID,
+                        });
+                    },
                 }}
             />
         </View>

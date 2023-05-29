@@ -4,7 +4,8 @@ const ZegoMenuBarButtonName = {
     switchCameraButton: 2,
     switchAudioOutputButton: 3,
     hangUpButton: 4,
-    showMemberListButton: 5
+    showMemberListButton: 5,
+    minimizingButton: 6,
 }
 
 export default ZegoMenuBarButtonName;

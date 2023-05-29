@@ -2,7 +2,11 @@ import React, { useRef } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VOICE_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn'
+import {
+    ZegoUIKitPrebuiltCall,
+    ONE_ON_ONE_VOICE_CALL_CONFIG,
+    ZegoMenuBarButtonName,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn'
 import KeyCenter from '../KeyCenter';
 
 export default function VoiceCallScreen(props) {
@@ -54,11 +58,29 @@ export default function VoiceCallScreen(props) {
                         isVisible: true,
                         onDurationUpdate: (duration) => {
                             console.log('########VoiceCallScreen onDurationUpdate', duration);
-                            if (duration > 10) {
+                            if (duration === 10 * 60) {
                                 prebuiltRef.current.hangUp(false);
                             }
                         }
-                    }
+                    },
+                    topMenuBarConfig: {
+                        buttons: [
+                            ZegoMenuBarButtonName.showMemberListButton,
+                            ZegoMenuBarButtonName.minimizingButton,
+                        ],
+                    },
+                    onWindowMinimized: () => {
+                        console.log('[Demo]VoiceCallScreen onWindowMinimized');
+                        props.navigation.navigate('HomeScreen');
+                    },
+                    onWindowMaximized: () => {
+                        console.log('[Demo]VoiceCallScreen onWindowMaximized');
+                        props.navigation.navigate('VoiceCallScreen', {
+                          userID: userID,
+                          userName: userName,
+                          callID: callID,
+                        });
+                    },
                 }}
             />
         </View>

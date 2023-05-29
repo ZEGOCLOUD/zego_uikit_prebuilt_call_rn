@@ -6,6 +6,7 @@ import VideoCallScreen from './VideoCallScreen';
 import VoiceCallScreen from './VoiceCallScreen';
 import GroupVideoCallScreen from './GroupVideoCallScreen';
 import GroupVoiceCallScreen from './GroupVoiceCallScreen';
+import { ZegoUIKitPrebuiltCallFloatingMinimizedView } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,7 @@ export default function AppNavigation(props) {
           component={GroupVoiceCallScreen}
         />
       </Stack.Navigator>
+      <ZegoUIKitPrebuiltCallFloatingMinimizedView />
     </NavigationContainer>
   );
 }

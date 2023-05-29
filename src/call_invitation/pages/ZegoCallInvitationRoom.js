@@ -14,8 +14,9 @@ import {
   GROUP_VOICE_CALL_CONFIG,
 } from '../../services/defines';
 import CallInviteHelper from '../services/call_invite_helper';
-import OfflineCallEventListener from '../services/offline_call_event_listener';
 import TimingHelper from '../services/timing_helper';
+import PrebuiltHelper from "../../call/services/prebuilt_helper";
+import MinimizingHelper from "../../call/services/minimizing_helper";
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -24,6 +25,17 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { token, onRequireNewToken, requireConfig } = initConfig;
   const { route } = props;
+  const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+  let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+  if (!isMinimizeSwitch) {
+    routeParams.origin = route.params.origin;
+    routeParams.roomID = route.params.roomID;
+    routeParams.isVideoCall = route.params.isVideoCall;
+    routeParams.invitees = route.params.invitees;
+    routeParams.inviter = route.params.inviter;
+    routeParams.invitationID = route.params.invitationID;
+  }
+  console.log('#####ZegoUIKitPrebuiltCallInCallScreen#######', routeParams, route.params);
   const {
     origin,
     roomID,
@@ -31,7 +43,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     invitees,
     inviter,
     invitationID,
-  } = route.params;
+  } = routeParams;
   const callInvitationData = {
     type: isVideoCall
       ? ZegoInvitationType.videoCall
@@ -51,9 +63,18 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       ...callConfig,
       onOnlySelfInRoom: () => {
         zloginfo('requireDefaultConfig onOnlySelfInRoom', data);
+        const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
         if (data.invitees.length == 1) {
-          navigation.goBack();
-          origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
+          if (isMinimize) {
+            PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+          } else {
+            if (typeof config.onHangUp === 'function') {
+              config.onHangUp(TimingHelper.getInstance().getDuration());
+            } else {
+              navigation.goBack();
+              origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
+            }
+          }
         }
       },
     };

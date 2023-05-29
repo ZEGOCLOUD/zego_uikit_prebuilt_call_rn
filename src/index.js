@@ -1,4 +1,5 @@
 import ZegoUIKitPrebuiltCall from './call';
+import ZegoUIKitPrebuiltCallFloatingMinimizedView from './call/ZegoUIKitPrebuiltCallFloatingMinimizedView';
 import ZegoCallInvitationDialog from './call_invitation/components/ZegoCallInvitationDialog';
 import ZegoUIKitPrebuiltCallWaitingScreen from './call_invitation/pages/ZegoCallInvitationWaiting';
 import ZegoUIKitPrebuiltCallInCallScreen from './call_invitation/pages/ZegoCallInvitationRoom';
@@ -18,6 +19,7 @@ export default ZegoUIKitPrebuiltCallService.getInstance();
 
 export {
   ZegoUIKitPrebuiltCall,
+  ZegoUIKitPrebuiltCallFloatingMinimizedView,
   ZegoSendCallInvitationButton,
   ZegoCallInvitationDialog,
   ZegoUIKitPrebuiltCallWaitingScreen,
