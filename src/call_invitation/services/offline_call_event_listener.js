@@ -33,12 +33,14 @@ export default class OfflineCallEventListener {
     callbackID = 'OfflineCallEventListener ' + String(Math.floor(Math.random() * 10000));
     config = {};
     _currentCallData = {};
+    _isSystemCalling = false;
 
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
     }
     useSystemCallingUI(plugins = []) {
+        this._isSystemCalling = true;
         // GetAppName.getAppName((appName) => {
             // console.log("[useSystemCallingUI]Here is your app name:", appName)    
             // this.updateAppName(appName);
@@ -118,7 +120,7 @@ export default class OfflineCallEventListener {
         this.registerCallback();
 
         // Setup for background invitation
-        if (!config.notifyWhenAppRunningInBackgroundOrQuit) return;
+        if (!config.notifyWhenAppRunningInBackgroundOrQuit || !this._isSystemCalling) return;
 
         RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
 
@@ -248,7 +250,7 @@ export default class OfflineCallEventListener {
         if (Platform.OS === "android" && parseInt(Platform.constants['Release']) < 8) {
             shouldUseRNCallKeep = false;
         }
-        if (shouldUseRNCallKeep && notifyWhenAppRunningInBackgroundOrQuit) {
+        if (shouldUseRNCallKeep && notifyWhenAppRunningInBackgroundOrQuit && this._isSystemCalling) {
             RNCallKeep.displayIncomingCall(callID, inviterName, inviterName, 'generic', true);
         } else {
             notifee.displayNotification({
