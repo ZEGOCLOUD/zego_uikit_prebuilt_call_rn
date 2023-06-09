@@ -99,7 +99,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     const stateData = useRef(PrebuiltHelper.getInstance().getStateData());
 
-    const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || false);
+    const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || true);
     const [turnOnCameraWhenJoining, setTurnOnCameraWhenJoining] = 
         useState(
         stateData.current.turnOnCameraWhenJoining !== undefined ?
