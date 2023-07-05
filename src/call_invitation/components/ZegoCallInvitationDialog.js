@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Modal, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Modal, TouchableOpacity, AppState } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
 import CallInviteStateManage from '../services/invite_state_manager';
@@ -138,8 +138,10 @@ export default function ZegoCallInvitationDialog(props) {
               setInviter(inviter);
               setExtendData(JSON.parse(data));
               setIsDialogVisable(true);
-              BellManage.playIncomingSound();
-              BellManage.vibrate();
+              if (AppState.currentState !== 'background') {
+                BellManage.playIncomingSound();
+                BellManage.vibrate();
+              }
             }
           }
         }
