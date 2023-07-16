@@ -7,6 +7,7 @@ import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
 import InnerTextHelper from '../services/inner_text_helper'
 import CallInviteHelper from '../services/call_invite_helper'
+import notifee from '@notifee/react-native';
 
 import ZegoUIKit, {
   ZegoAcceptInvitationButton,
@@ -141,6 +142,7 @@ export default function ZegoCallInvitationDialog(props) {
               if (AppState.currentState !== 'background') {
                 BellManage.playIncomingSound();
                 BellManage.vibrate();
+                notifee.cancelAllNotifications();
               }
             }
           }

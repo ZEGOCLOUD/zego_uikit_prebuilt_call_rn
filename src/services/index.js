@@ -58,7 +58,6 @@ export default class ZegoUIKitPrebuiltCallService {
         const {
             ringtoneConfig,
             innerText,
-            androidNotificationConfig,
             notifyWhenAppRunningInBackgroundOrQuit,
             isIOSSandboxEnvironment,
         } = this.config;
@@ -75,17 +74,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 }
             }
         );
-        // Notifee create
-        notifee.cancelAllNotifications();
-        notifee.createChannel({
-            id: androidNotificationConfig.channelID,
-            name: androidNotificationConfig.channelName,
-            badge: false,
-            vibration: false,
-            importance: AndroidImportance.HIGH,
-            visibility: AndroidVisibility.PUBLIC,
-            sound: ringtoneConfig.incomingCallFileName.split('.')[0]
-        });
+
         return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
             // TODO trigger in timer is a workaround, it should be fix after upgrade ZIM to 2.6.0
             setTimeout(() => {

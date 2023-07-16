@@ -74,7 +74,7 @@ export default class MinimizingHelper {
         this._updateTimer = null;
     }
     updateActiveUserIDByTimer() {
-        const allUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && user.userID !== this._localUser.userID && (user.isCameraOn || user.isMicrophoneOn));
+        const allUsers = ZegoUIKit.getAllUsers().filter((user: { userID: string; isCameraOn: any; isMicrophoneOn: any; }) => user.userID && user.userID !== this._localUser.userID && (user.isCameraOn || user.isMicrophoneOn));
         const activeUserID = allUsers.length ? allUsers[0].userID : this._localUser.userID;
 
         this._activeUserID = activeUserID || '';
