@@ -8,8 +8,9 @@ import { AppState } from 'react-native';
 import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
 // import GetAppName from 'react-native-get-app-name';
-import TimingHelper from "../call_invitation/services/timing_helper";
+import TimingHelper from "./timing_helper";
 import MinimizingHelper from "../call/services/minimizing_helper";
+import HangupHelper from "../call_invitation/services/hangup_helper";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -127,31 +128,31 @@ export default class ZegoUIKitPrebuiltCallService {
         }
     }
     hangUp(showConfirmation = false) {
-        const debounce = TimingHelper.getInstance().getDebounce();
+        const debounce = HangupHelper.getInstance().getDebounce();
         const config = this.config.requireConfig ? this.config.requireConfig() : {};
         const { onHangUp, onHangUpConfirmation, hangUpConfirmInfo } = config;
         if (debounce) return;
         if (!showConfirmation) {
             const duration = TimingHelper.getInstance().getDuration();
-            TimingHelper.getInstance().setDebounce(true);
+            HangupHelper.getInstance().setDebounce(true);
             if (typeof onHangUp == 'function') {
                 onHangUp(duration);
             } else {
-                TimingHelper.getInstance().notifyAutoJump();
+                HangupHelper.getInstance().notifyAutoJump();
             }
-            TimingHelper.getInstance().setDebounce(false);
+            HangupHelper.getInstance().setDebounce(false);
         } else {
-            TimingHelper.getInstance().setDebounce(true);
-            const temp = onHangUpConfirmation || TimingHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
+            HangupHelper.getInstance().setDebounce(true);
+            const temp = onHangUpConfirmation || HangupHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
             temp().then(() => {
                 const duration = TimingHelper.getInstance().getDuration();
                 if (typeof onHangUp == 'function') {
                     onHangUp(duration);
                 } else {
-                    TimingHelper.getInstance().notifyAutoJump();
+                    HangupHelper.getInstance().notifyAutoJump();
                 }
                 typeof onHangUp == 'function' && onHangUp(duration);
-                TimingHelper.getInstance().setDebounce(false);
+                HangupHelper.getInstance().setDebounce(false);
             });
         }
     }

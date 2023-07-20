@@ -1,20 +1,13 @@
 import { Alert } from 'react-native';
 
-export default class TimingHelper {
+export default class HangupHelper {
     _instance;
-    _duration = 0;
     _debounce = false;
     _onAutoJumpCallbackMap = {};
 
     constructor() { }
     static getInstance() {
-        return this._instance || (this._instance = new TimingHelper());
-    }
-    setDuration(duration) {
-        this._duration = duration;
-    }
-    getDuration() {
-        return this._duration;
+        return this._instance || (this._instance = new HangupHelper());
     }
     setDebounce(debounce) {
         this._debounce = !!debounce;

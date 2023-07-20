@@ -14,9 +14,10 @@ import {
   GROUP_VOICE_CALL_CONFIG,
 } from '../../services/defines';
 import CallInviteHelper from '../services/call_invite_helper';
-import TimingHelper from '../services/timing_helper';
+import TimingHelper from '../../services/timing_helper';
 import PrebuiltHelper from "../../call/services/prebuilt_helper";
 import MinimizingHelper from "../../call/services/minimizing_helper";
+import HangupHelper from '../services/hangup_helper';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -124,7 +125,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
         }
       });
     }
-    TimingHelper.getInstance().onAutoJump(callbackID, () => {
+    HangupHelper.getInstance().onAutoJump(callbackID, () => {
       zloginfo('########onAutoJump#########', origin, invitees.length);
       hangUpHandle();
 
@@ -133,7 +134,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     });
     return () => {
       zloginfo('ZegoUIKitPrebuiltCallInCallScreen destroy');
-      TimingHelper.getInstance().onAutoJump(callbackID);
+      HangupHelper.getInstance().onAutoJump(callbackID);
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BellManage.stopOutgoingSound();

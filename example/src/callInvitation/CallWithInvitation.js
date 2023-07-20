@@ -15,6 +15,7 @@ import ZegoUIKitPrebuiltCallService, {
     ZegoSendCallInvitationButton,
     ZegoMenuBarButtonName,
     ZegoUIKitPrebuiltCallFloatingMinimizedView,
+    ZegoCountdownLabel,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
@@ -62,8 +63,9 @@ const onUserLogin = async (userID, userName, props) => {
                         console.log('########CallWithInvitation onHangUp', duration);
                         props.navigation.navigate('HomeScreen');
                     },
-                    durationConfig: {
-                        isVisible: false,
+                    foregroundBuilder: () => <ZegoCountdownLabel maxDuration={60} onCountdownFinished={() => {console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true);}}/>,
+                    timingConfig: {
+                        enableTiming: true,
                         onDurationUpdate: (duration) => {
                             console.log('########CallWithInvitation onDurationUpdate', duration);
                             if (duration === 10 * 60) {

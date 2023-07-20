@@ -8,6 +8,8 @@ import ZegoMenuBarButtonName from './call/ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './call/ZegoMenuBarStyle';
 import ZegoSendCallInvitationButton from './call_invitation/components/ZegoSendCallInvitationButton';
 import ZegoUIKitPrebuiltCallService from './services';
+import ZegoCountdownLabel from './call/ZegoCountdownLabel';
+
 import {
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
   ONE_ON_ONE_VOICE_CALL_CONFIG,
@@ -24,6 +26,7 @@ export {
   ZegoCallInvitationDialog,
   ZegoUIKitPrebuiltCallWaitingScreen,
   ZegoUIKitPrebuiltCallInCallScreen,
+  ZegoCountdownLabel,
   ZegoMenuBarButtonName,
   ZegoMenuBarStyle,
   ONE_ON_ONE_VIDEO_CALL_CONFIG,

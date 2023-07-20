@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { PermissionsAndroid, Alert } from 'react-native';
-
-import { StyleSheet, View, SafeAreaView, Text } from 'react-native';
+import { PermissionsAndroid, Alert, Text } from 'react-native';
+import Delegate from 'react-delegate-component';
+import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
@@ -9,15 +9,15 @@ import ZegoTopMenuBar from './ZegoTopMenuBar';
 import ZegoCallMemberList from './ZegoCallMemberList';
 import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
-import { durationFormat } from "../utils";
-import TimingHelper from "../call_invitation/services/timing_helper";
+import TimingHelper from "../services/timing_helper";
 import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from "./services/prebuilt_helper";
+import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
     !isMinimizeSwitch && MinimizingHelper.getInstance().notifyEntryNormal();
-    
+
     const {
         appID,
         appSign,
@@ -53,7 +53,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         onHangUp,
         onHangUpConfirmation,
         onOnlySelfInRoom,
-        durationConfig = {},
+        durationConfig = {}, // Deprecate
+        timingConfig = {},
+        foregroundBuilder: prebuiltForegroundBuilder
     } = config;
     const {
         showMicrophoneStateOnView = true,
@@ -93,30 +95,29 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         itemBuilder,
     } = memberListConfig;
     const {
-        isVisible: isDurationVisible = true,
-        onDurationUpdate,
-    } = durationConfig;
+        enableTiming = durationConfig.isVisible || true,
+        onDurationUpdate = durationConfig.onDurationUpdate,
+    } = timingConfig
 
     const stateData = useRef(PrebuiltHelper.getInstance().getStateData());
 
     const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || true);
-    const [turnOnCameraWhenJoining, setTurnOnCameraWhenJoining] = 
+    const [turnOnCameraWhenJoining, setTurnOnCameraWhenJoining] =
         useState(
-        stateData.current.turnOnCameraWhenJoining !== undefined ?
-            stateData.current.turnOnCameraWhenJoining :
-            (config.turnOnCameraWhenJoining));
-    const [turnOnMicrophoneWhenJoining, setTurnOnMicrophoneWhenJoining] = 
+            stateData.current.turnOnCameraWhenJoining !== undefined ?
+                stateData.current.turnOnCameraWhenJoining :
+                (config.turnOnCameraWhenJoining));
+    const [turnOnMicrophoneWhenJoining, setTurnOnMicrophoneWhenJoining] =
         useState(
-        stateData.current.turnOnMicrophoneWhenJoining !== undefined ?
-            stateData.current.turnOnMicrophoneWhenJoining :
-            (config.turnOnMicrophoneWhenJoining));
-    const [useSpeakerWhenJoining, setUseSpeakerWhenJoining] = 
+            stateData.current.turnOnMicrophoneWhenJoining !== undefined ?
+                stateData.current.turnOnMicrophoneWhenJoining :
+                (config.turnOnMicrophoneWhenJoining));
+    const [useSpeakerWhenJoining, setUseSpeakerWhenJoining] =
         useState(
-        stateData.current.useSpeakerWhenJoining !== undefined ?
-            stateData.current.useSpeakerWhenJoining :
-            (config.useSpeakerWhenJoining));
+            stateData.current.useSpeakerWhenJoining !== undefined ?
+                stateData.current.useSpeakerWhenJoining :
+                (config.useSpeakerWhenJoining));
 
-    const [duration, setDuration] = useState(stateData.current.duration || 0);
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
@@ -125,13 +126,13 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     // The cache is used for the next clear
     const callTimingTimer = useRef(stateData.current.callTimingTimer || null);
-  
+
     const debounce = useRef(false);
 
     if (stateData.current.callbackID) {
-        stateData.current.callbackID  = 'ZegoUIKitPrebuiltCall' +
-        String(Math.floor(Math.random() * 10000));
-      }
+        stateData.current.callbackID = 'ZegoUIKitPrebuiltCall' +
+            String(Math.floor(Math.random() * 10000));
+    }
     const callbackID = stateData.current.callbackID;
 
     const isPageInBackground = () => {
@@ -252,18 +253,17 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         }
     };
     const startCallTimingTimer = useCallback(() => {
-        if (!isDurationVisible) return;
+        if (!enableTiming) return;
         clearInterval(callTimingTimer.current);
         callTimingTimer.current = setInterval(() => {
             stateData.current.duration = stateData.current.duration || 0;
             stateData.current.duration += 1;
-            setDuration(stateData.current.duration);
             TimingHelper.getInstance().setDuration(stateData.current.duration);
             typeof onDurationUpdate === 'function' && onDurationUpdate(stateData.current.duration);
         }, 1000);
         stateData.current.callTimingTimer = callTimingTimer.current;
     }, []);
-    const initCallTimingTimer = useCallback(() => {
+    const destroyCallTimingTimer = useCallback(() => {
         clearInterval(callTimingTimer.current);
         callTimingTimer.current = null;
     }, []);
@@ -327,7 +327,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             ZegoUIKit.onOnlySelfInRoom(callbackID);
             ZegoUIKit.onRequireNewToken(callbackID);
 
-            initCallTimingTimer();
+            destroyCallTimingTimer();
             PrebuiltHelper.getInstance().clearState();
             PrebuiltHelper.getInstance().clearRouteParams();
             PrebuiltHelper.getInstance().clearNotify();
@@ -351,7 +351,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     if (appSign) {
                         ZegoUIKit.joinRoom(callID);
                     } else {
-                        ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : '' ));
+                        ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''));
                     }
                     startCallTimingTimer();
                 });
@@ -367,7 +367,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 ZegoUIKit.onOnlySelfInRoom(callbackID);
                 ZegoUIKit.onRequireNewToken(callbackID);
 
-                initCallTimingTimer();
+                destroyCallTimingTimer();
                 PrebuiltHelper.getInstance().clearState();
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
@@ -412,12 +412,16 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     }, 1000);
 
     return (
-        <View style={[styles.container, styles.fillParent]} >
-            {
-                isDurationVisible ? <SafeAreaView style={styles.timingContainer}>
-                    <Text style={styles.timing}>{durationFormat(duration)}</Text>
-                </SafeAreaView>: null
-            }
+        <View style={[styles.container, styles.fillParent]}>
+
+            <View style={styles.prebuiltForegroundBuilderContainer} pointerEvents="none">
+                <Delegate
+                    style={styles.prebuiltForegroundBuilderDelegate}
+                    to={prebuiltForegroundBuilder}
+                    default={ZegoPrebuiltForegroundView}
+                    props={{ enableTiming }}
+                />
+            </View>
             {isVisible && isTopMenubarVisable ?
                 <ZegoTopMenuBar
                     menuTitle={topTitle}
@@ -482,6 +486,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 /> :
                 <View />
             }
+
+
+
         </View>
     );
 }
@@ -506,12 +513,20 @@ const styles = StyleSheet.create({
         right: 0,
         top: 0,
     },
-    timingContainer: {
+    prebuiltForegroundBuilderDelegate: {
+        flex: 1,
         position: 'absolute',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+    },
+    prebuiltForegroundBuilderContainer: {
+        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
         top: 6,
         zIndex: 11,
+        alignItems: 'center',
     },
-    timing: {
-        color: 'white',
-    }
 });
