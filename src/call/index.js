@@ -13,6 +13,8 @@ import TimingHelper from "../services/timing_helper";
 import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
+import Timer from "../utils/timer"
+
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
@@ -96,6 +98,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     } = memberListConfig;
     const {
         enableTiming = durationConfig.isVisible || true,
+        isDurationVisible = true,
         onDurationUpdate = durationConfig.onDurationUpdate,
     } = timingConfig
 
@@ -124,11 +127,13 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     var hideCountdown = 5;
     var hideCountdownOnTopMenu = 5;
 
-    // The cache is used for the next clear
-    const callTimingTimer = useRef(stateData.current.callTimingTimer || null);
-
     const debounce = useRef(false);
 
+    const timingTimer = new Timer(elapsed => {
+        TimingHelper.getInstance().increaseDuration()
+        typeof onDurationUpdate === 'function' && onDurationUpdate(TimingHelper.getInstance().getDuration());
+    }, 1000)
+    
     if (stateData.current.callbackID) {
         stateData.current.callbackID = 'ZegoUIKitPrebuiltCall' +
             String(Math.floor(Math.random() * 10000));
@@ -254,18 +259,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     };
     const startCallTimingTimer = useCallback(() => {
         if (!enableTiming) return;
-        clearInterval(callTimingTimer.current);
-        callTimingTimer.current = setInterval(() => {
-            stateData.current.duration = stateData.current.duration || 0;
-            stateData.current.duration += 1;
-            TimingHelper.getInstance().setDuration(stateData.current.duration);
-            typeof onDurationUpdate === 'function' && onDurationUpdate(stateData.current.duration);
-        }, 1000);
-        stateData.current.callTimingTimer = callTimingTimer.current;
+        timingTimer.stop()
+        TimingHelper.getInstance().resetDuration()
+        timingTimer.start()
     }, []);
     const destroyCallTimingTimer = useCallback(() => {
-        clearInterval(callTimingTimer.current);
-        callTimingTimer.current = null;
+        timingTimer.stop()
     }, []);
     const onOpenCallMemberList = () => {
         setIsCallMemberListVisable(true);
@@ -286,13 +285,13 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             if (debounce.current) return;
             if (!showConfirmation) {
                 debounce.current = true;
-                typeof onHangUp == 'function' && onHangUp(stateData.current.duration);
+                typeof onHangUp == 'function' && onHangUp(TimingHelper.getInstance().getDuration());
                 debounce.current = false;
             } else {
                 debounce.current = true;
                 const temp = onHangUpConfirmation || showLeaveAlert;
                 temp().then(() => {
-                    typeof onHangUp == 'function' && onHangUp(stateData.current.duration);
+                    typeof onHangUp == 'function' && onHangUp(TimingHelper.getInstance().getDuration());
                     debounce.current = false;
                 });
             }
@@ -305,7 +304,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     useEffect(() => {
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom(stateData.current.duration);
+                onOnlySelfInRoom(TimingHelper.getInstance().getDuration());
             }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
@@ -419,7 +418,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     style={styles.prebuiltForegroundBuilderDelegate}
                     to={prebuiltForegroundBuilder}
                     default={ZegoPrebuiltForegroundView}
-                    props={{ enableTiming }}
+                    props={{ isDurationVisible }}
                 />
             </View>
             {isVisible && isTopMenubarVisable ?
@@ -429,7 +428,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     menuBarButtons={topButtons}
                     menuBarExtendedButtons={topExtendButtons}
                     onHangUp={() => {
-                        onHangUp(stateData.current.duration);
+                        onHangUp(TimingHelper.getInstance().getDuration());
                     }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
@@ -466,7 +465,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                     menuBarButtons={buttons}
                     menuBarExtendedButtons={extendButtons}
                     onHangUp={() => {
-                        onHangUp(stateData.current.duration);
+                        onHangUp(TimingHelper.getInstance().getDuration());
                     }}
                     onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}

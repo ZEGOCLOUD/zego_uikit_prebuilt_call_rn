@@ -4,13 +4,25 @@ export default class TimingHelper {
     _instance;
     _duration = 0;
     _onDurationUpdateCallbackMap = {};
+    _durationStart = Date.now();
 
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new TimingHelper());
     }
-    setDuration(duration) {
-        this._duration = duration;
+    resetDuration() {
+        this._duration = 0;
+        this._durationStart = Date.now();
+    }
+    increaseDuration() {
+        // The timing depends on the hardware, and on machines with poor performance, the timing may be slower than the actual
+        const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)
+        const duration = this._duration + 1
+        if (realDuration >= duration + 1){
+            this._duration = realDuration;
+        } else {
+            this._duration = duration;
+        }
         this.notifyDurationUpdate(duration)
     }
     getDuration() {
@@ -23,7 +35,7 @@ export default class TimingHelper {
             this._onDurationUpdateCallbackMap[callbackID] = callback;
         }
     }
-    notifyDurationUpdate(duration) {
+    async notifyDurationUpdate(duration) {
         Object.keys(this._onDurationUpdateCallbackMap).forEach((callbackID) => {
             if (this._onDurationUpdateCallbackMap[callbackID]) {
                 this._onDurationUpdateCallbackMap[callbackID](duration);
