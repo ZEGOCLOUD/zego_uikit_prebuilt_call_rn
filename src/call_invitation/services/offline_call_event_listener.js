@@ -2,7 +2,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { AppState, Platform, NativeModules, NativeEventEmitter, AppRegistry } from 'react-native';
 import notifee, { AndroidImportance, AndroidCategory, AndroidVisibility } from '@notifee/react-native';
 import InnerTextHelper from '../services/inner_text_helper';
-import RNCallKeep from 'react-native-callkeep';
+import RNCallKeep from '@zegocloud/react-native-callkeep';
 import CallInviteHelper from './call_invite_helper';
 // import GetAppName from 'react-native-get-app-name';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
