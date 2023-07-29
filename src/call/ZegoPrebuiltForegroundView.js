@@ -5,7 +5,7 @@ import TimingHelper, { } from "../services/timing_helper"
 
 export default function ZegoPrebuiltForegroundView(props) {
     const { isDurationVisible } = props;
-    const [duration, setDuration] = useState(0);
+    const [duration, setDuration] = useState(TimingHelper.getInstance().getDuration());
     useEffect(() => {
         TimingHelper.getInstance().onDurationUpdate("ZegoPrebuiltForegroundViewDuration", (duration) => setDuration(duration));
     }, [])

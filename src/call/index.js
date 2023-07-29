@@ -260,10 +260,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     const startCallTimingTimer = useCallback(() => {
         if (!enableTiming) return;
         timingTimer.stop()
-        TimingHelper.getInstance().resetDuration()
         timingTimer.start()
     }, []);
     const destroyCallTimingTimer = useCallback(() => {
+        if (!MinimizingHelper.getInstance().getIsMinimizeSwitch()) {
+            TimingHelper.getInstance().resetDuration()
+        }
         timingTimer.stop()
     }, []);
     const onOpenCallMemberList = () => {
@@ -368,11 +370,11 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 ZegoUIKit.onOnlySelfInRoom(callbackID);
                 ZegoUIKit.onRequireNewToken(callbackID);
 
-                destroyCallTimingTimer();
                 PrebuiltHelper.getInstance().clearState();
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
             }
+            destroyCallTimingTimer();
         }
     }, []);
 

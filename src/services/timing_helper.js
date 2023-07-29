@@ -18,7 +18,7 @@ export default class TimingHelper {
         // The timing depends on the hardware, and on machines with poor performance, the timing may be slower than the actual
         const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)
         const duration = this._duration + 1
-        if (realDuration >= duration + 1){
+        if (realDuration >= duration + 1) {
             this._duration = realDuration;
         } else {
             this._duration = duration;
@@ -26,6 +26,10 @@ export default class TimingHelper {
         this.notifyDurationUpdate(duration)
     }
     getDuration() {
+        const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)
+        if (realDuration - this._duration > 2) {
+            return realDuration;
+        }
         return this._duration;
     }
     onDurationUpdate(callbackID, callback) {

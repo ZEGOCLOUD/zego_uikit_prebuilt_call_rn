@@ -5,7 +5,7 @@ import TimingHelper, { } from "../services/timing_helper"
 
 export default function ZegoCountdownLabel(props) {
     const { maxDuration, onCountdownFinished } = props;
-    const [duration, setDuration] = useState(maxDuration);
+    const [duration, setDuration] = useState(Math.max(maxDuration - TimingHelper.getInstance().getDuration(), 0));
     const [countdownFinished, setCountdownFinished] = useState(false);
     useEffect(() => {
         TimingHelper.getInstance().onDurationUpdate("ZegoCountdownLabelDuration", (v) => {
