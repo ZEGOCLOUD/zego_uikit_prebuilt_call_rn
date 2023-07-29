@@ -98,7 +98,7 @@ export default class OfflineCallEventListener {
                     CallInviteHelper.getInstance().setOfflineData(data);
                 });
 
-                RNCallKeep.displayIncomingCall(data.call_id, data.inviter.id, data.inviter.name, 'generic', true);
+                RNCallKeep.displayIncomingCall(data.call_id, data.inviter.name, data.inviter.name, 'generic', true);
             }
 
         })
