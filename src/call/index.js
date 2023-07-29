@@ -341,18 +341,20 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             { userID: userID, userName: userName }).then(() => {
                 MinimizingHelper.getInstance().notifyPrebuiltInit();
 
-                ZegoUIKit.turnCameraOn('', turnOnCameraWhenJoining);
-                ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
-                ZegoUIKit.useFrontFacingCamera(isFrontCamera);
 
+                if (appSign) {
+                    ZegoUIKit.joinRoom(callID);
+                } else {
+                    ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''));
+                }
+                startCallTimingTimer();
                 grantPermissions(() => {
-                    if (appSign) {
-                        ZegoUIKit.joinRoom(callID);
-                    } else {
-                        ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''));
-                    }
-                    startCallTimingTimer();
+                    // RTC need it
+                    ZegoUIKit.turnCameraOn('', false);
+                    ZegoUIKit.turnCameraOn('', turnOnCameraWhenJoining);
+                    ZegoUIKit.useFrontFacingCamera(isFrontCamera);
+                    ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
                 });
 
             });
