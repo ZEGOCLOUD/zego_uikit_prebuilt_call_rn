@@ -98,7 +98,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       inviter === userID &&
       CallInviteStateManage.isAutoCancelInvite(invitationID)
     ) {
-      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees);
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees, JSON.stringify({"call_id": roomID, "operation_type": "cancel_invitation"}));
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
     // navigation.navigate('ZegoInnerChildrenPage');

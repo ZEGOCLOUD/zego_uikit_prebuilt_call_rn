@@ -76,36 +76,47 @@ export default class OfflineCallEventListener {
 
         signalingPlugin.getInstance().setAndroidOfflineDataHandler((data) => {
             console.log('OfflineDataHandler: ', data, rnCallKeepPptions);
+            const cancelInvitation = data && data.operation_type === "cancel_invitation"
 
             if (Platform.OS === "android" && parseInt(Platform.constants['Release']) < 8) {
-                const inviteesCount = data.invitees.length;
-                this.displayNotification(SYSTEM_CALL_FALLBACK_NOTIFICATION_CHANNEL_ID, data.inviter.name, data.type, inviteesCount);
+                if (cancelInvitation) {
+                    notifee.cancelAllNotifications();
+                } else {
+                    const inviteesCount = data.invitees.length;
+                    this.displayNotification(SYSTEM_CALL_FALLBACK_NOTIFICATION_CHANNEL_ID, data.inviter.name, data.type, inviteesCount);
+                }
             } else {
-                // It need to be setup again for offline call
-                RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
-                RNCallKeep.setAvailable(true)
+                if (cancelInvitation) {
+                    RNCallKeep.reportEndCallWithUUID(data.call_id, 6);
+                } else {
+                    // It need to be setup again for offline call
+                    RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
+                    RNCallKeep.setAvailable(true)
 
-                RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-                    RNCallKeep.endAllCalls();
-                    // RNCallKeep.backToForeground()
-                    if (Platform.OS === "android") {
-                        const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
-                        ZegoUIKitPrebuiltCallRNModule.startActivity();
-                    }
+                    RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+                        RNCallKeep.endAllCalls();
+                        // RNCallKeep.backToForeground()
+                        if (Platform.OS === "android") {
+                            const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
+                            ZegoUIKitPrebuiltCallRNModule.startActivity();
+                        }
 
-                    // When the app launch, ZIM will send the online invite again
-                    // Then we can read the offline data to decide if need to join the room directly
-                    CallInviteHelper.getInstance().setOfflineData(data);
-                });
+                        // When the app launch, ZIM will send the online invite again
+                        // Then we can read the offline data to decide if need to join the room directly
+                        CallInviteHelper.getInstance().setOfflineData(data);
+                    });
 
-                RNCallKeep.displayIncomingCall(data.call_id, data.inviter.name, data.inviter.name, 'generic', true);
+                    RNCallKeep.displayIncomingCall(data.call_id, data.inviter.name, data.inviter.name, 'generic', true);
+                }
             }
 
         })
 
         signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
             CallInviteHelper.getInstance().setOfflineData(undefined)
-            zloginfo("setIOSOfflineDataHandler", data)
+            zloginfo("setIOSOfflineDataHandler", callUUID, data)
+
+
             CallInviteHelper.getInstance().setCurrentCallUUID(callUUID);
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
@@ -269,6 +280,10 @@ export default class OfflineCallEventListener {
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
+            // We need to close the callkit window
+            if (AppState.currentState == "background" || Platform.OS == 'ios') {
+                ZegoUIKit.getSignalingPlugin().reportZPNsCallKitCallEnded(CallInviteHelper.getInstance().getCurrentCallUUID(), 2) // RemoteEnded = 2
+            }
             if (typeof onIncomingCallCanceled == 'function') {
                 onIncomingCallCanceled(callID, { userID: inviter.id, userName: inviter.name })
             }

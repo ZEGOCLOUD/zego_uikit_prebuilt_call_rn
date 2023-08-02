@@ -52,7 +52,7 @@ const onUserLogin = async (userID, userName, props) => {
         outgoingCallFileName: 'zego_outgoing.mp3',
       },
       notifyWhenAppRunningInBackgroundOrQuit: true,
-      isIOSSandboxEnvironment: false,
+      isIOSSandboxEnvironment: true,
       androidNotificationConfig: {
         channelID: "ZegoUIKit",
         channelName: "ZegoUIKit",

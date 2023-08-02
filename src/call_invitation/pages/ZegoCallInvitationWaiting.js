@@ -78,7 +78,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       onOutgoingCallCancelButtonPressed()
     }
     if (CallInviteStateManage.isAutoCancelInvite(invitationID)) {
-      ZegoUIKit.getSignalingPlugin().cancelInvitation(getInviteeIDList());
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(getInviteeIDList(), JSON.stringify({"call_id": roomID, "operation_type": "cancel_invitation"}));
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
     BellManage.stopOutgoingSound();
