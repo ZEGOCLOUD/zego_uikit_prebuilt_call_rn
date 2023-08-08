@@ -81,7 +81,8 @@
     "@zegocloud/react-native-callkeep": "*",
     "react-native-safe-area-context": "*",
     "react-native-screens": "*",
-    "react-native-sound": "*"
+    "react-native-sound": "*",
+    "react-native-encrypted-storage": "*"
   },
   "jest": {
     "preset": "react-native",

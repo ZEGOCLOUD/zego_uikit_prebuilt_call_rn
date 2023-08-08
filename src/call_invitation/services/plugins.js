@@ -1,7 +1,8 @@
 import ZegoUIKit, {
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
-import { zloginfo } from '../../utils/logger';
+import { zlogerror, zloginfo } from '../../utils/logger';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const _appInfo = {};
 const _localUser = {};
@@ -23,6 +24,22 @@ const _install = (plugins) => {
   })
 };
 
+const _storeLoginInfo = async () => {
+  try {
+    await EncryptedStorage.setItem(
+      "_ZegoUIKitPrebuiltCallLoginInfo",
+      JSON.stringify({
+        userID: _localUser.userID,
+        userName: _localUser.userName,
+        appID: _appInfo.appID,
+        appSign: _appInfo.appSign,
+      })
+    );
+  } catch (error) {
+    zlogerror('[Plugins] _storeLoginInfo error', error)
+  }
+}
+
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins) => {
     const callbackID =
@@ -39,6 +56,8 @@ const ZegoPrebuiltPlugins = {
     _appInfo.appSign = appSign;
     _localUser.userID = userID;
     _localUser.userName = userName;
+    _storeLoginInfo();
+
     return ZegoUIKit.getSignalingPlugin().login(userID, userName).then(() => {
       zloginfo('[Plugins] login success.');
     });
@@ -78,6 +97,19 @@ const ZegoPrebuiltPlugins = {
   getZIMKitPlugin: () => {
     return ZIMKitPlugin;
   },
+  loadLoginInfoFromLocalEncryptedStorage: async () => {
+    try {
+      const loginInfoStr = await EncryptedStorage.getItem(
+        "_ZegoUIKitPrebuiltCallLoginInfo"
+      );
+      if (loginInfoStr) {
+        return JSON.parse(loginInfoStr);
+      }
+    } catch (error) {
+      zlogerror('[Plugins] getAppInfoFromLocalEncryptedStorage error', error)
+      return Promise.resolve(undefined)
+    }
+  }
 };
 
 export default ZegoPrebuiltPlugins;
