@@ -235,7 +235,6 @@ export default class OfflineCallEventListener {
 
             RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
                 this._callEndByAnswer = true;
-                RNCallKeep.endAllCalls();
 
                 // RNCallKeep.backToForeground()
                 if (Platform.OS === "android") {
@@ -247,6 +246,8 @@ export default class OfflineCallEventListener {
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
                 CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
                 ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
+
+                RNCallKeep.endAllCalls();
             });
             RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
                 if (!this._callEndByAnswer) {

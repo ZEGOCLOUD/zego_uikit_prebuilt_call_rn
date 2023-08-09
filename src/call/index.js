@@ -262,8 +262,13 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         timingTimer.stop()
         timingTimer.start()
     }, []);
-    const destroyCallTimingTimer = useCallback(() => {
-        if (!MinimizingHelper.getInstance().getIsMinimizeSwitch()) {
+    const destroyCallTimingTimer = useCallback((isFromMinimize) => {
+        // we need to reset duration when call is ended from minimize
+        if (isFromMinimize) {
+            TimingHelper.getInstance().resetDuration()
+        } 
+        // we need to reset duration when the call is normal ended.
+        else if (!MinimizingHelper.getInstance().getIsMinimizeSwitch()) {
             TimingHelper.getInstance().resetDuration()
         }
         timingTimer.stop()
@@ -328,7 +333,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             ZegoUIKit.onOnlySelfInRoom(callbackID);
             ZegoUIKit.onRequireNewToken(callbackID);
 
-            destroyCallTimingTimer();
+            destroyCallTimingTimer(true);
             PrebuiltHelper.getInstance().clearState();
             PrebuiltHelper.getInstance().clearRouteParams();
             PrebuiltHelper.getInstance().clearNotify();
@@ -374,7 +379,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
             }
-            destroyCallTimingTimer();
+            destroyCallTimingTimer(false);
         }
     }, []);
 
