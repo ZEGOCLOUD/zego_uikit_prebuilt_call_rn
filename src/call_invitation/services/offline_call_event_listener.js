@@ -24,7 +24,8 @@ const rnCallKeepPptions = {
             channelId: 'ZegoUIKitPrebuiltCallOfflineDataChannel',
             channelName: 'Foreground service for Call Kit',
             notificationTitle: 'My app is running on background',
-        }
+        },
+        displayCallReachabilityTimeout: 1000 * 60,
     }
 };
 const SYSTEM_CALL_FALLBACK_NOTIFICATION_CHANNEL_ID = "call_kit_fallback_notification"
@@ -122,19 +123,24 @@ export default class OfflineCallEventListener {
                             ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(true, true, "My App");
                             zloginfo('[setAndroidOfflineDataHandler] login zim success.', data.inviter);
 
-                            // Refuse after receive the online incomming call
-                            ZegoUIKit.getSignalingPlugin().onInvitationReceived(this.callbackID, ({ callID, type, inviter, data }) => {
-                                ZegoUIKit.getSignalingPlugin().refuseInvitation(inviter.id, undefined).then(() => {
-                                    console.log('[setAndroidOfflineDataHandler] refuse invitation success')
-                                    ZegoUIKit.getSignalingPlugin().uninit()
+                            // Refuse incomming call
+                            ZegoUIKit.getSignalingPlugin().refuseInvitation(
+                                data.inviter.id, 
+                                JSON.stringify({callID: data.zim_call_id})
+                              ).then(() => {
+                                console.log('[setAndroidOfflineDataHandler] refuse invitation success')
+                                ZegoUIKit.getSignalingPlugin().uninit()
 
-                                    this._callEndByAnswer = false;
-                                });
+                                this._callEndByAnswer = false;
+                            })
+                            .catch(() => {
+                                console.log('[setAndroidOfflineDataHandler] refuse invitation failed.')
+                                ZegoUIKit.getSignalingPlugin().uninit()
+                                this._callEndByAnswer = false;
                             });
                         }
                     });
-
-                    RNCallKeep.displayIncomingCall(data.call_id, data.inviter.name, data.inviter.name, 'generic', true);
+                    this.displayIncomingCall(data.call_id, data.inviter.name, data.type);
                 }
             }
 
@@ -373,9 +379,21 @@ export default class OfflineCallEventListener {
             shouldUseRNCallKeep = false;
         }
         if (shouldUseRNCallKeep && notifyWhenAppRunningInBackgroundOrQuit && this._isSystemCalling) {
-            RNCallKeep.displayIncomingCall(callID, inviterName, inviterName, 'generic', true);
+            this.displayIncomingCall(callID, inviterName, type);
         } else {
             this.displayNotification(androidNotificationConfig.channelID, inviterName, type, count)
         }
+    }
+
+    displayIncomingCall(callID, inviterName, type) {
+        console.log(`DisplayIncomingCall, callID: ${callID}, inviterName: ${inviterName}, type: ${type}`);
+        const callerName = type == 0 ? `Audio · ${inviterName}` : `Video · ${inviterName}`
+        RNCallKeep.displayIncomingCall(
+            callID, 
+            callerName,
+            localizedCallerName = callerName, 
+            handleType = 'generic',
+            hasVideo = true
+            );
     }
 }
