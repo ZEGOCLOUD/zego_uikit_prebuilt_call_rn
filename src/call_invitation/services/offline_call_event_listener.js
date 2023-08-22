@@ -388,12 +388,6 @@ export default class OfflineCallEventListener {
     displayIncomingCall(callID, inviterName, type) {
         console.log(`DisplayIncomingCall, callID: ${callID}, inviterName: ${inviterName}, type: ${type}`);
         const callerName = type == 0 ? `Audio · ${inviterName}` : `Video · ${inviterName}`
-        RNCallKeep.displayIncomingCall(
-            callID, 
-            callerName,
-            localizedCallerName = callerName, 
-            handleType = 'generic',
-            hasVideo = true
-            );
+        RNCallKeep.displayIncomingCall(callID, callerName, callerName, 'generic', true);
     }
 }
