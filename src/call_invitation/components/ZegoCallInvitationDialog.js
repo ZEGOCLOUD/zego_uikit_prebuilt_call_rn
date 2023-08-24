@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Modal, TouchableOpacity, AppState } from 'react-native';
+import { StyleSheet, View, Text, Modal, TouchableOpacity, AppState, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ZegoInvitationType } from '../services/defines';
 import CallInviteStateManage from '../services/invite_state_manager';
@@ -14,6 +14,7 @@ import ZegoUIKit, {
   ZegoRefuseInvitationButton,
 } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService from "../../services";
+import RNCallKeep from '@zegocloud/react-native-callkeep';
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
@@ -63,6 +64,9 @@ export default function ZegoCallInvitationDialog(props) {
   }
   const refuseHandle = () => {
     CallInviteHelper.getInstance().refuseCall(callID)
+    if (Platform.OS === 'android') {
+        RNCallKeep.endAllCalls();
+    }
   };
   const onAccectCallback = (data) => {
     zloginfo("onAccectCallback", data.call_id, data.inviter.id)
@@ -81,6 +85,9 @@ export default function ZegoCallInvitationDialog(props) {
   }
   const acceptHandle = () => {
     CallInviteHelper.getInstance().acceptCall(callID, {...extendData, inviteType, inviter});
+    if (Platform.OS === 'android') {
+        RNCallKeep.endAllCalls();
+    }
   };
   const pressHandle = () => {
     setIsFullScreen(true);
@@ -108,10 +115,15 @@ export default function ZegoCallInvitationDialog(props) {
         'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
         callbackID,
-        ({ callID: invitationID, type, inviter, data }) => {
-          const onCall = CallInviteStateManage.isOncall(invitationID);
+        async ({ callID: invitationID, type, inviter, data }) => {
+          let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
           const offlineData = CallInviteHelper.getInstance().getOfflineData();
+
+          if (onCall) {
+            await CallInviteStateManage.deleteEndedCall();
+            onCall = CallInviteStateManage.isOncall(invitationID);
+          }
 
           if (onCall || (!offlineData && onRoom)) {
             zloginfo(

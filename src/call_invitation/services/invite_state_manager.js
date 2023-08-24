@@ -193,7 +193,7 @@ const CallInviteStateManage = {
       inviteState: InviteState.uncompleted,
       invitees: temp,
     });
-    console.warn('######addInviteData######', CallInviteStateManage._invitationMap);
+    console.log('######addInviteData######', JSON.stringify(...CallInviteStateManage._invitationMap));
   },
   // This interface is called after the invitation is successfully rejected
   updateInviteDataAfterRejected: (callID) => {
@@ -259,7 +259,7 @@ const CallInviteStateManage = {
     newCallID,
     inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID
   ) => {
-    console.warn('######isOncall######', CallInviteStateManage._invitationMap);
+    console.log('######isOncall######', JSON.stringify(...CallInviteStateManage._invitationMap));
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
     for (let index = 0, len = callIDs.length; index < len; index++) {
@@ -281,6 +281,33 @@ const CallInviteStateManage = {
     }
     return isOn;
   },
+
+  // query call list, and delete ended call data
+  deleteEndedCall: () => {
+    if (CallInviteStateManage._invitationMap.size == 0) {
+        console.log('no call data');
+        return;
+    }
+    return new Promise((resolve, reject) => {
+        ZegoUIKit.getSignalingPlugin().queryCallList(5)
+        .then((data) => {
+            console.log(`queryCallList, nextFlag: ${data.nextFlag}, count: ${data.callList.length}`);
+            for (const info of data.callList) {
+                if (info.state === 1) {
+                    continue;
+                }
+                console.log(`call info:`, info.callID, info.caller, info.state, info.extendedData);
+                CallInviteStateManage._invitationMap.delete(info.callID);
+            }
+            resolve();
+        })
+        .catch((error) => {
+            console.log(`queryCallList error: ${error}`);
+            reject(error);
+        });
+    });
+  },
+
   onSomeoneAcceptedInvite: (callbackID, callback) => {
     if (typeof callback !== 'function') {
       if (CallInviteStateManage._onSomeoneAcceptedInviteMap.has(callbackID)) {

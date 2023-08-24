@@ -88,7 +88,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
     const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
     if (signalingPlugin && currentCallUUID) {
-      signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID);
+      signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID, 2);
     }
   };
   const hangUpHandle = () => {
