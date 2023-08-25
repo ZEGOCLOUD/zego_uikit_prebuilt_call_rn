@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Platform, PermissionsAndroid } from 'react-native';
+import { StyleSheet, View, Platform, PermissionsAndroid, BackHandler } from 'react-native';
 import ZegoUIKit, {
   ZegoAudioVideoView,
   ZegoSwitchCameraButton,
@@ -105,6 +105,11 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleBackButton = () => {
+    return true;
+  }
+
   useEffect(() => {
     const callbackID =
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
@@ -141,11 +146,17 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         // });
       }
     );
+
+    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    navigation.setOptions({ gestureEnabled: false });
+
     return () => {
       ZegoUIKit.onRequireNewToken(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+      navigation.setOptions({ gestureEnabled: true });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { PermissionsAndroid, Alert, Text } from 'react-native';
+import { PermissionsAndroid, Alert, Text, BackHandler } from 'react-native';
 import Delegate from 'react-delegate-component';
 import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
@@ -14,9 +14,12 @@ import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 import Timer from "../utils/timer"
+import { useNavigation } from '@react-navigation/native';
 
 
 function ZegoUIKitPrebuiltCall(props, ref) {
+    const navigation = useNavigation();
+
     const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
     !isMinimizeSwitch && MinimizingHelper.getInstance().notifyEntryNormal();
 
@@ -308,6 +311,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         },
     }));
 
+    const handleBackButton = () => {
+        return true;
+    }
+
     useEffect(() => {
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             if (typeof onOnlySelfInRoom == 'function') {
@@ -366,6 +373,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             });
 
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+        navigation.setOptions({ gestureEnabled: false });
+
         // Initialize after use
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
         return () => {
@@ -380,6 +390,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 PrebuiltHelper.getInstance().clearNotify();
             }
             destroyCallTimingTimer(false);
+            BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+            navigation.setOptions({ gestureEnabled: true });
         }
     }, []);
 
