@@ -203,6 +203,7 @@ export default class OfflineCallEventListener {
             if (nextState === 'active') {
                 if (Platform.OS === 'ios') {
                     this.reportEndCallWithUUID(CallInviteHelper.getInstance().getCurrentCallUUID(), 2);
+                    this._isDisplayingCall = false;
                 }
             }
         });
@@ -350,6 +351,7 @@ export default class OfflineCallEventListener {
             // We need to close the callkit window
             if (AppState.currentState === "background" || Platform.OS === 'ios') {
                 // RemoteEnded = 2
+                this._isDisplayingCall = false;
                 this.reportEndCallWithUUID(callUUID, 2);
             }
             if (typeof onIncomingCallCanceled == 'function') {

@@ -68,6 +68,10 @@ export default function ZegoCallInvitationDialog(props) {
         RNCallKeep.endAllCalls();
     }
   };
+  const refuseFailHandle = (error) => {
+    console.log(`Refuse Call Invitation failed, code: ${error.code}, message: ${error.message}`);
+    refuseHandle();
+  }
   const onAccectCallback = (data) => {
     zloginfo("onAccectCallback", data.call_id, data.inviter.id)
     if (typeof onIncomingCallAcceptButtonPressed == 'function') {
@@ -89,6 +93,10 @@ export default function ZegoCallInvitationDialog(props) {
         RNCallKeep.endAllCalls();
     }
   };
+  const acceptFailHandle = (error) => {
+    console.log(`Accept Call Invitation failed, code: ${error.code}, message: ${error.message}`);
+    refuseHandle();
+  }
   const pressHandle = () => {
     setIsFullScreen(true);
   };
@@ -211,6 +219,7 @@ export default function ZegoCallInvitationDialog(props) {
                     <ZegoRefuseInvitationButton
                       inviterID={inviter.id}
                       onPressed={refuseHandle}
+                      onFailure={refuseFailHandle}
                       data={JSON.stringify({
                         inviterID: inviter.id,
                         reason: 'decline',
@@ -224,6 +233,7 @@ export default function ZegoCallInvitationDialog(props) {
                     icon={getImageSourceByPath()}
                     inviterID={inviter.id}
                     onPressed={acceptHandle}
+                    onFailure={acceptFailHandle}
                   />
                 </View>
               </View>
@@ -246,6 +256,7 @@ export default function ZegoCallInvitationDialog(props) {
                   <ZegoRefuseInvitationButton
                     inviterID={inviter.id}
                     onPressed={refuseHandle}
+                    onFailure={refuseFailHandle}
                     data={JSON.stringify({
                       inviterID: inviter.id,
                       reason: 'decline',
@@ -261,6 +272,7 @@ export default function ZegoCallInvitationDialog(props) {
                   icon={getImageSourceByPath()}
                   inviterID={inviter.id}
                   onPressed={acceptHandle}
+                  onFailure={acceptFailHandle}
                 />
                 <Text style={styles.fullAcceptTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton}</Text>
               </View>
