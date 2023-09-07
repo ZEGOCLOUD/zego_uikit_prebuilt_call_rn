@@ -151,6 +151,9 @@ export default class OfflineCallEventListener {
 
             this._isDisplayingCall = true;
             CallInviteHelper.getInstance().setCurrentCallUUID(callUUID);
+
+            this._currentCallData = data
+
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
                 zloginfo("onCallKitAnswerCall", data)
@@ -171,8 +174,8 @@ export default class OfflineCallEventListener {
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
                 if (data && data.inviter) {
                     // If you kill the application, you do not need to process it, and this value is also empty
-                    if (this._currentCallData && this._currentCallData.callID) {
-                        CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, data);
+                    if (this._currentCallData && this._currentCallData.zim_call_id) {
+                        CallInviteHelper.getInstance().acceptCall(data.zim_call_id, data);
                         ZegoUIKit.getSignalingPlugin().acceptInvitation(data.inviter.id, undefined)
                         this._currentCallData = {}
                     }
@@ -185,10 +188,10 @@ export default class OfflineCallEventListener {
                 console.log('######onCallKitEndCall', callUUID);
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
                 if (data && data.inviter) {
-                    if (this._currentCallData && this._currentCallData.callID) {
+                    if (this._currentCallData && this._currentCallData.zim_call_id) {
                         ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, undefined).then(() => {
                         });
-                        CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
+                        CallInviteHelper.getInstance().refuseCall(data.zim_call_id);
                         this._currentCallData = {}
                     } else {
                         console.log('######ZegoUIKitPrebuiltCallService.hangUp');
@@ -328,12 +331,16 @@ export default class OfflineCallEventListener {
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
-            this._currentCallData = {
-                ...JSON.parse(data),
-                type,
-                inviter,
-                callID,
+            // only for Android, ios will record at `setIOSOfflineDataHandler`
+            if (Platform.OS === 'android') {
+                this._currentCallData = {
+                    ...JSON.parse(data),
+                    type,
+                    inviter,
+                    callID,
+                }
             }
+
             const invitees = this.getInviteesFromData(data)
             // Listen and show notification on background
             this.showBackgroundNotification(callID, inviter.name, type, invitees)
