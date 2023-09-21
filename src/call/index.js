@@ -433,15 +433,18 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     return (
         <View style={[styles.container, styles.fillParent]}>
-
-            <View style={styles.prebuiltForegroundBuilderContainer} pointerEvents="none">
-                <Delegate
-                    style={styles.prebuiltForegroundBuilderDelegate}
-                    to={prebuiltForegroundBuilder}
-                    default={ZegoPrebuiltForegroundView}
-                    props={{ isDurationVisible }}
-                />
-            </View>
+          <View style={styles.foregroundContainer} pointerEvents='none'>
+            <ZegoPrebuiltForegroundView 
+              style={styles.foregroundView}
+              isDurationVisible={isDurationVisible}
+            />
+          </View>
+          <View style={styles.foregroundBuilderContainer} pointerEvents='box-none'>
+            <Delegate
+              // style={styles.foregroundBuilderDelegate}
+              to={prebuiltForegroundBuilder}
+            />
+          </View>
             {isVisible && isTopMenubarVisable ?
                 <ZegoTopMenuBar
                     menuTitle={topTitle}
@@ -533,20 +536,35 @@ const styles = StyleSheet.create({
         right: 0,
         top: 0,
     },
-    prebuiltForegroundBuilderDelegate: {
-        flex: 1,
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-    },
-    prebuiltForegroundBuilderContainer: {
+    foregroundContainer: {
         flex: 1,
         position: 'absolute',
         width: '100%',
         height: '100%',
         top: 6,
         zIndex: 11,
+        alignItems: 'center',
+    },
+    foregroundView: {
+        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+    },
+    foregroundBuilderDelegate: {
+        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+    },
+    foregroundBuilderContainer: {
+        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        zIndex: 21,
         alignItems: 'center',
     },
 });
