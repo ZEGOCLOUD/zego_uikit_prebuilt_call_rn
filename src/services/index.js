@@ -27,7 +27,7 @@ export default class ZegoUIKitPrebuiltCallService {
             channelName: "CallInvitation",
         },
         notifyWhenAppRunningInBackgroundOrQuit: false,
-        isIOSSandboxEnvironment: true,
+        isIOSSandboxEnvironment: null,
     };
     isInit = false;
     subscription = null;
@@ -78,7 +78,7 @@ export default class ZegoUIKitPrebuiltCallService {
 
         return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
             // Enable offline notification
-            ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName || 'My app');
+            ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
             zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
             
 
