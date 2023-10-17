@@ -18,6 +18,16 @@ export default function ZegoSendCallInvitationButton(props) {
     timeout = 60,
     onWillPressed,
     onPressed,
+    width = 42,
+    height = 42,
+    verticalLayout = false,
+    textColor,
+    fontSize,
+    backgroundColor,
+    borderRadius,
+    borderWidth,
+    borderColor,
+    borderStyle,
     resourceID: _resourceID = ''
   } = props;
 
@@ -89,6 +99,16 @@ export default function ZegoSendCallInvitationButton(props) {
         onWillPressed={onWillPressed}
         onPressed={onPress}
         resourceID={_resourceID}
+        width={width}
+        height={height}
+        color={textColor}
+        fontSize={fontSize}
+        backgroundColor={backgroundColor}
+        verticalLayout={verticalLayout}
+        borderRadius={borderRadius}
+        borderWidth={borderWidth}
+        borderColor={borderColor}
+        borderStyle={borderStyle}
         notificationTitle={
           InnerTextHelper.instance().getIncomingCallDialogTitle(
             localUser.userName,
