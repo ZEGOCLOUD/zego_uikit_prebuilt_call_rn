@@ -50,6 +50,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       ? ZegoInvitationType.videoCall
       : ZegoInvitationType.voiceCall,
     invitees,
+    callID: roomID,
   };
   const requireDefaultConfig = (data) => {
     const callConfig =

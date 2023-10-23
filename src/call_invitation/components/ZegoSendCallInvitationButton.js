@@ -28,6 +28,7 @@ export default function ZegoSendCallInvitationButton(props) {
     borderWidth,
     borderColor,
     borderStyle,
+    callID,
     resourceID: _resourceID = ''
   } = props;
 
@@ -38,7 +39,7 @@ export default function ZegoSendCallInvitationButton(props) {
   }
 
   const localUser = ZegoPrebuiltPlugins.getLocalUser();
-  const roomID = `call_${localUser.userID}_${Date.now()}`;
+  const roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
   const data = JSON.stringify({
     call_id: roomID,
     invitees: invitees.map(invitee => {
