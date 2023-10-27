@@ -16,7 +16,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
   const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { token = '', onRequireNewToken, onOutgoingCallCancelButtonPressed} = initConfig;
+  const { onOutgoingCallCancelButtonPressed} = initConfig;
   const { route } = props;
   const {
     roomID,
@@ -89,15 +89,11 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   useEffect(() => {
     BellManage.playOutgoingSound();
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
-      ZegoUIKit.turnCameraOn('', true);
+      ZegoUIKit.turnCameraOn('', isVideoCall);
       ZegoUIKit.turnMicrophoneOn('', true);
       ZegoUIKit.setAudioOutputToSpeaker(true);
       grantPermissions(() => {
-        if (appSign) {
-          ZegoUIKit.joinRoom(roomID);
-        } else {
-          ZegoUIKit.joinRoom(roomID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : '' ));
-        }
+        ZegoUIKit.joinRoom(roomID);
       });
     });
     return () => {
@@ -113,7 +109,6 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   useEffect(() => {
     const callbackID =
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
     ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
       BellManage.stopOutgoingSound();
       ZegoUIKit.leaveRoom();
@@ -151,7 +146,6 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     navigation.setOptions({ gestureEnabled: false });
 
     return () => {
-      ZegoUIKit.onRequireNewToken(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);

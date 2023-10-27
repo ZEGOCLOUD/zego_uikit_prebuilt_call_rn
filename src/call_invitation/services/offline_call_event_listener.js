@@ -82,13 +82,15 @@ export default class OfflineCallEventListener {
 
         signalingPlugin.getInstance().setAndroidOfflineDataHandler(async (data) => {
             console.log('OfflineDataHandler: ', data, rnCallKeepPptions);
-            if (this._isDisplayingCall) {
+
+            const cancelInvitation = data && data.operation_type === "cancel_invitation"
+
+            if (this._isDisplayingCall && !cancelInvitation) {
                 // reject call.
                 console.log('OfflineDataHandler: busy, reject call invitation.');
                 this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
                 return;
             }
-            const cancelInvitation = data && data.operation_type === "cancel_invitation"
 
             if (Platform.OS === "android" && parseInt(Platform.constants['Release']) < 8) {
                 if (cancelInvitation) {
