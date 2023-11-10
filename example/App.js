@@ -52,18 +52,17 @@ const onUserLogin = async (userID, userName, props) => {
         outgoingCallFileName: 'zego_outgoing.mp3',
       },
       notifyWhenAppRunningInBackgroundOrQuit: true,
-      isIOSSandboxEnvironment: true,
       androidNotificationConfig: {
         channelID: "ZegoUIKit",
         channelName: "ZegoUIKit",
       },
       requireConfig: (data) => {
+        console.log('requireConfig, callID: ', data.callID);
         return {
           onHangUp: (duration) => {
             console.log('########CallWithInvitation onHangUp', duration);
             props.navigation.navigate('HomeScreen');
           },
-          foregroundBuilder: () => <ZegoCountdownLabel maxDuration={60} onCountdownFinished={() => { console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true); }} />,
           timingConfig: {
             enableTiming: true,
             onDurationUpdate: (duration) => {

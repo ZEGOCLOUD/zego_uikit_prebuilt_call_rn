@@ -15,6 +15,7 @@ import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 import Timer from "../utils/timer"
 import { useNavigation } from '@react-navigation/native';
+import KeepAwake from 'react-native-keep-awake'
 
 
 function ZegoUIKitPrebuiltCall(props, ref) {
@@ -347,6 +348,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
             MinimizingHelper.getInstance().notifyEntryNormal();
+            KeepAwake.deactivate();
         })
 
         ZegoUIKit.init(
@@ -375,6 +377,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButton);
         navigation.setOptions({ gestureEnabled: false });
+        KeepAwake.activate();
 
         // Initialize after use
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
@@ -388,6 +391,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 PrebuiltHelper.getInstance().clearState();
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
+                KeepAwake.deactivate();
             }
             destroyCallTimingTimer(false);
             BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
