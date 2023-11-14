@@ -41,6 +41,7 @@ export default class OfflineCallEventListener {
     _isSystemCalling = false;
     _callEndByAnswer = false;
     _isDisplayingCall = false;
+    _currentCallID = ''; // For Android.
 
     constructor() { }
     static getInstance() {
@@ -101,7 +102,8 @@ export default class OfflineCallEventListener {
                 }
             } else {
                 if (cancelInvitation) {
-                    RNCallKeep.reportEndCallWithUUID(data.call_id, 6);
+                    RNCallKeep.reportEndCallWithUUID(data.zim_call_id, 6);
+                    this._isDisplayingCall = false;
                 } else {
                     // It need to be setup again for offline call
                     RNCallKeep.setup(rnCallKeepPptions).then(accepted => { });
@@ -134,7 +136,7 @@ export default class OfflineCallEventListener {
                             this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
                         }
                     });
-                    this.displayIncomingCall(data.call_id, data.inviter.name, data.type);
+                    this.displayIncomingCall(data.zim_call_id, data.inviter.name, data.type);
                 }
             }
 
@@ -421,6 +423,11 @@ export default class OfflineCallEventListener {
     }
 
     displayIncomingCall(callID, inviterName, type) {
+        if (this._currentCallID === callID) {
+          console.log(`DisplayIncomingCall busy, callID: ${callID}`);
+          return;
+        }
+        this._currentCallID = callID;
         console.log(`DisplayIncomingCall, callID: ${callID}, inviterName: ${inviterName}, type: ${type}`);
         const callerName = type == 0 ? `Audio · ${inviterName}` : `Video · ${inviterName}`
         RNCallKeep.displayIncomingCall(callID, callerName, callerName, 'generic', true);
