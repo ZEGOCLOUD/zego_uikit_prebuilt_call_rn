@@ -24,7 +24,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
   const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { requireConfig } = initConfig;
+  const { requireConfig, avatarBuilder } = initConfig;
   const { route } = props;
   const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
   let routeParams = PrebuiltHelper.getInstance().getRouteParams();
@@ -161,6 +161,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
             origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
           }
         },
+        avatarBuilder: avatarBuilder,
         onOnlySelfInRoom: (duration) => {
           callEndHandle();
           zloginfo('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);

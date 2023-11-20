@@ -61,6 +61,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         onOnlySelfInRoom,
         durationConfig = {}, // Deprecate
         timingConfig = {},
+        avatarBuilder,
         foregroundBuilder: prebuiltForegroundBuilder
     } = config;
     const {
@@ -467,25 +468,27 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 /> : <View />
             }
             <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
-                <ZegoAudioVideoContainer style={[styles.audioVideoView, styles.fillParent]}
-                    audioVideoConfig={{
-                        showSoundWavesInAudioMode: showSoundWavesInAudioMode,
-                        useVideoViewAspectFill: useVideoViewAspectFill,
-                        cacheAudioVideoUserList: isMinimizeSwitch ?
-                            ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
-                            null
-                    }}
-                    layout={layout}
-                    foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
-                        <AudioVideoForegroundView
-                            userInfo={userInfo}
-                            showMicrophoneStateOnView={showMicrophoneStateOnView}
-                            showCameraStateOnView={showCameraStateOnView}
-                            showUserNameOnView={showUserNameOnView}
-                        />
-                    }
-                    sortAudioVideo={sortAudioVideo}
-                />
+              <ZegoAudioVideoContainer
+                style={[styles.audioVideoView, styles.fillParent]}
+                audioVideoConfig={{
+                    showSoundWavesInAudioMode: showSoundWavesInAudioMode,
+                    useVideoViewAspectFill: useVideoViewAspectFill,
+                    cacheAudioVideoUserList: isMinimizeSwitch ?
+                        ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
+                        null
+                }}
+                layout={layout}
+                avatarBuilder={avatarBuilder}
+                foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
+                    <AudioVideoForegroundView
+                        userInfo={userInfo}
+                        showMicrophoneStateOnView={showMicrophoneStateOnView}
+                        showCameraStateOnView={showCameraStateOnView}
+                        showUserNameOnView={showUserNameOnView}
+                    />
+                }
+                sortAudioVideo={sortAudioVideo}
+              />
             </View>
             {isMenubarVisable ?
                 <ZegoBottomBar

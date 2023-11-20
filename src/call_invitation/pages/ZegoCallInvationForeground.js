@@ -4,10 +4,11 @@ import ZegoBottomBar from '../../call/ZegoBottomBar';
 import ZegoMenuBarButtonName from '../../call/ZegoMenuBarButtonName';
 import { ZegoInvitationType } from '../services/defines';
 import InnerTextHelper from '../services/inner_text_helper';
+import Delegate from 'react-delegate-component';
 
 export default function ZegoCallInvationForeground(props) {
-  const { isVideoCall, invitee, onHangUp } = props;
-  const userName = invitee;
+  const { isVideoCall, invitee, onHangUp, avatarBuilder } = props;
+  const userName = invitee.userName;
 
   const getShotName = (name) => {
     if (!name) {
@@ -26,7 +27,16 @@ export default function ZegoCallInvationForeground(props) {
     <View style={[styles.container, isVideoCall ? styles.opacity : null]}>
       <View style={styles.content}>
         <View style={styles.avatar}>
-          <Text style={styles.nameLabel}>{getShotName(userName)}</Text>
+          {
+            !avatarBuilder ?
+            <Text style={styles.nameLabel}>{getShotName(userName)}</Text> :
+            <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <Delegate
+                to={avatarBuilder}
+                props={{ userInfo: invitee }}
+              />
+            </View>
+          }
         </View>
         <Text style={styles.userName}>{
           InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
@@ -66,6 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 5,
+    overflow: 'hidden',
   },
   nameLabel: {
     color: '#222222',

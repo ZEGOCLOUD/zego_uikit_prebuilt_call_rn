@@ -8,6 +8,7 @@ import BellManage from '../services/bell';
 import InnerTextHelper from '../services/inner_text_helper'
 import CallInviteHelper from '../services/call_invite_helper'
 import notifee from '@notifee/react-native';
+import Delegate from 'react-delegate-component';
 
 import ZegoUIKit, {
   ZegoAcceptInvitationButton,
@@ -18,7 +19,7 @@ import RNCallKeep from '@zegocloud/react-native-callkeep';
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed } = initConfig;
+  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed, avatarBuilder } = initConfig;
 
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
@@ -204,9 +205,16 @@ export default function ZegoCallInvitationDialog(props) {
             <View style={styles.dialog}>
               <View style={styles.left}>
                 <View style={styles.avatar}>
-                  <Text style={styles.nameLabel}>
-                    {getShotName(inviter.name)}
-                  </Text>
+                  {
+                    !avatarBuilder ? 
+                    <Text style={styles.nameLabel}>{getShotName(inviter.name)} </Text> :
+                    <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                      <Delegate
+                        to={avatarBuilder}
+                        props={{ userInfo: {userID: inviter.id, userName: inviter.name} }}
+                      />
+                    </View>
+                  }
                 </View>
                 <View>
                   <Text style={styles.callName}>{getDialogTitle()}</Text>
@@ -243,9 +251,16 @@ export default function ZegoCallInvitationDialog(props) {
           <View style={styles.fullDialog}>
             <View style={styles.content}>
               <View style={styles.fullAvatar}>
-                <Text style={styles.fullNameLabel}>
-                  {getShotName(inviter.name)}
-                </Text>
+                {
+                  !avatarBuilder ? 
+                  <Text style={styles.fullNameLabel}>{getShotName(inviter.name)}</Text> :
+                  <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                      <Delegate
+                        to={avatarBuilder}
+                        props={{ userInfo: {userID: inviter.id, userName: inviter.name} }}
+                      />
+                    </View>
+                }
               </View>
               <Text style={styles.fullCallName}>{inviter.name}</Text>
               <Text style={styles.calling}>{getDialogMessage()}</Text>
@@ -325,6 +340,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 13,
+    overflow: 'hidden',
   },
   nameLabel: {
     fontSize: 26,
@@ -366,6 +382,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 5,
+    overflow: 'hidden',
   },
   fullNameLabel: {
     color: '#222222',
