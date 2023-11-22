@@ -11,6 +11,7 @@ import { zloginfo } from '../utils/logger';
 import TimingHelper from "./timing_helper";
 import MinimizingHelper from "../call/services/minimizing_helper";
 import HangupHelper from "../call_invitation/services/hangup_helper";
+import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -127,7 +128,7 @@ export default class ZegoUIKitPrebuiltCallService {
     }
     hangUp(showConfirmation = false) {
         const debounce = HangupHelper.getInstance().getDebounce();
-        const config = this.config.requireConfig ? this.config.requireConfig() : {};
+        const config = this.config.requireConfig ? this.config.requireConfig({}) : {};
         const { onHangUp, onHangUpConfirmation, hangUpConfirmInfo } = config;
         if (debounce) return;
         if (!showConfirmation) {
@@ -156,5 +157,16 @@ export default class ZegoUIKitPrebuiltCallService {
     }
     minimizeWindow () {
         MinimizingHelper.getInstance().minimizeWindow();
+    }
+
+    sendCallInvitation(invitees, isVideoCall, navigation, options) {
+      return ZegoUIKitPrebuiltCallInvitation
+        .getInstance()
+        .sendCallInvitation(
+        invitees, 
+        isVideoCall, 
+        navigation, 
+        options
+      );
     }
 }

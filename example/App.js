@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Image, } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import KeyCenter from './KeyCenter';
@@ -56,19 +56,29 @@ const onUserLogin = async (userID, userName, props) => {
         channelID: "ZegoUIKit",
         channelName: "ZegoUIKit",
       },
+      avatarBuilder: ({userInfo}) => {
+        return <View style={{width: '100%', height: '100%'}}>
+         <Image 
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+          source={{ uri: `https://robohash.org/${userInfo.userID}.png` }}
+          />
+        </View>
+      },
       requireConfig: (data) => {
         console.log('requireConfig, callID: ', data.callID);
         return {
+          // foregroundBuilder: () => <ZegoCountdownLabel maxDuration={10} onCountdownFinished={() => { console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true); }} />,
           onHangUp: (duration) => {
             console.log('########CallWithInvitation onHangUp', duration);
             props.navigation.navigate('HomeScreen');
           },
           timingConfig: {
-            enableTiming: true,
+            isDurationVisible: true,
             onDurationUpdate: (duration) => {
               console.log('########CallWithInvitation onDurationUpdate', duration);
               if (duration === 10 * 60) {
-                ZegoUIKitPrebuiltCallService.hangUp(true);
+                ZegoUIKitPrebuiltCallService.hangUp();
               }
             }
           },

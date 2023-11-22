@@ -20,7 +20,7 @@ export default function ZegoCountdownLabel(props) {
         });
     }, [])
     return (
-        <View style={styles.container}>
+        <View style={styles.container} pointerEvents={'box-none'}>
             <SafeAreaView ><Text style={styles.timing}>{durationFormat(duration)}</Text></SafeAreaView>
         </View>
     );
