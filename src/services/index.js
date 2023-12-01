@@ -77,20 +77,27 @@ export default class ZegoUIKitPrebuiltCallService {
             }
         );
 
-        return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
-            // Enable offline notification
-            ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
-            zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
-            
+        // Enable offline notification
+        ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
+        zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
 
-            OfflineCallEventListener.getInstance().init(this.config);
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
+              resolve();
 
-            CallInviteStateManage.init();
-            BellManage.initRingtoneConfig(ringtoneConfig);
-            BellManage.initIncomingSound();
-            BellManage.initOutgoingSound();
-            this.isInit = true;
-            this.notifyInit();
+              OfflineCallEventListener.getInstance().init(this.config);
+  
+              CallInviteStateManage.init();
+              BellManage.initRingtoneConfig(ringtoneConfig);
+              BellManage.initIncomingSound();
+              BellManage.initOutgoingSound();
+              this.isInit = true;
+              this.notifyInit();
+            }).catch(() => {
+              reject();
+            });
+          }, 500);
         });
     }
     uninit() {

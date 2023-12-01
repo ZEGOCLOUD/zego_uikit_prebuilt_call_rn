@@ -145,6 +145,8 @@ export default class OfflineCallEventListener {
         signalingPlugin.getInstance().setIOSOfflineDataHandler((data, callUUID) => {
             CallInviteHelper.getInstance().setOfflineData(undefined)
             zloginfo("setIOSOfflineDataHandler", callUUID, data)
+            
+            ZegoUIKit.getSignalingPlugin().setAdvancedConfig('zim_voip_call_id', data.zim_call_id);
 
             if (this._isDisplayingCall)  {
                 zloginfo('setIOSOfflineDataHandler: busy, reject call invitation.');
@@ -179,29 +181,28 @@ export default class OfflineCallEventListener {
                 if (data && data.inviter) {
                     // If you kill the application, you do not need to process it, and this value is also empty
                     if (this._currentCallData && this._currentCallData.zim_call_id) {
+                        this._currentCallData = {}
                         CallInviteHelper.getInstance().acceptCall(data.zim_call_id, data);
                         ZegoUIKit.getSignalingPlugin().acceptInvitation(data.inviter.id, undefined)
-                        this._currentCallData = {}
                     }
                 }
             });
             signalingPlugin.getInstance().onCallKitEndCall((action) => {
-                // The report succeeds regardless of the direct service scenario
-                action.fulfill();
                 this._isDisplayingCall = false;
                 console.log('######onCallKitEndCall', callUUID);
                 // TODO it should be invitataionID but not callUUID, wait for ZPNs's solution
                 if (data && data.inviter) {
                     if (this._currentCallData && this._currentCallData.zim_call_id) {
-                        ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, undefined).then(() => {
-                        });
-                        CallInviteHelper.getInstance().refuseCall(data.zim_call_id);
                         this._currentCallData = {}
+                        this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
+                        CallInviteHelper.getInstance().refuseCall(data.zim_call_id);
                     } else {
                         console.log('######ZegoUIKitPrebuiltCallService.hangUp');
                         ZegoUIKitPrebuiltCallService.getInstance().hangUp();
                     }
                 }
+                // The report succeeds regardless of the direct service scenario
+                action.fulfill();
             })
         });
 
@@ -343,6 +344,7 @@ export default class OfflineCallEventListener {
                     inviter,
                     callID,
                 }
+                console.log('The current call data: ', this._currentCallData);
             }
 
             const invitees = this.getInviteesFromData(data)
@@ -444,10 +446,13 @@ export default class OfflineCallEventListener {
     async refuseOfflineInvitation(plugins, inviterID, callID) {
         // Init ZIM for reject invitation
         const loginInfo = await ZegoPrebuiltPlugin.loadLoginInfoFromLocalEncryptedStorage()
-        await ZegoPrebuiltPlugin.init(loginInfo.appID, loginInfo.appSign, loginInfo.userID, loginInfo.userName, plugins)
         
-        ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(true);
-        zloginfo('[setAndroidOfflineDataHandler] login zim success.', loginInfo.userID, loginInfo.userName);
+        if (loginInfo) {
+          await ZegoPrebuiltPlugin.init(loginInfo.appID, loginInfo.appSign, loginInfo.userID, loginInfo.userName, plugins)
+        
+          ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(true);
+          zloginfo('[setAndroidOfflineDataHandler] login zim success.', loginInfo.userID, loginInfo.userName);
+        }
 
         // Refuse incomming call
         ZegoUIKit.getSignalingPlugin().refuseInvitation(
@@ -455,14 +460,18 @@ export default class OfflineCallEventListener {
             JSON.stringify({callID: callID})
           ).then(() => {
             console.log('[setAndroidOfflineDataHandler] refuse invitation success')
-            ZegoUIKit.getSignalingPlugin().uninit()
+            if (Platform.OS === 'android') {
+              ZegoUIKit.getSignalingPlugin().uninit()
 
-            this._callEndByAnswer = false;
+              this._callEndByAnswer = false;
+            }
         })
         .catch(() => {
             console.log('[setAndroidOfflineDataHandler] refuse invitation failed.')
-            ZegoUIKit.getSignalingPlugin().uninit()
-            this._callEndByAnswer = false;
+            if (Platform.OS === 'android') {
+              ZegoUIKit.getSignalingPlugin().uninit()
+              this._callEndByAnswer = false;
+            }
         });
     }
 }
