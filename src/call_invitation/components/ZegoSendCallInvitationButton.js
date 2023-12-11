@@ -69,6 +69,12 @@ export default function ZegoSendCallInvitationButton(props) {
     }
   };
 
+  const onFailure = ({code: errorCode, message: errorMessage}) => {
+    if (typeof onPressed === 'function') {
+      onPressed(errorCode, errorMessage, undefined);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ZegoSendInvitationButton
@@ -84,6 +90,7 @@ export default function ZegoSendCallInvitationButton(props) {
         timeout={timeout}
         onWillPressed={onWillPressed}
         onPressed={onPress}
+        onFailure={onFailure}
         resourceID={_resourceID}
         width={width}
         height={height}
