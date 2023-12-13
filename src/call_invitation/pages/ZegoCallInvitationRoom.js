@@ -133,6 +133,17 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       navigation.goBack();
       origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
     });
+
+    const unsubscribe1 = navigation.addListener('blur', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallInCallScreen, blur');
+    })
+    const unsubscribe2 = navigation.addListener('focus', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallInCallScreen, focus');
+    })
+    const unsubscribe3 = navigation.addListener('beforeRemove', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallInCallScreen, beforeRemove');
+    })
+
     return () => {
       zloginfo('ZegoUIKitPrebuiltCallInCallScreen destroy');
       HangupHelper.getInstance().onAutoJump(callbackID);
@@ -140,6 +151,9 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BellManage.stopOutgoingSound();
       CallInviteStateManage.initInviteData();
+      unsubscribe1();
+      unsubscribe2();
+      unsubscribe3();
     };
   }, []);
 

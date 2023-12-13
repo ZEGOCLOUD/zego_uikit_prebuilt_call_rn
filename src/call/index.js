@@ -188,7 +188,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
                     );
                 }
-                if (!isVideoGranted) {
+                const isVideoCall = buttons.includes(ZegoMenuBarButtonName.toggleCameraButton) || turnOnCameraWhenJoining;
+                if (!isVideoGranted && isVideoCall) {
                     ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
                 }
             } catch (error) {

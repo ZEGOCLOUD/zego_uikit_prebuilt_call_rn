@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
 import { ZegoInvitationType } from '../services/defines';
@@ -6,6 +6,7 @@ import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
 import InnerTextHelper from '../services/inner_text_helper';
 import ZegoUIKitPrebuiltCallInvitation from '../../services/invitation';
+import { zloginfo } from '../../utils/logger';
 
 export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
@@ -74,6 +75,23 @@ export default function ZegoSendCallInvitationButton(props) {
       onPressed(errorCode, errorMessage, undefined);
     }
   };
+
+  useEffect(() => {
+    const unsubscribe1 = navigation.addListener('blur', () => {  
+      zloginfo(`[Navigation] ZegoSendCallInvitationButton blur, isVideoCall: ${isVideoCall}`);
+    })
+    const unsubscribe2 = navigation.addListener('focus', () => {  
+      zloginfo(`[Navigation] ZegoSendCallInvitationButton focus, isVideoCall: ${isVideoCall}`);
+    })
+    const unsubscribe3 = navigation.addListener('beforeRemove', () => {  
+      zloginfo(`[Navigation] ZegoSendCallInvitationButton beforeRemove, isVideoCall: ${isVideoCall}`);
+    })
+    return () => {
+      unsubscribe1();
+      unsubscribe2();
+      unsubscribe3();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>

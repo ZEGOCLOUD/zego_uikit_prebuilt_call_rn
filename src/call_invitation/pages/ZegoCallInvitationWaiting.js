@@ -50,7 +50,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
           );
         }
-        if (!isVideoGranted) {
+        if (!isVideoGranted && isVideoCall) {
           ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
         }
       } catch (error) {
@@ -96,8 +96,20 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         ZegoUIKit.joinRoom(roomID);
       });
     });
+    const unsubscribe1 = navigation.addListener('blur', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallWaitingScreen, blur');
+    })
+    const unsubscribe2 = navigation.addListener('focus', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallWaitingScreen, focus');
+    })
+    const unsubscribe3 = navigation.addListener('beforeRemove', () => {  
+      zloginfo('[Navigation] ZegoUIKitPrebuiltCallWaitingScreen, beforeRemove');
+    })
     return () => {
       BellManage.stopOutgoingSound();
+      unsubscribe1();
+      unsubscribe2();
+      unsubscribe3();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
