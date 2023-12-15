@@ -449,8 +449,8 @@ export default class OfflineCallEventListener {
         
         if (loginInfo) {
           await ZegoPrebuiltPlugin.init(loginInfo.appID, loginInfo.appSign, loginInfo.userID, loginInfo.userName, plugins)
-        
-          ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(true);
+          
+          ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(this.config.certificateIndex);
           zloginfo('[setAndroidOfflineDataHandler] login zim success.', loginInfo.userID, loginInfo.userName);
         }
 

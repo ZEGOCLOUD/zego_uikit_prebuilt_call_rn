@@ -60,7 +60,7 @@ export default class ZegoUIKitPrebuiltCallService {
         const {
             ringtoneConfig,
             innerText,
-            notifyWhenAppRunningInBackgroundOrQuit,
+            certificateIndex,
             isIOSSandboxEnvironment,
         } = this.config;
         // Init inner text helper
@@ -78,8 +78,7 @@ export default class ZegoUIKitPrebuiltCallService {
         );
 
         // Enable offline notification
-        ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
-        zloginfo("enableNotifyWhenAppRunningInBackgroundOrQuit: ", notifyWhenAppRunningInBackgroundOrQuit, isIOSSandboxEnvironment, this.config.appName);
+        ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
 
         return new Promise((resolve, reject) => {
           setTimeout(() => {

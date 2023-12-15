@@ -95,10 +95,16 @@ const GROUP_VOICE_CALL_CONFIG = {
     },
 };
 
+const ZegoMultiCertificate = {
+  first: 1,
+  second: 2,
+};
+
 export {
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
     ONE_ON_ONE_VOICE_CALL_CONFIG,
     GROUP_VIDEO_CALL_CONFIG,
     GROUP_VOICE_CALL_CONFIG,
     ZegoMenuBarButtonName,
+    ZegoMultiCertificate,
 }

@@ -15,6 +15,7 @@ import {
   ONE_ON_ONE_VOICE_CALL_CONFIG,
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
+  ZegoMultiCertificate,
 } from './services/defines';
 
 export default ZegoUIKitPrebuiltCallService.getInstance();
@@ -34,4 +35,5 @@ export {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
   ZegoInvitationType,
+  ZegoMultiCertificate,
 };

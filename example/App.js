@@ -16,6 +16,7 @@ import ZegoUIKitPrebuiltCallService, {
   ZegoMenuBarButtonName,
   ZegoUIKitPrebuiltCallFloatingMinimizedView,
   ZegoCountdownLabel,
+  ZegoMultiCertificate,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
@@ -56,6 +57,7 @@ const onUserLogin = async (userID, userName, props) => {
         channelID: "ZegoUIKit",
         channelName: "ZegoUIKit",
       },
+      certificateIndex: ZegoMultiCertificate.first,
       avatarBuilder: ({userInfo}) => {
         return <View style={{width: '100%', height: '100%'}}>
          <Image 
