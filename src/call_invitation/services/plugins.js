@@ -85,7 +85,7 @@ const ZegoPrebuiltPlugins = {
     delete _appInfo.appSign;
     delete _localUser.userID;
     delete _localUser.userName;
-    // ZegoUIKit.getSignalingPlugin().logout();
+    ZegoUIKit.getSignalingPlugin().logout();
     ZegoUIKit.getSignalingPlugin().uninit();
   },
   getLocalUser: () => {
