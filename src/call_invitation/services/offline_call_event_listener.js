@@ -348,10 +348,11 @@ export default class OfflineCallEventListener {
             }
 
             const invitees = this.getInviteesFromData(data)
+            const custom_data = JSON.parse(data).custom_data;
             // Listen and show notification on background
             this.showBackgroundNotification(callID, inviter.name, type, invitees)
             if (typeof onIncomingCallReceived == 'function') {
-                onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, invitees)
+                onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, invitees, custom_data)
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
