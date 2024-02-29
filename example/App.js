@@ -18,6 +18,8 @@ import ZegoUIKitPrebuiltCallService, {
   ZegoCountdownLabel,
   ZegoMultiCertificate,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import Orientation from 'react-native-orientation-locker';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 
 const Stack = createNativeStackNavigator();
 
@@ -52,7 +54,7 @@ const onUserLogin = async (userID, userName, props) => {
         incomingCallFileName: 'zego_incoming.mp3',
         outgoingCallFileName: 'zego_outgoing.mp3',
       },
-      notifyWhenAppRunningInBackgroundOrQuit: true,
+      // notifyWhenAppRunningInBackgroundOrQuit: true,
       androidNotificationConfig: {
         channelID: "ZegoUIKit",
         channelName: "ZegoUIKit",
@@ -66,6 +68,9 @@ const onUserLogin = async (userID, userName, props) => {
           source={{ uri: `https://robohash.org/${userInfo.userID}.png` }}
           />
         </View>
+      },
+      onIncomingCallReceived: (callID, inviter, type, invitees, customData) => {
+        console.log('Incoming call: ', callID, inviter, type, invitees, customData)
       },
       requireConfig: (data) => {
         console.log('requireConfig, callID: ', data.callID);
@@ -192,6 +197,20 @@ function HomeScreen(props) {
 
 
   useEffect(() => {
+
+    Orientation.addOrientationListener((orientation) => {
+      var orientationValue = 0;
+      if (orientation === 'PORTRAIT') {
+        orientationValue = 0;
+      } else if (orientation === 'LANDSCAPE-LEFT') {
+        orientationValue = 1;
+      } else if (orientation === 'LANDSCAPE-RIGHT') {
+        orientationValue = 3;
+      }
+      console.log('+++++++Orientation+++++++', orientation, orientationValue);
+      ZegoUIKit.setAppOrientation(orientationValue);
+    });
+
     // Simulated auto login if there is login info cache
     getUserInfo().then((info) => {
       if (info) {
@@ -227,7 +246,7 @@ function HomeScreen(props) {
               return { userID: inviteeID, userName: 'user_' + inviteeID };
             })}
             isVideoCall={true}
-            resourceID={"zegouikit_call"}
+            resourceID={"zego_data"}            
           />
         </View>
         <View style={{ width: 220, marginTop: 100 }}>

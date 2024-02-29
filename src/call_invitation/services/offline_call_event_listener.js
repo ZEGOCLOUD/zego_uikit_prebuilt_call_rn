@@ -222,7 +222,7 @@ export default class OfflineCallEventListener {
         this.registerCallback();
 
         // Setup for background invitation
-        if (!config.notifyWhenAppRunningInBackgroundOrQuit || !this._isSystemCalling) return;
+        if (!this._isSystemCalling) return;
 
         const {
             ringtoneConfig,
@@ -406,8 +406,7 @@ export default class OfflineCallEventListener {
         const count = invitees ? invitees.length : 0;
 
         const {
-            androidNotificationConfig,
-            notifyWhenAppRunningInBackgroundOrQuit,
+            androidNotificationConfig
         } = this.config;
 
         if (AppState.currentState !== "background" || Platform.OS === 'ios') {
@@ -418,7 +417,7 @@ export default class OfflineCallEventListener {
         if (Platform.OS === "android" && parseInt(Platform.constants['Release']) < 8) {
             shouldUseRNCallKeep = false;
         }
-        if (shouldUseRNCallKeep && notifyWhenAppRunningInBackgroundOrQuit && this._isSystemCalling) {
+        if (shouldUseRNCallKeep && this._isSystemCalling) {
             this.displayIncomingCall(callID, inviterName, type);
         } else {
             this.displayNotification(androidNotificationConfig.channelID, inviterName, type, count)
