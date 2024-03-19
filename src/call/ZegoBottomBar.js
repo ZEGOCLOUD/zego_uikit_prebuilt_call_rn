@@ -10,6 +10,7 @@ import {
 
 import ZegoMoreButton from './ZegoMoreButton';
 import ZegoMenuBarButtonName from "./ZegoMenuBarButtonName";
+import ZegoMessageButton from "./ZegoMessageButton";
 
 
 export default function ZegoBottomBar(props) {
@@ -24,6 +25,7 @@ export default function ZegoBottomBar(props) {
         useSpeakerWhenJoining,
         onMorePress,
         onSwitchCamera,
+        onMessagePress,
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -39,6 +41,8 @@ export default function ZegoBottomBar(props) {
                 return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
             case ZegoMenuBarButtonName.switchCameraButton:
                 return <ZegoSwitchCameraButton key={3} onPress={onSwitchCamera}/>
+            case ZegoMenuBarButtonName.messageButton:
+                return <ZegoMessageButton key={7} onPress={onMessagePress} />
         }
     }
     const getDisplayButtons = () => {

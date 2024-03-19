@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { PermissionsAndroid, Alert, Text, BackHandler } from 'react-native';
+import { PermissionsAndroid, Alert, Text, BackHandler, TouchableOpacity } from 'react-native';
 import Delegate from 'react-delegate-component';
 import { StyleSheet, View } from 'react-native';
-import ZegoUIKit, { ZegoAudioVideoContainer, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageView, ZegoLayoutMode, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
 import ZegoTopMenuBar from './ZegoTopMenuBar';
@@ -16,6 +16,7 @@ import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 import Timer from "../utils/timer"
 import { useNavigation } from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake'
+import { useKeyboard } from '../utils/keyboard';
 
 
 function ZegoUIKitPrebuiltCall(props, ref) {
@@ -62,7 +63,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         durationConfig = {}, // Deprecate
         timingConfig = {},
         avatarBuilder,
-        foregroundBuilder: prebuiltForegroundBuilder
+        foregroundBuilder: prebuiltForegroundBuilder,
+        messageItemBuilder,
     } = config;
     const {
         showMicrophoneStateOnView = true,
@@ -129,6 +131,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     const [isMenubarVisable, setIsMenubarVidable] = useState(true);
     const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
+    const [textInputVisable, setTextInputVisable] = useState(false);
+    const keyboardHeight = useKeyboard();
+
     var hideCountdown = 5;
     var hideCountdownOnTopMenu = 5;
 
@@ -293,6 +298,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         setIsFrontCamera(result);
     }
 
+    const showMessageListView = () => {
+      return buttons.includes(ZegoMenuBarButtonName.messageButton);
+    }
+
     useImperativeHandle(ref, () => ({
         hangUp: (showConfirmation = false) => {
             if (debounce.current) return;
@@ -451,75 +460,117 @@ function ZegoUIKitPrebuiltCall(props, ref) {
               to={prebuiltForegroundBuilder}
             />
           </View>
-            {isVisible && isTopMenubarVisable ?
-                <ZegoTopMenuBar
-                    menuTitle={topTitle}
-                    menuBarButtonsMaxCount={topMaxCount}
-                    menuBarButtons={topButtons}
-                    menuBarExtendedButtons={topExtendButtons}
-                    onHangUp={() => {
-                        onHangUp(TimingHelper.getInstance().getDuration());
-                    }}
-                    onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
-                    turnOnCameraWhenJoining={turnOnCameraWhenJoining}
-                    turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
-                    useSpeakerWhenJoining={useSpeakerWhenJoining}
-                    onOpenCallMemberList={onOpenCallMemberList}
-                    onSwitchCamera={onSwitchCamera}
-                /> : <View />
+          {isVisible && isTopMenubarVisable ?
+              <ZegoTopMenuBar
+                  menuTitle={topTitle}
+                  menuBarButtonsMaxCount={topMaxCount}
+                  menuBarButtons={topButtons}
+                  menuBarExtendedButtons={topExtendButtons}
+                  onHangUp={() => {
+                      onHangUp(TimingHelper.getInstance().getDuration());
+                  }}
+                  onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
+                  turnOnCameraWhenJoining={turnOnCameraWhenJoining}
+                  turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+                  useSpeakerWhenJoining={useSpeakerWhenJoining}
+                  onOpenCallMemberList={onOpenCallMemberList}
+                  onSwitchCamera={onSwitchCamera}
+                  onMessagePress={() => {
+                    setTextInputVisable(true); 
+                    setIsMenubarVidable(false);
+                    setTopIsMenubarVidable(false);
+                  }}
+              /> : <View />
+          }
+          <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
+            <ZegoAudioVideoContainer
+              style={[styles.audioVideoView, styles.fillParent]}
+              audioVideoConfig={{
+                  showSoundWavesInAudioMode: showSoundWavesInAudioMode,
+                  useVideoViewAspectFill: useVideoViewAspectFill,
+                  cacheAudioVideoUserList: isMinimizeSwitch ?
+                      ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
+                      null
+              }}
+              layout={layout}
+              avatarBuilder={avatarBuilder}
+              foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
+                  <AudioVideoForegroundView
+                      userInfo={userInfo}
+                      showMicrophoneStateOnView={showMicrophoneStateOnView}
+                      showCameraStateOnView={showCameraStateOnView}
+                      showUserNameOnView={showUserNameOnView}
+                  />
+              }
+              sortAudioVideo={sortAudioVideo}
+            />
+            {/* Message list */}
+            {
+              showMessageListView() ? <View style={styles.messageListView}>
+                <ZegoInRoomMessageView itemBuilder={messageItemBuilder} style={styles.fillParent} />
+              </View> : null
             }
-            <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
-              <ZegoAudioVideoContainer
-                style={[styles.audioVideoView, styles.fillParent]}
-                audioVideoConfig={{
-                    showSoundWavesInAudioMode: showSoundWavesInAudioMode,
-                    useVideoViewAspectFill: useVideoViewAspectFill,
-                    cacheAudioVideoUserList: isMinimizeSwitch ?
-                        ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
-                        null
+          </View>
+          {isMenubarVisable ?
+              <ZegoBottomBar
+                  menuBarButtonsMaxCount={maxCount}
+                  menuBarButtons={buttons}
+                  menuBarExtendedButtons={extendButtons}
+                  onHangUp={() => {
+                      onHangUp(TimingHelper.getInstance().getDuration());
+                  }}
+                  onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
+                  turnOnCameraWhenJoining={turnOnCameraWhenJoining}
+                  turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+                  useSpeakerWhenJoining={useSpeakerWhenJoining}
+                  onMorePress={() => { hideCountdown = 5; }}
+                  onSwitchCamera={onSwitchCamera}
+                  onMessagePress={() => { 
+                    setTextInputVisable(true); 
+                    setIsMenubarVidable(false);
+                    setTopIsMenubarVidable(false);
+                  }}
+              /> :
+              <View />
+          }
+          {isCallMemberListVisable ?
+              <ZegoCallMemberList
+                  showMicrophoneState={showMicrophoneState}
+                  showCameraState={showCameraState}
+                  itemBuilder={itemBuilder}
+                  onCloseCallMemberList={onCloseCallMemberList}
+              /> :
+              <View />
+          }
+          {textInputVisable ? <TouchableOpacity
+            style={styles.fillParent}
+            // behavior={'padding'}
+            onPress={() => { setTextInputVisable(false); }}
+          >
+            <View
+              style={[
+                styles.messageInputPannel,
+                {
+                  bottom: Platform.OS == 'ios' ? keyboardHeight : 0,
+                  height: 45,
+                },
+              ]}
+            >
+              <ZegoInRoomMessageInput
+                ref={(input) => {
+                  // setTextInput(input);
                 }}
-                layout={layout}
-                avatarBuilder={avatarBuilder}
-                foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
-                    <AudioVideoForegroundView
-                        userInfo={userInfo}
-                        showMicrophoneStateOnView={showMicrophoneStateOnView}
-                        showCameraStateOnView={showCameraStateOnView}
-                        showUserNameOnView={showUserNameOnView}
-                    />
-                }
-                sortAudioVideo={sortAudioVideo}
+                // @ts-ignore
+                onContentSizeChange={(height) => {
+                  // setTextInputHeight(height);
+                }}
+                placeholder={'Say something...'}
+                onSumit={() => {
+                  setTextInputVisable(false);
+                }}
               />
             </View>
-            {isMenubarVisable ?
-                <ZegoBottomBar
-                    menuBarButtonsMaxCount={maxCount}
-                    menuBarButtons={buttons}
-                    menuBarExtendedButtons={extendButtons}
-                    onHangUp={() => {
-                        onHangUp(TimingHelper.getInstance().getDuration());
-                    }}
-                    onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
-                    turnOnCameraWhenJoining={turnOnCameraWhenJoining}
-                    turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
-                    useSpeakerWhenJoining={useSpeakerWhenJoining}
-                    onMorePress={() => { hideCountdown = 5; }}
-                    onSwitchCamera={onSwitchCamera}
-                /> :
-                <View />
-            }
-            {isCallMemberListVisable ?
-                <ZegoCallMemberList
-                    showMicrophoneState={showMicrophoneState}
-                    showCameraState={showCameraState}
-                    itemBuilder={itemBuilder}
-                    onCloseCallMemberList={onCloseCallMemberList}
-                /> :
-                <View />
-            }
-
-
-
+          </TouchableOpacity> : null}
         </View>
     );
 }
@@ -574,5 +625,20 @@ const styles = StyleSheet.create({
         height: '100%',
         zIndex: 21,
         alignItems: 'center',
+    },
+    messageInputPannel: {
+      position: 'absolute',
+      borderTopLeftRadius: 12,
+      borderTopRightRadius: 12,
+      backgroundColor: 'rgba(0, 0, 0, 0.7500)',
+      width: '100%',
+    },
+    messageListView: {
+      position: 'absolute',
+      left: 16,
+      bottom: 40,
+      width: 230,
+      maxHeight: 200,
+      zIndex: 10,
     },
 });

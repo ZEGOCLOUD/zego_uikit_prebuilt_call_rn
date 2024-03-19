@@ -6,6 +6,7 @@ const ZegoMenuBarButtonName = {
     hangUpButton: 4,
     showMemberListButton: 5,
     minimizingButton: 6,
+    messageButton: 7,
 }
 
 export default ZegoMenuBarButtonName;

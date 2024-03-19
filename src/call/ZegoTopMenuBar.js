@@ -10,6 +10,7 @@ import {
     ZegoToggleCameraButton,
     ZegoToggleMicrophoneButton
 } from '@zegocloud/zego-uikit-rn'
+import ZegoMessageButton from "./ZegoMessageButton";
 
 export default function ZegoTopBar(props) {
     const {
@@ -24,24 +25,27 @@ export default function ZegoTopBar(props) {
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
+        onMessagePress,
     } = props;
 
     const getButtonByButtonIndex = (buttonIndex) => {
         switch (buttonIndex) {
             case ZegoMenuBarButtonName.toggleCameraButton:
-                return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
+                return <ZegoToggleCameraButton key={1} width={30} height={30} isOn={turnOnCameraWhenJoining} />;
             case ZegoMenuBarButtonName.toggleMicrophoneButton:
-                return <ZegoToggleMicrophoneButton key={2} isOn={turnOnMicrophoneWhenJoining} />;
+                return <ZegoToggleMicrophoneButton key={2} width={30} height={30} isOn={turnOnMicrophoneWhenJoining} />;
             case ZegoMenuBarButtonName.hangUpButton:
-                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
+                return <ZegoLeaveButton key={0} width={30} height={30} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
             case ZegoMenuBarButtonName.switchAudioOutputButton:
-                return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
+                return <ZegoSwitchAudioOutputButton key={4} width={30} height={30} useSpeaker={useSpeakerWhenJoining} />
             case ZegoMenuBarButtonName.switchCameraButton:
-                return <ZegoSwitchCameraButton key={3} onPress={onSwitchCamera}/>
+                return <ZegoSwitchCameraButton key={3} width={30} height={30} onPress={onSwitchCamera}/>
             case ZegoMenuBarButtonName.showMemberListButton:
                 return <ZegoMemberButton key={5} onPressed={onOpenCallMemberList}/>
             case ZegoMenuBarButtonName.minimizingButton:
                 return <ZegoMinimizingButton key={6} />
+            case ZegoMenuBarButtonName.messageButton:
+                return <ZegoMessageButton key={7} width={30} height={30} onPress={onMessagePress} />
         }
     };
     const getDisplayButtons = () => {
