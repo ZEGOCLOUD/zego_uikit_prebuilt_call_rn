@@ -1,3 +1,5 @@
+import BackgroundTimer from "./background_timer";
+
 export default class Timer {
     constructor(callback, interval) {
         this.callback = callback;
@@ -14,12 +16,18 @@ export default class Timer {
             this.isRunning = true;
             this.startTime = Date.now();
             this.tick(); // Call tick method to start the timer
+            
+            this.requestId = BackgroundTimer.setInterval(() => {
+              this.tick();
+            }, 100);
         }
     }
     stop() {
         if (this.isRunning) {
             this.isRunning = false;
-            cancelAnimationFrame(this.requestId);
+
+            // cancelAnimationFrame(this.requestId);
+            BackgroundTimer.clearInterval(this.requestId);
         }
     }
     tick() {
@@ -35,6 +43,6 @@ export default class Timer {
             this.lastElapsed = 0;
             this.averageElapsed = 0;
         }
-        this.requestId = requestAnimationFrame(this.tick.bind(this));
+        // this.requestId = requestAnimationFrame(this.tick.bind(this));
     }
 }

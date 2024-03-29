@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -102,6 +104,21 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
       focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK + Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
       context.startActivity(focusIntent);
     }
+  }
+
+  @ReactMethod
+  public void setTimeout(final int id, final double timeout) {
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable(){
+      @Override
+      public void run(){
+        if (getReactApplicationContext().hasActiveCatalystInstance()) {
+          getReactApplicationContext()
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("backgroundTimer.timeout", id);
+        }
+      }
+    }, (long) timeout);
   }
 
   private Context getAppContext() {
