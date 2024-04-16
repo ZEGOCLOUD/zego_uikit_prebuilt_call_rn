@@ -26,7 +26,7 @@ export default function ZegoBottomBar(props) {
         onMorePress,
         onSwitchCamera,
         onMessagePress,
-        buttonBuilders,
+        buttonBuilders = {},
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
