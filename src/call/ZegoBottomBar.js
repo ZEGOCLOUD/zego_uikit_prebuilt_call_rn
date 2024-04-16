@@ -26,6 +26,7 @@ export default function ZegoBottomBar(props) {
         onMorePress,
         onSwitchCamera,
         onMessagePress,
+        buttonBuilders,
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -36,7 +37,7 @@ export default function ZegoBottomBar(props) {
             case ZegoMenuBarButtonName.toggleMicrophoneButton:
                 return <ZegoToggleMicrophoneButton key={2} isOn={turnOnMicrophoneWhenJoining} />;
             case ZegoMenuBarButtonName.hangUpButton:
-                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
+                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} iconBuilder={buttonBuilders.hangupBuilder} />
             case ZegoMenuBarButtonName.switchAudioOutputButton:
                 return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
             case ZegoMenuBarButtonName.switchCameraButton:

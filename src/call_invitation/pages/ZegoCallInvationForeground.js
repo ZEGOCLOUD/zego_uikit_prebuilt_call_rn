@@ -7,7 +7,13 @@ import InnerTextHelper from '../services/inner_text_helper';
 import Delegate from 'react-delegate-component';
 
 export default function ZegoCallInvationForeground(props) {
-  const { isVideoCall, invitee, onHangUp, avatarBuilder } = props;
+  const { 
+    isVideoCall, 
+    invitee, 
+    onHangUp, 
+    avatarBuilder, 
+    waitingPageConfig,
+  } = props;
   const userName = invitee.userName;
 
   const getShotName = (name) => {
@@ -24,9 +30,16 @@ export default function ZegoCallInvationForeground(props) {
     return shotName;
   };
   return (
-    <View style={[styles.container, isVideoCall ? styles.opacity : null]}>
+    <View style={[styles.container, waitingPageConfig.backgroundColor ? {backgroundColor: waitingPageConfig.backgroundColor} : null, isVideoCall ? styles.opacity : null]}>
+      <View style={{position: 'absolute', width: '100%', height: '100%'}}>
+      {waitingPageConfig.backgroundBuilder 
+        ? waitingPageConfig.backgroundBuilder(invitee, isVideoCall)
+        : null
+      }
+      </View>
       <View style={styles.content}>
-        <View style={styles.avatar}>
+        {waitingPageConfig.avatarBuilder ? waitingPageConfig.avatarBuilder(invitee)
+        : <View style={styles.avatar}>
           {
             !avatarBuilder ?
             <Text style={styles.nameLabel}>{getShotName(userName)}</Text> :
@@ -37,17 +50,22 @@ export default function ZegoCallInvationForeground(props) {
               />
             </View>
           }
-        </View>
-        <Text style={styles.userName}>{
-          InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
-        }</Text>
-        <Text style={styles.calling}>{
-          InnerTextHelper.instance().getOutgoingCallPageMessage(isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
-        }</Text>
+        </View>}
+        { waitingPageConfig.nameBuilder ? waitingPageConfig.nameBuilder(userName) :
+          <Text style={styles.userName}>{
+            InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
+          }</Text>
+        }
+        { waitingPageConfig.stateBuilder ? waitingPageConfig.stateBuilder() :
+          <Text style={styles.calling}>{
+            InnerTextHelper.instance().getOutgoingCallPageMessage(isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
+          }</Text>
+        }
       </View>
       <ZegoBottomBar
         menuBarButtons={[ZegoMenuBarButtonName.hangUpButton]}
         onHangUp={onHangUp}
+        buttonBuilders={{hangupBuilder: waitingPageConfig.hangupBuilder}}
       />
     </View>
   );

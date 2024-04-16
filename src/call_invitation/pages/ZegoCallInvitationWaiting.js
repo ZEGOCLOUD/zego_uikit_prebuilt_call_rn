@@ -16,7 +16,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
   const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { onOutgoingCallCancelButtonPressed, avatarBuilder } = initConfig;
+  const { onOutgoingCallCancelButtonPressed, avatarBuilder, waitingPageConfig } = initConfig;
   const { route } = props;
   const {
     roomID,
@@ -181,6 +181,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
               invitee={invitees[0]}
               onHangUp={hangUpHandle}
               avatarBuilder={avatarBuilder}
+              waitingPageConfig={waitingPageConfig}
             />
           )}
         />
@@ -190,11 +191,12 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
           invitee={invitees[0]}
           onHangUp={hangUpHandle}
           avatarBuilder={avatarBuilder}
+          waitingPageConfig={waitingPageConfig}
         />
       )}
       {isVideoCall ? (
         <View style={styles.topMenuContainer}>
-          <ZegoSwitchCameraButton />
+          <ZegoSwitchCameraButton iconBuilder={waitingPageConfig.switchCameraBuilder} />
         </View>
       ) : (
         <View />

@@ -29,6 +29,15 @@ export default class ZegoUIKitPrebuiltCallService {
         },
         notifyWhenAppRunningInBackgroundOrQuit: false,
         isIOSSandboxEnvironment: null,
+        waitingPageConfig: {
+          // avatarBuilder
+          // nameBuilder
+          // stateBuilder
+          // hangupBuilder
+          // switchCameraBuilder,
+          // backgroundColor,
+          // foregroundBuilder,
+        },
     };
     isInit = false;
     subscription = null;
