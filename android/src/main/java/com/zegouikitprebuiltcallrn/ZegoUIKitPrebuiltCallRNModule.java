@@ -1,33 +1,28 @@
 package com.zegouikitprebuiltcallrn;
 
 import androidx.annotation.NonNull;
-
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.KeyguardManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.WindowManager;
-
-import androidx.annotation.RequiresApi;
+import android.provider.Settings;
 
 @ReactModule(name = ZegoUIKitPrebuiltCallRNModule.NAME)
 public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     public static final String NAME = "ZegoUIKitPrebuiltCallRNModule";
 
-    private static ReactApplicationContext reactContext;
+    public static ReactApplicationContext reactContext;
 
 
     public ZegoUIKitPrebuiltCallRNModule(ReactApplicationContext context) {
@@ -41,87 +36,76 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
         return NAME;
     }
 
-
-    // Example method
-    // See https://reactnative.dev/docs/native-modules-android
     @ReactMethod
-    public void multiply(double a, double b, Promise promise) {
-        promise.resolve(a * b);
-    }
-
-
-  @RequiresApi(api = Build.VERSION_CODES.O_MR1)
-  @ReactMethod
-  public void dismissKeyguard(Activity activity){
-    KeyguardManager keyguardManager = (KeyguardManager) reactContext.getSystemService(
-      Context.KEYGUARD_SERVICE
-    );
-    boolean isLocked = keyguardManager.isKeyguardLocked();
-    if (isLocked) {
-      Log.d("ZegoUIKitPrebuiltCallRNModule", "screen is locked");
-    //   activity.setShowWhenLocked(true);
-    //   activity.setTurnScreenOn(true);
-      keyguardManager.requestDismissKeyguard(
-        activity,
-        new KeyguardManager.KeyguardDismissCallback() {
-          @Override
-          public void onDismissError() {
-            Log.d("ZegoUIKitPrebuiltCallRNModule", "onDismissError");
-          }
-
-          @Override
-          public void onDismissSucceeded() {
-            Log.d("ZegoUIKitPrebuiltCallRNModule", "onDismissSucceeded");
-          }
-
-          @Override
-          public void onDismissCancelled() {
-            Log.d("ZegoUIKitPrebuiltCallRNModule", "onDismissCancelled");
+    public void setTimeout(final int id, final double timeout) {
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable(){
+        @Override
+        public void run(){
+          if (getReactApplicationContext().hasActiveCatalystInstance()) {
+            getReactApplicationContext()
+              .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+              .emit("backgroundTimer.timeout", id);
           }
         }
-      );
-    } else {
-      Log.d("ZegoUIKitPrebuiltCallRNModule", "unlocked");
+      }, (long) timeout);
     }
-  }
 
-  @ReactMethod
-  public void startActivity() {
-    Log.d("ZegoUIKitPrebuiltCallRNModule", "start activity");
-    Context context = getAppContext();
-    String packageName = context.getApplicationContext().getPackageName();
-    Intent focusIntent = context.getPackageManager().getLaunchIntentForPackage(packageName).cloneFilter();
-    Activity activity = getCurrentActivity();
-    boolean isRunning = activity != null;
-
-    if(isRunning){
-      Log.d("ZegoUIKitPrebuiltCallRNModule", "activity is running");
-      focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-      activity.startActivity(focusIntent);
-      dismissKeyguard(activity);
-    } else {
-      Log.d("ZegoUIKitPrebuiltCallRNModule", "activity is not running, starting activity");
-      focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK + Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-      context.startActivity(focusIntent);
+    @ReactMethod
+    public void setupCallKit(ReadableMap options) {
+        CallNotificationManager.getInstance().setupOptions(options);
     }
-  }
 
-  @ReactMethod
-  public void setTimeout(final int id, final double timeout) {
-    Handler handler = new Handler();
-    handler.postDelayed(new Runnable(){
-      @Override
-      public void run(){
-        if (getReactApplicationContext().hasActiveCatalystInstance()) {
-          getReactApplicationContext()
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit("backgroundTimer.timeout", id);
+    @ReactMethod
+    public void displayIncomingCall(String title, String message) {
+        CallNotificationManager
+            .getInstance()
+            .showCallNotification(reactContext, title, message);
+    }
+
+    @ReactMethod
+    public void endCall() {
+        CallNotificationManager.getInstance().dismissCallNotification(reactContext);
+    }
+
+    @ReactMethod
+    public void requestSystemAlertWindow(String message, String allow, String deny) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(reactContext)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(reactContext.getCurrentActivity());
+            builder.setMessage(message);
+            builder.setPositiveButton(allow, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                    intent.setData(Uri.parse("package:" + reactContext.getPackageName()));
+                    reactContext.startActivityForResult(intent, 0, new Bundle());
+                }
+            });
+            builder.setNegativeButton(deny, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
         }
-      }
-    }, (long) timeout);
-  }
+    }
 
-  private Context getAppContext() {
-    return this.reactContext.getApplicationContext();
-  }
+    @ReactMethod
+    public void addListener(String eventName) {
+        // Keep: Required for RN built in Event Emitter Calls.
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+        // Keep: Required for RN built in Event Emitter Calls.
+    }
+
+    private Context getAppContext() {
+      return this.reactContext.getApplicationContext();
+    }
 }
