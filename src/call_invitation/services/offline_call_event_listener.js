@@ -36,6 +36,12 @@ export default class OfflineCallEventListener {
 
             const cancelInvitation = data && data.operation_type === "cancel_invitation"
 
+            // receive invitation first and then receive cancel.
+            if (this._currentCallID == data.zim_call_id && !cancelInvitation) {
+              console.log('OfflineDataHandler: busy, callID: ', data.zim_call_id);
+              return;
+            }
+
             if (this._isDisplayingCall && !cancelInvitation) {
                 // reject call.
                 console.log('OfflineDataHandler: busy, reject call invitation.');
@@ -46,6 +52,7 @@ export default class OfflineCallEventListener {
             if (cancelInvitation) {
               RNCallKit.endCall();
               this._isDisplayingCall = false;
+              this._currentCallID = data.zim_call_id;
             } else {
               RNCallKit.removeEventListener('answerCall');
               RNCallKit.removeEventListener('endCall');
