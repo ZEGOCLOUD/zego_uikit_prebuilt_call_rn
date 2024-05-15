@@ -88,6 +88,13 @@ class RNCallKit {
     }
     ZegoUIKitPrebuiltCallRNModule.requestSystemAlertWindow(message, allow, deny);   
   };
+
+  getApiLevelSync = () => {
+    if (Platform.OS === 'ios') {
+      return 0;
+    }
+    return ZegoUIKitPrebuiltCallRNModule.getApiLevelSync();
+  }
 }
 
 export default new RNCallKit();

@@ -166,6 +166,9 @@ export default class OfflineCallEventListener {
       if (Platform.OS !== 'android') {
         return;
       }
+      if (RNCallKit.getApiLevelSync() < 33) {
+        return;
+      }
 
       // Notification
       let grantednNtification = PermissionsAndroid.check(

@@ -105,6 +105,11 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
         // Keep: Required for RN built in Event Emitter Calls.
     }
 
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public int getApiLevelSync() {
+        return Build.VERSION.SDK_INT;
+    }
+
     private Context getAppContext() {
       return this.reactContext.getApplicationContext();
     }
