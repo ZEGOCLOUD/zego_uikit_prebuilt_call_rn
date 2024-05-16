@@ -2,16 +2,17 @@ package com.zegouikitprebuiltcallrn;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -26,6 +27,8 @@ import java.util.List;
  * foreground service, when receive fcm data,use this service to show a Notification .
  */
 public class OffLineCallNotificationService extends Service {
+
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -61,6 +64,7 @@ public class OffLineCallNotificationService extends Service {
                 } else {
                     startForeground(CallNotificationManager.callNotificationID, callNotification);
                 }
+                wakeup();
             }
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
@@ -70,6 +74,15 @@ public class OffLineCallNotificationService extends Service {
                 }, 60000);
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void wakeup() {
+        PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        int flag = PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE;
+        wakeLock = powerManager.newWakeLock(flag, "ZegoPrebuiltCall::WakelockTag");
+        if (wakeLock != null && !wakeLock.isHeld()) {
+            wakeLock.acquire(60*1000L /*60s */);
+        }
     }
 
     public void startApp() {
@@ -100,6 +113,11 @@ public class OffLineCallNotificationService extends Service {
     public void onDestroy() {
         super.onDestroy();
         stopForeground(true);
+
+        // release wakeLock.
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+        }
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
