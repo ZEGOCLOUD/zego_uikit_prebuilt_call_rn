@@ -159,9 +159,9 @@ export default function ZegoCallInvitationDialog(props) {
               setInviter(inviter);
               setExtendData(JSON.parse(data));
               setIsDialogVisable(true);
+              BellManage.vibrate();
               if (AppState.currentState !== 'background') {
                 BellManage.playIncomingSound();
-                BellManage.vibrate();
               }
             }
           }
