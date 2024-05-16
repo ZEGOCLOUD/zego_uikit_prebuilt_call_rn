@@ -29,10 +29,25 @@ import java.util.List;
 public class OffLineCallNotificationService extends Service {
 
     private PowerManager.WakeLock wakeLock;
+    private Handler dismissHandler;
+    private Runnable dismissTask;
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        dismissHandler = new Handler(Looper.getMainLooper());
+        dismissTask = new Runnable() {
+            @Override
+            public void run() {
+                CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
+            }
+        };
     }
 
     @Override
@@ -65,13 +80,8 @@ public class OffLineCallNotificationService extends Service {
                     startForeground(CallNotificationManager.callNotificationID, callNotification);
                 }
                 wakeup();
+                dismissHandler.postDelayed(dismissTask, 60000);
             }
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
-                }
-                }, 60000);
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -118,6 +128,8 @@ public class OffLineCallNotificationService extends Service {
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
+
+        dismissHandler.removeCallbacks(dismissTask);
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
