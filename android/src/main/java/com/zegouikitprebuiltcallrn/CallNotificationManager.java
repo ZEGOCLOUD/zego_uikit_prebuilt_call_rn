@@ -38,6 +38,9 @@ public class CallNotificationManager {
     private String notificationMessage;
     private String soundName;
 
+    private String incomingAcceptButtonText = "Accept";
+    private String incomingDeclineButtonText = "Decline";
+
     private CallNotificationManager() {
 
     }
@@ -52,6 +55,14 @@ public class CallNotificationManager {
 
     public void setupOptions(ReadableMap options) {
         this.soundName = options.getString("incomingCallFileName");
+        String acceptText = options.getString("incomingAcceptButtonText");
+        if (!TextUtils.isEmpty(acceptText)) {
+            this.incomingAcceptButtonText = acceptText;
+        }
+        String declineText = options.getString("incomingDeclineButtonText");
+        if (!TextUtils.isEmpty(declineText)) {
+            this.incomingDeclineButtonText = declineText;
+        }
     }
 
     public void showCallNotification(Context context, String title, String message) {
@@ -179,13 +190,13 @@ public class CallNotificationManager {
                 // The icon that will be displayed on the button (or not, depends on the Android version)
                 null,
                 // The text on the button
-                "Accept", acceptIntent);
+                incomingAcceptButtonText, acceptIntent);
 
             NotificationCompat.Action.Builder declineAction = new Action.Builder(
                 // The icon that will be displayed on the button (or not, depends on the Android version)
                 null,
                 // The text on the button
-                "Decline", declineIntent);
+                incomingDeclineButtonText, declineIntent);
 
             builder.addAction(acceptAction.build());
             builder.addAction(declineAction.build());

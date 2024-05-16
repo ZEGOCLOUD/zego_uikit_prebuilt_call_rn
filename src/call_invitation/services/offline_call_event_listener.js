@@ -212,6 +212,8 @@ export default class OfflineCallEventListener {
         if (ringtoneConfig && ringtoneConfig.incomingCallFileName) {
           RNCallKit.setupCallKit({
             incomingCallFileName: ringtoneConfig.incomingCallFileName,
+            incomingDeclineButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton,
+            incomingAcceptButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton,
           });
         }
 
