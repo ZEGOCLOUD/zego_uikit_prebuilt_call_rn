@@ -90,8 +90,7 @@ public class CallNotificationManager {
         String channelID = callNotificationChannelID;
         String channelName = callNotificationChannelName;
         String channelDesc = callNotificationChannelDesc;
-        String soundSource = "resource://raw/" + getSoundName(this.soundName);
-        Uri ringtone = retrieveSoundResourceUri(context, soundSource);
+        Uri ringtone = getRingtone(context);
 
         if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelID, channelName,
@@ -116,6 +115,12 @@ public class CallNotificationManager {
             }
         }
         return uri;
+    }
+
+    public Uri getRingtone(Context context) {
+        String soundSource = "resource://raw/" + getSoundName(this.soundName);
+        Uri ringtone = retrieveSoundResourceUri(context, soundSource);
+        return ringtone;
     }
 
     public static String getSoundName(String sound) {
@@ -185,6 +190,7 @@ public class CallNotificationManager {
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             builder.setCategory(NotificationCompat.CATEGORY_CALL);
             builder.setOngoing(true).setAutoCancel(true);
+            builder.setSound(getRingtone(context));
 
             NotificationCompat.Action.Builder acceptAction = new Action.Builder(
                 // The icon that will be displayed on the button (or not, depends on the Android version)
