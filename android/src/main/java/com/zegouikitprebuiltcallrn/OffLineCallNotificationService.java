@@ -46,6 +46,7 @@ public class OffLineCallNotificationService extends Service {
             @Override
             public void run() {
                 CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
+                sendEvent("RNCallKitPerformEndCallAction", true);
             }
         };
     }
@@ -132,7 +133,7 @@ public class OffLineCallNotificationService extends Service {
         dismissHandler.removeCallbacks(dismissTask);
     }
 
-    private void sendEvent(String eventName, @Nullable WritableMap params) {
+    private void sendEvent(String eventName, @Nullable Object params) {
         ReactApplicationContext context = ZegoUIKitPrebuiltCallRNModule
             .reactContext;
         if (context.hasActiveCatalystInstance()) {
