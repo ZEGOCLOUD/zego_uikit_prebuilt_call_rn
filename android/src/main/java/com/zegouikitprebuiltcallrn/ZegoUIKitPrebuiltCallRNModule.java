@@ -24,6 +24,8 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
 
     public static ReactApplicationContext reactContext;
 
+    private AlertDialog alertDialog;
+
 
     public ZegoUIKitPrebuiltCallRNModule(ReactApplicationContext context) {
         super(context);
@@ -70,6 +72,9 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void requestSystemAlertWindow(String message, String allow, String deny) {
+        if (alertDialog != null && alertDialog.isShowing()) {
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(reactContext)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(reactContext.getCurrentActivity());
             builder.setMessage(message);
@@ -88,9 +93,11 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
                 }
             });
 
-            AlertDialog alertDialog = builder.create();
-            alertDialog.setCancelable(false);
-            alertDialog.setCanceledOnTouchOutside(false);
+            if (alertDialog == null) {
+                alertDialog = builder.create();
+                alertDialog.setCancelable(false);
+                alertDialog.setCanceledOnTouchOutside(false);
+            }
             alertDialog.show();
         }
     }
