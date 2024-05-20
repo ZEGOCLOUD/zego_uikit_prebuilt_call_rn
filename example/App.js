@@ -69,6 +69,9 @@ const onUserLogin = async (userID, userName, props) => {
           />
         </View>
       },
+      waitingPageConfig: {
+        
+      },
       onIncomingCallReceived: (callID, inviter, type, invitees, customData) => {
         console.log('Incoming call: ', callID, inviter, type, invitees, customData)
       },
@@ -105,7 +108,13 @@ const onUserLogin = async (userID, userName, props) => {
         }
       }
     }
-  );
+  ).then(() => {
+    ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
+      message: 'We need your consent for the following permissions in order to use the offline call function properly',
+      allow: 'Allow',
+      deny: 'Deny',
+    });
+  });
 }
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Step 1: Config React Navigation
@@ -250,7 +259,10 @@ function HomeScreen(props) {
           />
         </View>
         <View style={{ width: 220, marginTop: 100 }}>
-          <Button title='Back To Login Screen' onPress={() => { props.navigation.navigate('LoginScreen') }}></Button>
+          <Button title='Back To Login Screen' onPress={() => { 
+            props.navigation.navigate('LoginScreen')
+            ZegoUIKitPrebuiltCallService.uninit();
+          }}></Button>
         </View>
       </View>
     </TouchableWithoutFeedback>

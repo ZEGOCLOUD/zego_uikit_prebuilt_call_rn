@@ -7,7 +7,6 @@ import { zloginfo } from '../../utils/logger';
 import BellManage from '../services/bell';
 import InnerTextHelper from '../services/inner_text_helper'
 import CallInviteHelper from '../services/call_invite_helper'
-import notifee from '@notifee/react-native';
 import Delegate from 'react-delegate-component';
 
 import ZegoUIKit, {
@@ -15,7 +14,7 @@ import ZegoUIKit, {
   ZegoRefuseInvitationButton,
 } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService from "../../services";
-import RNCallKeep from '@zegocloud/react-native-callkeep';
+import RNCallKit from '../services/callkit';
 
 export default function ZegoCallInvitationDialog(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
@@ -66,7 +65,7 @@ export default function ZegoCallInvitationDialog(props) {
   const refuseHandle = () => {
     CallInviteHelper.getInstance().refuseCall(callID)
     if (Platform.OS === 'android') {
-        RNCallKeep.endAllCalls();
+        RNCallKit.endCall();
     }
   };
   const refuseFailHandle = (error) => {
@@ -91,7 +90,7 @@ export default function ZegoCallInvitationDialog(props) {
   const acceptHandle = () => {
     CallInviteHelper.getInstance().acceptCall(callID, {...extendData, inviteType, inviter});
     if (Platform.OS === 'android') {
-        RNCallKeep.endAllCalls();
+        RNCallKit.endCall();
     }
   };
   const acceptFailHandle = (error) => {
@@ -160,10 +159,9 @@ export default function ZegoCallInvitationDialog(props) {
               setInviter(inviter);
               setExtendData(JSON.parse(data));
               setIsDialogVisable(true);
+              BellManage.vibrate();
               if (AppState.currentState !== 'background') {
                 BellManage.playIncomingSound();
-                BellManage.vibrate();
-                notifee.cancelAllNotifications();
               }
             }
           }

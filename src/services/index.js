@@ -5,13 +5,13 @@ import BellManage from '../call_invitation/services/bell';
 import InnerTextHelper from '../call_invitation/services/inner_text_helper';
 import OfflineCallEventListener from '../call_invitation/services/offline_call_event_listener';
 import { AppState } from 'react-native';
-import notifee, { AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { zloginfo } from '../utils/logger';
 // import GetAppName from 'react-native-get-app-name';
 import TimingHelper from "./timing_helper";
 import MinimizingHelper from "../call/services/minimizing_helper";
 import HangupHelper from "../call_invitation/services/hangup_helper";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
+import RNCallKit from '../call_invitation/services/callkit'
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -79,9 +79,7 @@ export default class ZegoUIKitPrebuiltCallService {
             'change',
             (nextAppState) => {
                 if (nextAppState === 'active') {
-                    ZegoPrebuiltPlugins.reconnectIfDisconnected();
-                
-                    notifee.cancelAllNotifications();
+                  ZegoPrebuiltPlugins.reconnectIfDisconnected();
                 }
             }
         );
@@ -116,6 +114,7 @@ export default class ZegoUIKitPrebuiltCallService {
             CallInviteStateManage.uninit();
             this.subscription.remove();
             OfflineCallEventListener.getInstance().uninit();
+            this.isInit = false;
         }
     }
     getInitUser() {
@@ -183,5 +182,10 @@ export default class ZegoUIKitPrebuiltCallService {
         navigation, 
         options
       );
+    }
+
+    requestSystemAlertWindow(alert) {
+      // System Alert
+      RNCallKit.requestSystemAlertWindow(alert.message, alert.allow, alert.deny);
     }
 }

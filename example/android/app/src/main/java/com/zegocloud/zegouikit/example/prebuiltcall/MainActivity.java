@@ -13,11 +13,6 @@ public class MainActivity extends ReactActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // /////////////////////////
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-      setShowWhenLocked(true);
-    }
-    // /////////////////////////
   }
 
   /**
