@@ -162,10 +162,10 @@ export default class OfflineCallEventListener {
       this.config = config;
       this.registerCallback();
 
-      this.grantPermissions();
-
       // Setup for background invitation
       if (!this._isSystemCalling) return;
+
+      this.grantPermissions();
 
       this.setupOnlineCallKit();
     }
