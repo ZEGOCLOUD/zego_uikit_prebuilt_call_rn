@@ -75,7 +75,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const hangUpHandle = () => {
     zloginfo('Leave room on waiting page');
     if (typeof onOutgoingCallCancelButtonPressed == 'function') {
-      onOutgoingCallCancelButtonPressed(navigation, invitationID, invitees, isVideoCall ? 1 : 0);
+      onOutgoingCallCancelButtonPressed(navigation, roomID, invitees, isVideoCall ? 1 : 0);
     }
     if (CallInviteStateManage.isAutoCancelInvite(invitationID)) {
       ZegoUIKit.getSignalingPlugin().cancelInvitation(getInviteeIDList(), JSON.stringify({"call_id": roomID, "operation_type": "cancel_invitation"}));

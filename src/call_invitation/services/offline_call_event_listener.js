@@ -18,6 +18,8 @@ export default class OfflineCallEventListener {
     _isDisplayingCall = false;
     _currentCallID = ''; // For Android.
 
+    _currentRoomID = ''; // Use For callbacks.
+
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new OfflineCallEventListener());
@@ -256,26 +258,29 @@ export default class OfflineCallEventListener {
         } = this.config;
         ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, ({ callID, invitees, data }) => {
             if (typeof onOutgoingCallTimeout == 'function') {
-                onOutgoingCallTimeout(callID, invitees.map((invitee) => {
+                const roomID = this._currentRoomID === '' ? callID : this._currentRoomID;
+                onOutgoingCallTimeout(roomID, invitees.map((invitee) => {
                     return { userID: invitee.id, userName: invitee.name }
                 }))
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
-            const jsonData = data ? JSON.parse(data) : undefined;
+          const roomID = this._currentRoomID === '' ? callID : this._currentRoomID;
+          const jsonData = data ? JSON.parse(data) : undefined;
             if (jsonData && jsonData.reason == 'busy') {
                 if (typeof onOutgoingCallRejectedCauseBusy == 'function') {
-                    onOutgoingCallRejectedCauseBusy(callID, { userID: invitee.id, userName: invitee.name })
+                    onOutgoingCallRejectedCauseBusy(roomID, { userID: invitee.id, userName: invitee.name })
                 }
             } else {
                 if (typeof onOutgoingCallDeclined == 'function') {
-                    onOutgoingCallDeclined(callID, { userID: invitee.id, userName: invitee.name })
+                    onOutgoingCallDeclined(roomID, { userID: invitee.id, userName: invitee.name })
                 }
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ callID, invitee, data }) => {
             if (typeof onOutgoingCallAccepted == 'function') {
-                onOutgoingCallAccepted(callID, { userID: invitee.id, userName: invitee.name })
+                const roomID = this._currentRoomID === '' ? callID : this._currentRoomID;
+                onOutgoingCallAccepted(roomID, { userID: invitee.id, userName: invitee.name })
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
@@ -294,8 +299,11 @@ export default class OfflineCallEventListener {
             const custom_data = JSON.parse(data).custom_data;
             // Listen and show notification on background
             this.showBackgroundNotification(callID, inviter.name, type, invitees)
+
+            const roomID = JSON.parse(data).call_id;
+            this._currentRoomID = roomID;
             if (typeof onIncomingCallReceived == 'function') {
-                onIncomingCallReceived(callID, { userID: inviter.id, userName: inviter.name }, type, invitees, custom_data)
+                onIncomingCallReceived(roomID, { userID: inviter.id, userName: inviter.name }, type, invitees, custom_data)
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
@@ -312,12 +320,14 @@ export default class OfflineCallEventListener {
                 this.reportEndCallWithUUID(callUUID, 2);
             }
             if (typeof onIncomingCallCanceled == 'function') {
-                onIncomingCallCanceled(callID, { userID: inviter.id, userName: inviter.name })
+                const roomID = JSON.parse(data).call_id;
+                onIncomingCallCanceled(roomID, { userID: inviter.id, userName: inviter.name })
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {
             if (typeof onIncomingCallTimeout == 'function') {
-                onIncomingCallTimeout(callID, { userID: inviter.id, userName: inviter.name })
+                const roomID = this._currentRoomID === '' ? callID : this._currentRoomID;
+                onIncomingCallTimeout(roomID, { userID: inviter.id, userName: inviter.name })
             }
         });
     }
@@ -329,6 +339,10 @@ export default class OfflineCallEventListener {
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
         ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
+    }
+
+    setCurrentRoomID(roomID) {
+      this._currentRoomID = roomID;
     }
     getInviteesFromData(data) {
         const invitees = JSON.parse(data).invitees;

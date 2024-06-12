@@ -4,6 +4,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import CallInviteStateManage from "../call_invitation/services/invite_state_manager";
 import InnerTextHelper from "../call_invitation/services/inner_text_helper";
 import { zloginfo } from "../utils/logger";
+import OfflineCallEventListener from "../call_invitation/services/offline_call_event_listener";
 
 
 export default class ZegoUIKitPrebuiltCallInvitation {
@@ -85,6 +86,8 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       localUser.userID,
       successfulInvitees
     );
+
+    OfflineCallEventListener.getInstance().setCurrentRoomID(roomID);
 
     if (allInvitees.length === 1) {
       // Jump to call waiting page
