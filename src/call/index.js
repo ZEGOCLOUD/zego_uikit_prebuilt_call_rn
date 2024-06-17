@@ -538,6 +538,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   showMicrophoneState={showMicrophoneState}
                   showCameraState={showCameraState}
                   itemBuilder={itemBuilder}
+                  avatarBuilder={avatarBuilder}
                   onCloseCallMemberList={onCloseCallMemberList}
               /> :
               <View />

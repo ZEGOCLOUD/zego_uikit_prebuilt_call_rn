@@ -7,7 +7,8 @@ export default function ZegoCallMemberList(props) {
         showMicrophoneState,
         showCameraState,
         itemBuilder,
-        onCloseCallMemberList
+        onCloseCallMemberList,
+        avatarBuilder,
     } = props;
     
     return (<View style={styles.container}>
@@ -19,7 +20,7 @@ export default function ZegoCallMemberList(props) {
                     source={require('./resources/white_button_back.png')}
                 />
             </TouchableWithoutFeedback>
-            <Text style={styles.title}>Member</Text>
+            <Text style={styles.title}>Members</Text>
         </View>
         <View style={styles.divide}></View>
         <View style={styles.memberListContainer}>
@@ -27,6 +28,7 @@ export default function ZegoCallMemberList(props) {
                 showMicrophoneState={showMicrophoneState}
                 showCameraState={showCameraState}
                 itemBuilder={itemBuilder}
+                avatarBuilder={avatarBuilder}
             />
         </View>
     </View>);
