@@ -12,6 +12,7 @@ import {
   ONE_ON_ONE_VOICE_CALL_CONFIG,
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
+  ZegoCallEndReason,
 } from '../../services/defines';
 import CallInviteHelper from '../services/call_invite_helper';
 import TimingHelper from '../../services/timing_helper';
@@ -166,34 +167,42 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       callID={roomID}
       config={{
         ...config,
-        onHangUp: (duration) => {
-          hangUpHandle();
-          if (typeof config.onHangUp === 'function') {
-            config.onHangUp(duration);
+        onCallEnd: (callID, reason, duration) => {
+          zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
+          if (reason === ZegoCallEndReason.localHangUp) {
+            hangUpHandle();
           } else {
-            navigation.goBack();
-            origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
+            callEndHandle();
           }
-        },
-        avatarBuilder: avatarBuilder,
-        onOnlySelfInRoom: (duration) => {
-          callEndHandle();
-          zloginfo('requireDefaultConfig onOnlySelfInRoom', config.onOnlySelfInRoom, invitees);
-          if (typeof config.onOnlySelfInRoom === 'function') {
-            config.onOnlySelfInRoom(duration);
+
+          // callback.
+          if (typeof config.onCallEnd == 'function') {
+            config.onCallEnd(callID, reason, duration);
           } else {
-            // Invite a single
-            if (invitees.length === 1) {
-              // navigation.navigate('ZegoInnerChildrenPage');
-              if (typeof config.onHangUp === 'function') {
-                config.onHangUp(duration);
-              } else {
+            // hangup by self.
+            if (reason === ZegoCallEndReason.localHangUp && typeof config.onHangUp === 'function') {
+              config.onHangUp(duration);
+            }
+            
+            // end by others.
+            else if (reason !== ZegoCallEndReason.localHangUp && typeof config.onOnlySelfInRoom === 'function') {
+              config.onOnlySelfInRoom(duration);
+            }
+            
+            else {
+              if (reason === ZegoCallEndReason.localHangUp) {
                 navigation.goBack();
                 origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
+              } else {
+                if (invitees.length == 1) {
+                  navigation.goBack();
+                  origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
+                }
               }
             }
           }
         },
+        avatarBuilder: avatarBuilder,
         onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation()} : undefined,
       }}
     />

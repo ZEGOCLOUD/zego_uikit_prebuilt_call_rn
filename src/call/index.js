@@ -17,6 +17,7 @@ import Timer from "../utils/timer"
 import { useNavigation } from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake'
 import { useKeyboard } from '../utils/keyboard';
+import { ZegoCallEndReason } from '../services/defines';
 
 
 function ZegoUIKitPrebuiltCall(props, ref) {
@@ -60,6 +61,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         onHangUp,
         onHangUpConfirmation,
         onOnlySelfInRoom,
+        onCallEnd,
         durationConfig = {}, // Deprecate
         timingConfig = {},
         avatarBuilder,
@@ -307,13 +309,17 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             if (debounce.current) return;
             if (!showConfirmation) {
                 debounce.current = true;
-                typeof onHangUp == 'function' && onHangUp(TimingHelper.getInstance().getDuration());
+                const duration = TimingHelper.getInstance().getDuration();
+                typeof onHangUp == 'function' && onHangUp(duration);
+                typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                 debounce.current = false;
             } else {
                 debounce.current = true;
                 const temp = onHangUpConfirmation || showLeaveAlert;
                 temp().then(() => {
-                    typeof onHangUp == 'function' && onHangUp(TimingHelper.getInstance().getDuration());
+                    const duration = TimingHelper.getInstance().getDuration();
+                    typeof onHangUp == 'function' && onHangUp(duration);
+                    typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                     debounce.current = false;
                 });
             }
@@ -329,9 +335,22 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     useEffect(() => {
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
+            const duration = TimingHelper.getInstance().getDuration();
             if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom(TimingHelper.getInstance().getDuration());
+                onOnlySelfInRoom(duration);
             }
+            if (typeof onCallEnd == 'function') {
+              onCallEnd(callID, ZegoCallEndReason.remoteHangUp, duration);
+            }
+        });
+        ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
+          const duration = TimingHelper.getInstance().getDuration();
+          if (typeof onOnlySelfInRoom == 'function') {
+            onOnlySelfInRoom(duration);
+          }
+          if (typeof onCallEnd == 'function') {
+            onCallEnd(callID, ZegoCallEndReason.kickOut, duration);
+          }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
         ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {
@@ -350,6 +369,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
             ZegoUIKit.leaveRoom();
             ZegoUIKit.onOnlySelfInRoom(callbackID);
+            ZegoUIKit.onMeRemovedFromRoom(callbackID);
             ZegoUIKit.onRequireNewToken(callbackID);
 
             destroyCallTimingTimer(true);
@@ -397,6 +417,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             if (!isMinimizeSwitch) {
                 ZegoUIKit.leaveRoom();
                 ZegoUIKit.onOnlySelfInRoom(callbackID);
+                ZegoUIKit.onMeRemovedFromRoom(callbackID);
                 ZegoUIKit.onRequireNewToken(callbackID);
 
                 PrebuiltHelper.getInstance().clearState();
@@ -467,7 +488,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   menuBarButtons={topButtons}
                   menuBarExtendedButtons={topExtendButtons}
                   onHangUp={() => {
-                      onHangUp(TimingHelper.getInstance().getDuration());
+                      const duration = TimingHelper.getInstance().getDuration();
+                      typeof onHangUp == 'function' && onHangUp(duration);
+                      typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                   }}
                   onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                   turnOnCameraWhenJoining={turnOnCameraWhenJoining}
@@ -517,7 +540,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   menuBarButtons={buttons}
                   menuBarExtendedButtons={extendButtons}
                   onHangUp={() => {
-                      onHangUp(TimingHelper.getInstance().getDuration());
+                      const duration = TimingHelper.getInstance().getDuration();
+                      typeof onHangUp == 'function' && onHangUp(duration);
+                      typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                   }}
                   onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
                   turnOnCameraWhenJoining={turnOnCameraWhenJoining}

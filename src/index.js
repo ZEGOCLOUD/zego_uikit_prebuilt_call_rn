@@ -16,6 +16,7 @@ import {
   GROUP_VIDEO_CALL_CONFIG,
   GROUP_VOICE_CALL_CONFIG,
   ZegoMultiCertificate,
+  ZegoCallEndReason,
 } from './services/defines';
 
 export default ZegoUIKitPrebuiltCallService.getInstance();
@@ -36,4 +37,5 @@ export {
   GROUP_VOICE_CALL_CONFIG,
   ZegoInvitationType,
   ZegoMultiCertificate,
+  ZegoCallEndReason,
 };

@@ -100,6 +100,17 @@ const ZegoMultiCertificate = {
   second: 2,
 };
 
+const ZegoCallEndReason = {
+  /// the call ended due to a local hang-up
+  localHangUp: 0,
+
+  /// the call ended when the remote user hung up, leaving only one local user in the call
+  remoteHangUp: 1,
+
+  /// the call ended due to being kicked out
+  kickOut: 2,
+}
+
 export {
     ONE_ON_ONE_VIDEO_CALL_CONFIG,
     ONE_ON_ONE_VOICE_CALL_CONFIG,
@@ -107,4 +118,5 @@ export {
     GROUP_VOICE_CALL_CONFIG,
     ZegoMenuBarButtonName,
     ZegoMultiCertificate,
+    ZegoCallEndReason,
 }

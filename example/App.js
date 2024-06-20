@@ -72,15 +72,42 @@ const onUserLogin = async (userID, userName, props) => {
       waitingPageConfig: {
         
       },
+      onIncomingCallDeclineButtonPressed: (navigation) => {
+
+      },
+      onIncomingCallAcceptButtonPressed: (navigation) => {
+
+      },
+      onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
+        console.log('[onOutgoingCallCancelButtonPressed]+++',navigation, callID, invitees, type);
+      },
       onIncomingCallReceived: (callID, inviter, type, invitees, customData) => {
-        console.log('Incoming call: ', callID, inviter, type, invitees, customData)
+        console.log('[Incoming call]+++', callID, inviter, type, invitees, customData)
+      },
+      onIncomingCallCanceled: (callID, inviter) => {
+        console.log('[onIncomingCallCanceled]+++', callID, inviter);
+      },
+      onIncomingCallTimeout: (callID, inviter) => {
+        console.log('[onIncomingCallTimeout]+++', callID, inviter);
+      },
+      onOutgoingCallAccepted: (callID, invitee) => {
+        console.log('[onOutgoingCallAccepted]+++', callID, invitee);
+      },
+      onOutgoingCallRejectedCauseBusy: (callID, invitee) => {
+        console.log('[onOutgoingCallRejectedCauseBusy]+++', callID, invitee);
+      },
+      onOutgoingCallDeclined: (callID, invitee) => {
+        console.log('[onOutgoingCallDeclined]+++', callID, invitee);
+      },
+      onOutgoingCallTimeout: (callID, invitees) => {
+        console.log('[onOutgoingCallTimeout]+++', callID, invitees);
       },
       requireConfig: (data) => {
         console.log('requireConfig, callID: ', data.callID);
         return {
           // foregroundBuilder: () => <ZegoCountdownLabel maxDuration={10} onCountdownFinished={() => { console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true); }} />,
-          onHangUp: (duration) => {
-            console.log('########CallWithInvitation onHangUp', duration);
+          onCallEnd: (callID, reason, duration) => {
+            console.log('########CallWithInvitation onCallEnd', callID, reason, duration);
             props.navigation.navigate('HomeScreen');
           },
           timingConfig: {
