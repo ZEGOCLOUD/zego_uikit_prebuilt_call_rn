@@ -93,7 +93,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       ZegoUIKit.turnMicrophoneOn('', true);
       ZegoUIKit.setAudioOutputToSpeaker(true);
       grantPermissions(() => {
-        ZegoUIKit.joinRoom(roomID);
+        // ZegoUIKit.joinRoom(roomID);
       });
     });
     const unsubscribe1 = navigation.addListener('blur', () => {  
@@ -123,7 +123,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
     ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
       BellManage.stopOutgoingSound();
-      ZegoUIKit.leaveRoom();
+      // ZegoUIKit.leaveRoom();
       CallInviteStateManage.initInviteData();
       navigation.goBack();
     });
@@ -131,7 +131,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
       if (callIDs.includes(data.callID)) {
         BellManage.stopOutgoingSound();
-        ZegoUIKit.leaveRoom();
+        // ZegoUIKit.leaveRoom();
         CallInviteStateManage.initInviteData();
         navigation.goBack();
       }
