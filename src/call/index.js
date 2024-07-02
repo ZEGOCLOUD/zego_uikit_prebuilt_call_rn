@@ -336,20 +336,18 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     useEffect(() => {
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             const duration = TimingHelper.getInstance().getDuration();
-            if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom(duration);
-            }
             if (typeof onCallEnd == 'function') {
               onCallEnd(callID, ZegoCallEndReason.remoteHangUp, duration);
+            } else if (typeof onOnlySelfInRoom == 'function') {
+              onOnlySelfInRoom(duration);
             }
         });
         ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
           const duration = TimingHelper.getInstance().getDuration();
-          if (typeof onOnlySelfInRoom == 'function') {
-            onOnlySelfInRoom(duration);
-          }
           if (typeof onCallEnd == 'function') {
             onCallEnd(callID, ZegoCallEndReason.kickOut, duration);
+          } else if (typeof onOnlySelfInRoom == 'function') {
+            onOnlySelfInRoom(duration);
           }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
