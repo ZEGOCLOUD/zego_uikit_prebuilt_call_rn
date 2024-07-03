@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native"
 import { ZegoMicrophoneStateIcon, ZegoCameraStateIcon } from '@zegocloud/zego-uikit-rn'
 
@@ -6,9 +6,16 @@ export default function AudioVideoForegroundView(props) {
     const { userInfo, showUserNameOnView, showCameraStateOnView, showMicrophoneStateOnView } = props;
     const { userID = '', userName = '' } = userInfo;
 
+    const [bottomContainerMaxWidth, setBottomContainerMaxWidth] = useState(0);
+
     return (
-        <View style={styles.foregroundViewContainer}>
-            <View style={styles.bottomContainer}>
+        <View style={styles.foregroundViewContainer}
+          onLayout={(event) => {
+            const { width } = event.nativeEvent.layout;
+            setBottomContainerMaxWidth(width-10);
+          }}
+        >
+            <View style={[styles.bottomContainer, {maxWidth: bottomContainerMaxWidth}]}>
                 {showUserNameOnView ?
                     <View style={styles.nameLabelContainer}>
                         <Text style={styles.nameLabel}>{userName}</Text>
@@ -35,6 +42,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
         backgroundColor: '#2A2A2A',
         opacity: 0.5,
         position: 'absolute',
@@ -49,6 +57,7 @@ const styles = StyleSheet.create({
     },
     nameLabelContainer: {
         alignSelf: 'center',
+        flexShrink: 1,
     },
     nameLabel: {
         color: '#FFFFFF',
