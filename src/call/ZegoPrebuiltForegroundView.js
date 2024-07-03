@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        top: 6,
+        top: 26,
         zIndex: 5,
         alignItems: 'center',
     },
