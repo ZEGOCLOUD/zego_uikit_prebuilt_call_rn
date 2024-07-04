@@ -93,11 +93,9 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
                 }
             });
 
-            if (alertDialog == null) {
-                alertDialog = builder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.setCanceledOnTouchOutside(false);
-            }
+            alertDialog = builder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
         }
     }
