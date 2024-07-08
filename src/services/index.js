@@ -55,6 +55,8 @@ export default class ZegoUIKitPrebuiltCallService {
     }
     init(appID, appSign, userID, userName, plugins, config = {}) {
         if (this.isInit) {
+            this.notifyInit();
+            Object.assign(this.config, config);
             return Promise.resolve();
         }
         // GetAppName.getAppName((appName) => {
