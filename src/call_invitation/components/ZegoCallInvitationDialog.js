@@ -214,8 +214,8 @@ export default function ZegoCallInvitationDialog(props) {
                     </View>
                   }
                 </View>
-                <View>
-                  <Text style={styles.callName}>{getDialogTitle()}</Text>
+                <View style={styles.callInfo}>
+                  <Text style={styles.callName} numberOfLines={1} ellipsizeMode='tail'>{getDialogTitle()}</Text>
                   <Text style={styles.callTitle}>{getDialogMessage()}</Text>
                 </View>
               </View>
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   avatar: {
     backgroundColor: '#ffffff',
@@ -339,6 +340,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 13,
     overflow: 'hidden',
+  },
+  callInfo: {
+    flexDirection: 'column',
+    marginRight: 5,
+    flex: 1,
   },
   nameLabel: {
     fontSize: 26,
