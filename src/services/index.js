@@ -12,6 +12,7 @@ import MinimizingHelper from "../call/services/minimizing_helper";
 import HangupHelper from "../call_invitation/services/hangup_helper";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 import RNCallKit from '../call_invitation/services/callkit'
+import { ZegoCallEndReason } from "./defines";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -145,15 +146,15 @@ export default class ZegoUIKitPrebuiltCallService {
     hangUp(showConfirmation = false) {
         const debounce = HangupHelper.getInstance().getDebounce();
         const config = this.config.requireConfig ? this.config.requireConfig({}) : {};
-        const { onHangUp, onHangUpConfirmation, hangUpConfirmInfo } = config;
+        const { onCallEnd, onHangUpConfirmation, hangUpConfirmInfo } = config;
         if (debounce) return;
         if (!showConfirmation) {
             const duration = TimingHelper.getInstance().getDuration();
             HangupHelper.getInstance().setDebounce(true);
-            if (typeof onHangUp == 'function') {
-                onHangUp(duration);
+            if (typeof onCallEnd == 'function') {
+              onCallEnd('', ZegoCallEndReason.localHangUp, duration);
             } else {
-                HangupHelper.getInstance().notifyAutoJump();
+              HangupHelper.getInstance().notifyAutoJump();
             }
             HangupHelper.getInstance().setDebounce(false);
         } else {
@@ -161,12 +162,11 @@ export default class ZegoUIKitPrebuiltCallService {
             const temp = onHangUpConfirmation || HangupHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
             temp().then(() => {
                 const duration = TimingHelper.getInstance().getDuration();
-                if (typeof onHangUp == 'function') {
-                    onHangUp(duration);
+                if (typeof onCallEnd == 'function') {
+                  onCallEnd('', ZegoCallEndReason.localHangUp, duration);
                 } else {
-                    HangupHelper.getInstance().notifyAutoJump();
+                  HangupHelper.getInstance().notifyAutoJump();
                 }
-                typeof onHangUp == 'function' && onHangUp(duration);
                 HangupHelper.getInstance().setDebounce(false);
             });
         }

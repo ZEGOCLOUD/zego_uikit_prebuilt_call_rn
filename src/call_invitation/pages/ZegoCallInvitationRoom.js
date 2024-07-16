@@ -64,22 +64,6 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
           : ONE_ON_ONE_VOICE_CALL_CONFIG;
     return {
       ...callConfig,
-      onOnlySelfInRoom: () => {
-        zloginfo('requireDefaultConfig onOnlySelfInRoom', data);
-        const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
-        if (data.invitees.length == 1) {
-          if (isMinimize) {
-            PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
-          } else {
-            if (typeof config.onHangUp === 'function') {
-              config.onHangUp(TimingHelper.getInstance().getDuration());
-            } else {
-              navigation.goBack();
-              origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
-            }
-          }
-        }
-      },
     };
   };
   const config = typeof requireConfig === 'function' ? {
@@ -179,26 +163,12 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
           if (typeof config.onCallEnd == 'function') {
             config.onCallEnd(callID, reason, duration);
           } else {
-            // hangup by self.
-            if (reason === ZegoCallEndReason.localHangUp && typeof config.onHangUp === 'function') {
-              config.onHangUp(duration);
-            }
-            
-            // end by others.
-            else if (reason !== ZegoCallEndReason.localHangUp && typeof config.onOnlySelfInRoom === 'function') {
-              config.onOnlySelfInRoom(duration);
-            }
-            
-            else {
-              if (reason === ZegoCallEndReason.localHangUp) {
-                navigation.goBack();
-                origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
-              } else {
-                if (invitees.length == 1) {
-                  navigation.goBack();
-                  origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
-                }
-              }
+            const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+            if (isMinimize) {
+              PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+            } else {
+              navigation.goBack();
+              origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
             }
           }
         },

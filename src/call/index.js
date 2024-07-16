@@ -58,9 +58,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
         hangUpConfirmInfo, // {title: '', cancelButtonName: '', confirmButtonName: ''}
 
-        onHangUp,
         onHangUpConfirmation,
-        onOnlySelfInRoom,
         onCallEnd,
         durationConfig = {}, // Deprecate
         timingConfig = {},
@@ -310,7 +308,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             if (!showConfirmation) {
                 debounce.current = true;
                 const duration = TimingHelper.getInstance().getDuration();
-                typeof onHangUp == 'function' && onHangUp(duration);
                 typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                 debounce.current = false;
             } else {
@@ -318,7 +315,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 const temp = onHangUpConfirmation || showLeaveAlert;
                 temp().then(() => {
                     const duration = TimingHelper.getInstance().getDuration();
-                    typeof onHangUp == 'function' && onHangUp(duration);
                     typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                     debounce.current = false;
                 });
@@ -338,16 +334,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             const duration = TimingHelper.getInstance().getDuration();
             if (typeof onCallEnd == 'function') {
               onCallEnd(callID, ZegoCallEndReason.remoteHangUp, duration);
-            } else if (typeof onOnlySelfInRoom == 'function') {
-              onOnlySelfInRoom(duration);
             }
         });
         ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
           const duration = TimingHelper.getInstance().getDuration();
           if (typeof onCallEnd == 'function') {
             onCallEnd(callID, ZegoCallEndReason.kickOut, duration);
-          } else if (typeof onOnlySelfInRoom == 'function') {
-            onOnlySelfInRoom(duration);
           }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
@@ -487,7 +479,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   menuBarExtendedButtons={topExtendButtons}
                   onHangUp={() => {
                       const duration = TimingHelper.getInstance().getDuration();
-                      typeof onHangUp == 'function' && onHangUp(duration);
                       typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                   }}
                   onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
@@ -539,7 +530,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   menuBarExtendedButtons={extendButtons}
                   onHangUp={() => {
                       const duration = TimingHelper.getInstance().getDuration();
-                      typeof onHangUp == 'function' && onHangUp(duration);
                       typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
                   }}
                   onHangUpConfirmation={onHangUpConfirmation ? onHangUpConfirmation : showLeaveAlert}
