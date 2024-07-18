@@ -13,6 +13,7 @@ export default function ZegoCallInvationForeground(props) {
     onHangUp, 
     avatarBuilder, 
     waitingPageConfig,
+    callName,
   } = props;
   const userName = invitee.userName;
 
@@ -53,7 +54,7 @@ export default function ZegoCallInvationForeground(props) {
         </View>}
         { waitingPageConfig.nameBuilder ? waitingPageConfig.nameBuilder(userName) :
           <Text style={styles.userName}>{
-            InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
+            callName ? callName : InnerTextHelper.instance().getOutgoingCallPageTitle(userName, isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall)
           }</Text>
         }
         { waitingPageConfig.stateBuilder ? waitingPageConfig.stateBuilder() :

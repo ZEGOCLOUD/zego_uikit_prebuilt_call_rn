@@ -29,6 +29,8 @@ export default function ZegoSendCallInvitationButton(props) {
     borderColor,
     borderStyle,
     callID,
+    callName,
+    showWaitingPageWhenGroupCall = false,
     resourceID: _resourceID = ''
   } = props;
 
@@ -61,7 +63,9 @@ export default function ZegoSendCallInvitationButton(props) {
         invitees, 
         successfulInvitees, 
         roomID, 
-        isVideoCall
+        isVideoCall,
+        callName,
+        showWaitingPageWhenGroupCall
       );
     
     setForceRender(Date.now());

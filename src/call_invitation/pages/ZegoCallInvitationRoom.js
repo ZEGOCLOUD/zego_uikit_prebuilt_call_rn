@@ -94,7 +94,9 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     zloginfo('ZegoUIKitPrebuiltCallInCallScreen init');
     const callbackID =
       'ZegoUIKitPrebuiltCallInCallScreen ' + String(Math.floor(Math.random() * 10000));
-    if (invitees.length > 1 && inviter === userID) {
+    
+    // if group call from `ZegoUIKitPrebuiltCallWaitingScreen`, don't need add this anymore.
+    if (invitees.length > 1 && inviter === userID && origin != 'ZegoUIKitPrebuiltCallWaitingScreen') {
       BellManage.playOutgoingSound();
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
         zloginfo('Someone accepted the invitation');
@@ -103,12 +105,9 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
         zloginfo('Invite completed with nobody');
         // navigation.navigate('ZegoInnerChildrenPage');
-        if (typeof config.onHangUp === 'function') {
-          config.onHangUp();
-        } else {
-          navigation.goBack();
-          origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
-        }
+        // just go back, don't need call `onCallEnd`.
+        navigation.goBack();
+        origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && invitees.length === 1 && navigation.goBack();
       });
     }
     HangupHelper.getInstance().onAutoJump(callbackID, () => {

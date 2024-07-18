@@ -21,7 +21,9 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       notificationTitle, 
       notificationMessage, 
       callID, 
-      customData = ''
+      customData = '',
+      callName,
+      showWaitingPageWhenGroupCall = false,
     } = options;
 
     const localUser = ZegoPrebuiltPlugins.getLocalUser();
@@ -67,7 +69,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
             );
             index !== -1 && successfulInvitees.splice(index, 1);
           });
-          this.onInvitationSent(navigation, callID, invitees, successfulInvitees, roomID, isVideoCall);
+          this.onInvitationSent(navigation, callID, invitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall);
           resolve();
         } else {
           reject(-1, 'All invitees failed.');
@@ -79,7 +81,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     });
   }
 
-  onInvitationSent(navigation, callID, allInvitees, successfulInvitees, roomID, isVideoCall) {
+  onInvitationSent(navigation, callID, allInvitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall) {
     const localUser = ZegoPrebuiltPlugins.getLocalUser();
     CallInviteStateManage.addInviteData(
       callID,
@@ -89,7 +91,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
 
     OfflineCallEventListener.getInstance().setCurrentRoomID(roomID);
 
-    if (allInvitees.length === 1) {
+    if (allInvitees.length === 1 || showWaitingPageWhenGroupCall) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
       navigation.navigate('ZegoUIKitPrebuiltCallWaitingScreen', {
@@ -98,6 +100,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
         invitees: allInvitees,
         inviter: localUser.userID,
         invitationID: callID,
+        callName,
       });
     } else {
       // Jump to call room page

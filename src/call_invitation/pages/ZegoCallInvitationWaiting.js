@@ -24,6 +24,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     invitees,
     inviter,
     invitationID,
+    callName,
   } = route.params;
 
   const getInviteeIDList = () => {
@@ -121,21 +122,32 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   useEffect(() => {
     const callbackID =
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
-      BellManage.stopOutgoingSound();
-      // ZegoUIKit.leaveRoom();
-      CallInviteStateManage.initInviteData();
-      navigation.goBack();
-    });
-    ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
-      const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
-      if (callIDs.includes(data.callID)) {
+    if (invitees.length === 1) {
+      ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
         BellManage.stopOutgoingSound();
         // ZegoUIKit.leaveRoom();
         CallInviteStateManage.initInviteData();
         navigation.goBack();
-      }
-    });
+      });
+      ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
+        const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
+        if (callIDs.includes(data.callID)) {
+          BellManage.stopOutgoingSound();
+          // ZegoUIKit.leaveRoom();
+          CallInviteStateManage.initInviteData();
+          navigation.goBack();
+        }
+      });
+    } else {
+      // CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
+      //   zloginfo('Someone accepted the invitation');
+      //   BellManage.stopOutgoingSound();
+      // });
+      CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
+        zloginfo('Invite completed with nobody');
+        navigation.goBack();
+      });
+    }
     ZegoUIKit.getSignalingPlugin().onInvitationAccepted(
       callbackID,
       ({ invitee, data }) => {
@@ -161,6 +173,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
+      CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
       navigation.setOptions({ gestureEnabled: true });
     };
@@ -182,6 +195,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
               onHangUp={hangUpHandle}
               avatarBuilder={avatarBuilder}
               waitingPageConfig={waitingPageConfig}
+              callName={callName}
             />
           )}
         />
@@ -192,6 +206,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
           onHangUp={hangUpHandle}
           avatarBuilder={avatarBuilder}
           waitingPageConfig={waitingPageConfig}
+          callName={callName}
         />
       )}
       {isVideoCall ? (
