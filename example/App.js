@@ -72,6 +72,10 @@ const onUserLogin = async (userID, userName, props) => {
       waitingPageConfig: {
         
       },
+      requireInviterConfig: {
+        enabled: true,
+        detectSeconds: 5,
+      },
       onIncomingCallDeclineButtonPressed: (navigation) => {
 
       },
@@ -131,10 +135,6 @@ const onUserLogin = async (userID, userName, props) => {
           onWindowMaximized: () => {
             console.log('[Demo]CallInvitation onWindowMaximized');
             props.navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen');
-          },
-          requireInviterConfig: {
-            enabled: true,
-            detectSeconds: 5,
           },
         }
       }
