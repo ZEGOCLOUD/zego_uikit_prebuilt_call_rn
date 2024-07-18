@@ -59,7 +59,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         hangUpConfirmInfo, // {title: '', cancelButtonName: '', confirmButtonName: ''}
 
         onHangUpConfirmation,
+        onJoinRoom,
         onCallEnd,
+        onUserJoin,
         durationConfig = {}, // Deprecate
         timingConfig = {},
         avatarBuilder,
@@ -330,12 +332,14 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     }
 
     useEffect(() => {
+        ZegoUIKit.onJoinRoom(callbackID, onJoinRoom);
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             const duration = TimingHelper.getInstance().getDuration();
             if (typeof onCallEnd == 'function') {
               onCallEnd(callID, ZegoCallEndReason.remoteHangUp, duration);
             }
         });
+        ZegoUIKit.onUserJoin(callbackID, onUserJoin);
         ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
           const duration = TimingHelper.getInstance().getDuration();
           if (typeof onCallEnd == 'function') {
@@ -358,7 +362,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         });
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
             ZegoUIKit.leaveRoom();
+            ZegoUIKit.onJoinRoom(callbackID);
             ZegoUIKit.onOnlySelfInRoom(callbackID);
+            ZegoUIKit.onUserJoin(callbackID);
             ZegoUIKit.onMeRemovedFromRoom(callbackID);
             ZegoUIKit.onRequireNewToken(callbackID);
 
@@ -406,7 +412,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
             if (!isMinimizeSwitch) {
                 ZegoUIKit.leaveRoom();
+                ZegoUIKit.onJoinRoom(callbackID);
                 ZegoUIKit.onOnlySelfInRoom(callbackID);
+                ZegoUIKit.onUserJoin(callbackID);
                 ZegoUIKit.onMeRemovedFromRoom(callbackID);
                 ZegoUIKit.onRequireNewToken(callbackID);
 

@@ -70,6 +70,31 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     ...requireDefaultConfig(callInvitationData),
     ...requireConfig(callInvitationData)
   } : requireDefaultConfig(callInvitationData);
+
+  const _onCallEnd = (callID, reason, duration) => {
+    zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
+    if (reason === ZegoCallEndReason.localHangUp) {
+      hangUpHandle();
+    } else {
+      callEndHandle();
+    }
+
+    // callback.
+    if (typeof config.onCallEnd == 'function') {
+      config.onCallEnd(callID, reason, duration);
+    } else {
+      const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+      if (isMinimize) {
+        PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+      } else {
+        navigation.goBack();
+        origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
+      }
+    }
+    
+    clearAutoHangUpTimer();
+  };
+
   const callEndHandle = () => {
     const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
     const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
@@ -77,6 +102,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID, 2);
     }
   };
+
   const hangUpHandle = () => {
     callEndHandle();
     // Determine if the current is Inviter
@@ -88,6 +114,30 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
     // navigation.navigate('ZegoInnerChildrenPage');
+  };
+
+  let hangUpTimer = null;
+  const startAutoHangUpTimer = (detectSeconds) => {
+    if (hangUpTimer) {
+      clearTimeout(hangUpTimer);
+    }
+
+    zloginfo(`[ZegoUIKitPrebuiltCallInCallScreen] startAutoHangUpTimer, will auto hangup after ${detectSeconds} seconds if inviter does not join this call.`);
+    const newTimer = setTimeout(() => {
+      zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] autoHangUp');
+      const duration = TimingHelper.getInstance().getDuration();
+      _onCallEnd(roomID, ZegoCallEndReason.localHangUp, duration);
+    }, detectSeconds * 1000);
+
+    hangUpTimer = newTimer;
+  };
+
+  const clearAutoHangUpTimer = () => {
+    if (hangUpTimer) {
+      zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] clearAutoHangUpTimer');
+      clearTimeout(hangUpTimer);
+      hangUpTimer = null;
+    }
   };
 
   useEffect(() => {
@@ -150,29 +200,34 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       callID={roomID}
       config={{
         ...config,
+        onJoinRoom: () => {
+          zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onJoinRoom');
+          // If I am not the person who initiated the call, then set a timer to hang up according to the configuration settings
+          if (userID !== inviter) {
+            if (typeof config.requireInviterConfig == 'object' 
+              && config.requireInviterConfig.enabled && config.requireInviterConfig.detectSeconds > 0) {
+                startAutoHangUpTimer(config.requireInviterConfig.detectSeconds);
+              }
+          }
+        },
         onCallEnd: (callID, reason, duration) => {
-          zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
-          if (reason === ZegoCallEndReason.localHangUp) {
-            hangUpHandle();
-          } else {
-            callEndHandle();
-          }
-
-          // callback.
-          if (typeof config.onCallEnd == 'function') {
-            config.onCallEnd(callID, reason, duration);
-          } else {
-            const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
-            if (isMinimize) {
-              PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
-            } else {
-              navigation.goBack();
-              origin === 'ZegoUIKitPrebuiltCallWaitingScreen' && navigation.goBack();
-            }
-          }
+          _onCallEnd(callID, reason, duration)
         },
         avatarBuilder: avatarBuilder,
         onHangUpConfirmation: (typeof config.onHangUpConfirmation === 'function') ? () => {return config.onHangUpConfirmation()} : undefined,
+        onUserJoin: (userInfoList) => {
+          const foundInviterJoin = userInfoList.some((userInfo, _) => {
+            if (inviter === userInfo.userID) {
+              return true;
+            }
+            return false;
+          });
+
+          if (foundInviterJoin) {
+            zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] found inviter joined room, will clearAutoHangUpTimer');
+            clearAutoHangUpTimer();
+          }
+        },
       }}
     />
   );

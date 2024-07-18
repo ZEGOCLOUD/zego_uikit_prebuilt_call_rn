@@ -132,6 +132,10 @@ const onUserLogin = async (userID, userName, props) => {
             console.log('[Demo]CallInvitation onWindowMaximized');
             props.navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen');
           },
+          requireInviterConfig: {
+            enabled: true,
+            detectSeconds: 5,
+          },
         }
       }
     }
