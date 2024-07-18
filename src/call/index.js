@@ -130,8 +130,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 stateData.current.useSpeakerWhenJoining :
                 (config.useSpeakerWhenJoining));
 
-    const [isMenubarVisable, setIsMenubarVidable] = useState(true);
-    const [isTopMenubarVisable, setTopIsMenubarVidable] = useState(true);
+    const [isMenubarVisable, setIsMenubarVisable] = useState(true);
+    const [isTopMenubarVisable, setTopIsMenubarVisable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     const [textInputVisable, setTextInputVisable] = useState(false);
     const keyboardHeight = useKeyboard();
@@ -161,19 +161,19 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         hideCountdownOnTopMenu = 5;
         if (isMenubarVisable) {
             if (hideByClick) {
-                setIsMenubarVidable(false);
+                setIsMenubarVisable(false);
                 setIsCallMemberListVisable(false);
             }
         } else {
-            setIsMenubarVidable(true);
+            setIsMenubarVisable(true);
         }
         if (isTopMenubarVisable) {
             if (topHideByClick) {
-                setTopIsMenubarVidable(false);
+                setTopIsMenubarVisable(false);
                 setIsCallMemberListVisable(false);
             }
         } else {
-            setTopIsMenubarVidable(true);
+            setTopIsMenubarVisable(true);
         }
     };
     const grantPermissions = async (callback) => {
@@ -451,7 +451,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         if (hideCountdown <= 0) {
             hideCountdown = 5;
             if (hideAutomatically) {
-                setIsMenubarVidable(false);
+                setIsMenubarVisable(false);
             }
         }
     }, 1000);
@@ -460,7 +460,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         if (hideCountdownOnTopMenu <= 0) {
             hideCountdownOnTopMenu = 5;
             if (topHideAutomatically) {
-                setTopIsMenubarVidable(false);
+                setTopIsMenubarVisable(false);
             }
         }
     }, 1000);
@@ -497,8 +497,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   onSwitchCamera={onSwitchCamera}
                   onMessagePress={() => {
                     setTextInputVisable(true); 
-                    setIsMenubarVidable(false);
-                    setTopIsMenubarVidable(false);
+                    setIsMenubarVisable(false);
+                    setTopIsMenubarVisable(false);
                   }}
               /> : <View />
           }
@@ -548,8 +548,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   onSwitchCamera={onSwitchCamera}
                   onMessagePress={() => { 
                     setTextInputVisable(true); 
-                    setIsMenubarVidable(false);
-                    setTopIsMenubarVidable(false);
+                    setIsMenubarVisable(false);
+                    setTopIsMenubarVisable(false);
                   }}
               /> :
               <View />
