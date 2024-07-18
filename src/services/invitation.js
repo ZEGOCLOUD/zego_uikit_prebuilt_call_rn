@@ -30,6 +30,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     const roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
     const data = JSON.stringify({
       call_id: roomID,
+      call_name: callName,
       invitees: invitees.map(invitee => {
         return {user_id: invitee.userID, user_name: invitee.userName}
       }),

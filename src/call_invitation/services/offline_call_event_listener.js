@@ -79,7 +79,7 @@ export default class OfflineCallEventListener {
                   }
               });
               const invitees = data.invitees;
-              this.displayIncomingCall(data.zim_call_id, data.inviter.name, data.type, invitees.length);
+              this.displayIncomingCall(data.zim_call_id, data.call_name, data.inviter.name, data.type, invitees.length);
             }
         })
 
@@ -298,7 +298,7 @@ export default class OfflineCallEventListener {
             const invitees = this.getInviteesFromData(data)
             const custom_data = JSON.parse(data).custom_data;
             // Listen and show notification on background
-            this.showBackgroundNotification(callID, inviter.name, type, invitees)
+            this.showBackgroundNotification(callID, this._currentCallData.call_name, inviter.name, type, invitees)
 
             const roomID = JSON.parse(data).call_id;
             this._currentRoomID = roomID;
@@ -350,16 +350,16 @@ export default class OfflineCallEventListener {
             return { userID: invitee.user_id, userName: invitee.user_name };
         });
     }
-    showBackgroundNotification(callID, inviterName, type, invitees) {
+    showBackgroundNotification(callID, callName, inviterName, type, invitees) {
         if (AppState.currentState !== "background" || Platform.OS === 'ios') {
             return;
         }
         if (this._isSystemCalling) {
-          this.displayIncomingCall(callID, inviterName, type, invitees.length);
+          this.displayIncomingCall(callID, callName, inviterName, type, invitees.length);
         }
     }
 
-    displayIncomingCall(callID, inviterName, type, inviteesCount) {
+    displayIncomingCall(callID, callName, inviterName, type, inviteesCount) {
         if (this._currentCallID === callID) {
           console.log(`DisplayIncomingCall busy, callID: ${callID}`);
           return;
@@ -367,7 +367,7 @@ export default class OfflineCallEventListener {
         this._currentCallID = callID;
         console.log(`DisplayIncomingCall, callID: ${callID}, inviterName: ${inviterName}, type: ${type}`);
         
-        const title = InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, inviteesCount);
+        const title = callName ? callName : InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, inviteesCount);
         const message = InnerTextHelper.instance().getIncomingCallDialogMessage(type, inviteesCount);
         RNCallKit.displayIncomingCall(title, message);
     }

@@ -196,6 +196,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
               avatarBuilder={avatarBuilder}
               waitingPageConfig={waitingPageConfig}
               callName={callName}
+              isGroupCall={invitees.length > 1}
             />
           )}
         />
@@ -207,6 +208,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
           avatarBuilder={avatarBuilder}
           waitingPageConfig={waitingPageConfig}
           callName={callName}
+          isGroupCall={invitees.length > 1}
         />
       )}
       {isVideoCall ? (

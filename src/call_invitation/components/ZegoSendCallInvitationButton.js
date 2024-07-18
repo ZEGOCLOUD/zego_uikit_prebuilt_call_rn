@@ -44,6 +44,7 @@ export default function ZegoSendCallInvitationButton(props) {
   const roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
   const data = JSON.stringify({
     call_id: roomID,
+    call_name: callName,
     invitees: invitees.map(invitee => {
       return {user_id: invitee.userID, user_name: invitee.userName}
     }),
@@ -125,6 +126,7 @@ export default function ZegoSendCallInvitationButton(props) {
         borderColor={borderColor}
         borderStyle={borderStyle}
         notificationTitle={
+          callName ? callName :
           InnerTextHelper.instance().getIncomingCallDialogTitle(
             localUser.userName,
             isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,

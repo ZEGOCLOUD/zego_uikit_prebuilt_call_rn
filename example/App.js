@@ -280,13 +280,15 @@ function HomeScreen(props) {
             })}
             isVideoCall={false}
             resourceID={"zego_data"}
+            showWaitingPageWhenGroupCall={true}
           />
           <ZegoSendCallInvitationButton
             invitees={invitees.map((inviteeID) => {
               return { userID: inviteeID, userName: 'user_' + inviteeID };
             })}
             isVideoCall={true}
-            resourceID={"zego_data"}            
+            resourceID={"zego_data"}    
+            showWaitingPageWhenGroupCall={true}
           />
         </View>
         <View style={{ width: 220, marginTop: 100 }}>

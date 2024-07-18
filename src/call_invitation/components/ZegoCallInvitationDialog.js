@@ -31,7 +31,11 @@ export default function ZegoCallInvitationDialog(props) {
 
   const getDialogTitle = () => {
     const count = extendData.invitees ? extendData.invitees.length : 0;
-    return InnerTextHelper.instance().getIncomingCallDialogTitle(inviter.name, inviteType, count);
+    if (extendData.call_name) {
+      return extendData.call_name;
+    } else {
+      return InnerTextHelper.instance().getIncomingCallDialogTitle(inviter.name, inviteType, count);
+    }
   }
   const getDialogMessage = () => {
     const count = extendData.invitees ? extendData.invitees.length : 0;
@@ -260,7 +264,7 @@ export default function ZegoCallInvitationDialog(props) {
                     </View>
                 }
               </View>
-              <Text style={styles.fullCallName}>{inviter.name}</Text>
+              <Text style={styles.fullCallName}>{getDialogTitle()}</Text>
               <Text style={styles.calling}>{getDialogMessage()}</Text>
             </View>
             <View style={styles.bottomBarContainer}>
