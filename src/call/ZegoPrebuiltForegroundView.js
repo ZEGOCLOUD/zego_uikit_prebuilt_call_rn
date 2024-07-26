@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Text, SafeAreaView ,Platform, StatusBar} from 'react-native';
 import { durationFormat } from "../utils";
 import TimingHelper, { } from "../services/timing_helper"
 
@@ -9,6 +9,7 @@ export default function ZegoPrebuiltForegroundView(props) {
     useEffect(() => {
         TimingHelper.getInstance().onDurationUpdate("ZegoPrebuiltForegroundViewDuration", (duration) => setDuration(duration));
     }, [])
+
     return (
         <View style={styles.container}>
             {isDurationVisible ? <SafeAreaView ><Text style={styles.timing}>{durationFormat(duration)}</Text></SafeAreaView> : null}
@@ -16,6 +17,7 @@ export default function ZegoPrebuiltForegroundView(props) {
     );
 }
 
+const paddingTop = Platform.OS === "android" ? StatusBar.currentHeight : 26
 
 const styles = StyleSheet.create({
     container: {
@@ -23,7 +25,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        top: 26,
+        top: paddingTop,
         zIndex: 5,
         alignItems: 'center',
     },
