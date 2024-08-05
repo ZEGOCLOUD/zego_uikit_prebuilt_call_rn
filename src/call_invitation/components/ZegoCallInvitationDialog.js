@@ -128,6 +128,8 @@ export default function ZegoCallInvitationDialog(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
         callbackID,
         async ({ callID: invitationID, type, inviter, data }) => {
+          zloginfo('onInvitationReceived implement by call_invitation/components/ZegoCallInvitationDialog');
+
           let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
           const offlineData = CallInviteHelper.getInstance().getOfflineData();

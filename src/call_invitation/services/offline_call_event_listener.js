@@ -61,6 +61,8 @@ export default class OfflineCallEventListener {
 
               this._isDisplayingCall = true;
               RNCallKit.addEventListener('answerCall', () => {
+                  zloginfo('Answer call on offline mode');
+
                   this._callEndByAnswer = true;
                   this._isDisplayingCall = false;
 
@@ -284,6 +286,8 @@ export default class OfflineCallEventListener {
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+            zloginfo('onInvitationReceived implement by call_invitation/services/offline_call_event_listener');
+
             // only for Android, ios will record at `setIOSOfflineDataHandler`
             if (Platform.OS === 'android') {
                 this._currentCallData = {
@@ -303,6 +307,7 @@ export default class OfflineCallEventListener {
             const roomID = JSON.parse(data).call_id;
             this._currentRoomID = roomID;
             if (typeof onIncomingCallReceived == 'function') {
+                zloginfo('[onInvitationReceived] will call onIncomingCallReceived');
                 onIncomingCallReceived(roomID, { userID: inviter.id, userName: inviter.name }, type, invitees, custom_data)
             }
         });
@@ -369,6 +374,8 @@ export default class OfflineCallEventListener {
         
         const title = callName ? callName : InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, inviteesCount);
         const message = InnerTextHelper.instance().getIncomingCallDialogMessage(type, inviteesCount);
+        zloginfo(`DisplayIncomingCall, title: ${title}, message: ${message}`);
+
         RNCallKit.displayIncomingCall(title, message);
     }
     

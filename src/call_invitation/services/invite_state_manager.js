@@ -123,6 +123,8 @@ const CallInviteStateManage = {
     ZegoUIKit.getSignalingPlugin().onInvitationReceived(
       CallInviteStateManage._callbackID,
       ({ callID, type, inviter, data }) => {
+        zloginfo('onInvitationReceived implement by call_invitation/services/invite_state_manager');
+
         data = JSON.parse(data);
         // update _invitationMap
         const inviteDetails = CallInviteStateManage._invitationMap.get(callID);

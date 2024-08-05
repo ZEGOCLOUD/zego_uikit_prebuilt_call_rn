@@ -83,6 +83,8 @@ export default class ZegoUIKitPrebuiltCallInvitation {
   }
 
   onInvitationSent(navigation, callID, allInvitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall) {
+    console.log('[onInvitationSent]');
+
     const localUser = ZegoPrebuiltPlugins.getLocalUser();
     CallInviteStateManage.addInviteData(
       callID,
