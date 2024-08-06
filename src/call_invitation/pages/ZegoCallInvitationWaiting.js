@@ -74,7 +74,9 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     }
   };
   const hangUpHandle = () => {
-    zloginfo('Leave room on waiting page');
+    zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] hangUpHandle, Leave room on waiting page');
+
+    ZegoUIKit.uninit();
     if (typeof onOutgoingCallCancelButtonPressed == 'function') {
       onOutgoingCallCancelButtonPressed(navigation, roomID, invitees, isVideoCall ? 1 : 0);
     }

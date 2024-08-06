@@ -122,7 +122,7 @@ export default function ZegoCallInvitationDialog(props) {
 
   useEffect(() => {
     if (isInit) {
-      console.log('########Register callbacks after init');
+      zloginfo('[ZegoCallInvitationDialog] Register callbacks after init');
       const callbackID =
         'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
