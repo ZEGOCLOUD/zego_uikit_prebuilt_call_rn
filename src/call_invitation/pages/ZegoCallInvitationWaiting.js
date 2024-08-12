@@ -126,12 +126,18 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
     if (invitees.length === 1) {
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, () => {
+        zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] onInvitationResponseTimeout');
+
+        ZegoUIKit.uninit();
         BellManage.stopOutgoingSound();
         // ZegoUIKit.leaveRoom();
         CallInviteStateManage.initInviteData();
         navigation.goBack();
       });
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, (data) => {
+        zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] onInvitationRefused');
+
+        ZegoUIKit.uninit();
         const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
         if (callIDs.includes(data.callID)) {
           BellManage.stopOutgoingSound();
@@ -146,7 +152,9 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       //   BellManage.stopOutgoingSound();
       // });
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
-        zloginfo('Invite completed with nobody');
+        zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] onInviteCompletedWithNobody');
+
+        ZegoUIKit.uninit();
         navigation.goBack();
       });
     }
