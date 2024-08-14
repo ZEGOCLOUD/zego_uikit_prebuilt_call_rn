@@ -7,6 +7,8 @@ import ZegoPrebuiltPlugin from './plugins'
 import { setCategory } from 'react-native-sound';
 import ZegoUIKitPrebuiltCallService from '../../services';
 import RNCallKit from './callkit';
+import packageJson from '../../../package.json';
+
 
 export default class OfflineCallEventListener {
     _instance;
@@ -29,6 +31,7 @@ export default class OfflineCallEventListener {
         this._isSystemCalling = true;
 
         ZegoUIKit.installPlugins(plugins);
+        ZegoUIKit.logComponentsVersion(new Map([['PrebuiltCall', packageJson.version]]));
         const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
 
         signalingPlugin.getInstance().setBackgroundMessageHandler();
