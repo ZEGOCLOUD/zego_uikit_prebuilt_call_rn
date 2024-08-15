@@ -44,7 +44,7 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
       handler.postDelayed(new Runnable(){
         @Override
         public void run(){
-          if (getReactApplicationContext().hasActiveCatalystInstance()) {
+          if (getReactApplicationContext().hasActiveReactInstance()) {
             getReactApplicationContext()
               .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
               .emit("backgroundTimer.timeout", id);
