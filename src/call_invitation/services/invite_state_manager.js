@@ -99,7 +99,7 @@ const CallInviteStateManage = {
       CallInviteStateManage._callbackID,
       ({ callID, invitee, data }) => {
         // update _invitationMap
-        console.warn(
+        zloginfo(
           '######onInvitationAccepted######',
           CallInviteStateManage._invitationMap,
           callID
@@ -225,7 +225,7 @@ const CallInviteStateManage = {
     }
   },
   isAutoCancelInvite: (invitationID) => {
-    console.warn(
+    zloginfo(
       '######isAutoCancelInvite######',
       invitationID,
       CallInviteStateManage._invitationMap

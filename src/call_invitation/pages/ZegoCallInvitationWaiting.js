@@ -61,9 +61,10 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         );
       }
       // If not, request it
+      zloginfo(`[ZegoUIKitPrebuiltCallWaitingScreen] requestMultiple, ungrantedPermissions: ${ungrantedPermissions}`);
       return PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
-        (data) => {
-          console.warn('requestMultiple', data);
+        (result) => {
+          zloginfo(`[ZegoUIKitPrebuiltCallWaitingScreen] requestMultiple, result: ${result}`);
           if (callback) {
             callback();
           }

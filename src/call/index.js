@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake'
 import { useKeyboard } from '../utils/keyboard';
 import { ZegoCallEndReason } from '../services/defines';
-
+import { zloginfo } from '../utils/logger';
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const navigation = useNavigation();
@@ -206,9 +206,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 );
             }
             // If not, request it
+            zloginfo(`[ZegoUIKitPrebuiltCall] requestMultiple, ungrantedPermissions: ${ungrantedPermissions}`);
             return PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
-                data => {
-                    console.warn('requestMultiple', data);
+                result => {
+                    zloginfo(`[ZegoUIKitPrebuiltCall] requestMultiple, result: ${result}`);
                     if (callback) {
                         callback();
                     }
