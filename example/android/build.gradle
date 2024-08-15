@@ -11,6 +11,7 @@ buildscript {
         ndkVersion = "23.1.7779620"
     }
     repositories {
+        maven { url 'https://storage.zego.im/maven' }
         google()
         mavenCentral()
     }
@@ -23,6 +24,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'https://storage.zego.im/maven' }
         google()
         mavenCentral()
     }
