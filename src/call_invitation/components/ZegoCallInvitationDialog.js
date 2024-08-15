@@ -17,6 +17,8 @@ import ZegoUIKitPrebuiltCallService from "../../services";
 import RNCallKit from '../services/callkit';
 
 export default function ZegoCallInvitationDialog(props) {
+  const TAG = 'ZegoCallInvitationDialog';
+
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed, avatarBuilder } = initConfig;
 
@@ -128,7 +130,7 @@ export default function ZegoCallInvitationDialog(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
         callbackID,
         async ({ callID: invitationID, type, inviter, data }) => {
-          zloginfo('onInvitationReceived implement by call_invitation/components/ZegoCallInvitationDialog');
+          zloginfo(`onInvitationReceived implement by ${TAG}`);
 
           let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
@@ -171,7 +173,8 @@ export default function ZegoCallInvitationDialog(props) {
               }
             }
           }
-        }
+        },
+        TAG
       );
       ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, () => {
         BellManage.stopIncomingSound();

@@ -251,6 +251,7 @@ export default class OfflineCallEventListener {
         this.unregisterCallback();
     }
     registerCallback() {
+        const TAG = 'offline_call_event_listener';
         const callbackID = this.callbackID;
         const {
             onOutgoingCallTimeout,
@@ -289,7 +290,7 @@ export default class OfflineCallEventListener {
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
-            zloginfo('onInvitationReceived implement by call_invitation/services/offline_call_event_listener');
+            zloginfo('onInvitationReceived implement by ' + TAG);
 
             // only for Android, ios will record at `setIOSOfflineDataHandler`
             if (Platform.OS === 'android') {
@@ -313,7 +314,7 @@ export default class OfflineCallEventListener {
                 zloginfo('[onInvitationReceived] will call onIncomingCallReceived');
                 onIncomingCallReceived(roomID, { userID: inviter.id, userName: inviter.name }, type, invitees, custom_data)
             }
-        });
+        }, TAG);
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
             if (Platform.OS === 'android') {
                 RNCallKit.endCall();
@@ -338,6 +339,7 @@ export default class OfflineCallEventListener {
                 onIncomingCallTimeout(roomID, { userID: inviter.id, userName: inviter.name })
             }
         });
+        zloginfo('registerCallback done');
     }
     unregisterCallback() {
         const callbackID = this.callbackID;

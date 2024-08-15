@@ -1,5 +1,6 @@
 import Sound from 'react-native-sound';
 import { Vibration } from 'react-native';
+import { zloginfo } from '../../utils/logger';
 
 // console.warn('Sound', Sound);
 // console.warn('Vibration', Vibration);
