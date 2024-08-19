@@ -61,7 +61,7 @@ export default class ZegoUIKitPrebuiltCallService {
             return Promise.resolve();
         }
         // GetAppName.getAppName((appName) => {
-            // console.log("[init]Here is your app name:", appName)    
+            // zloginfo("[init]Here is your app name:", appName)    
             // this.config.appName = appName;
         // })
         this.appInfo = { appID, appSign };

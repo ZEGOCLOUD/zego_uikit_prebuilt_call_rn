@@ -1,5 +1,9 @@
 package com.zegouikitprebuiltcallrn;
 
+import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_ACCEPT_CALL;
+import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_CLICK;
+import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_DECLINE_CALL;
+
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
@@ -13,20 +17,21 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * foreground service, when receive fcm data,use this service to show a Notification .
  */
 public class OffLineCallNotificationService extends Service {
+    private String TAG = "OffLineCallNotificationService";
 
     private PowerManager.WakeLock wakeLock;
     private Handler dismissHandler;
@@ -53,25 +58,31 @@ public class OffLineCallNotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        XLog.i(String.format(Locale.getDefault(), "[%s] onStartCommand, flag: %d, startId:%d", TAG, flags, startId));
+
         if (intent == null) {
             return super.onStartCommand(null, flags, startId);
         }
 
-        Log.d("NotificationService", "onStartCommand() called with: intent.getAction() = [" + intent.getAction() + "]");
+        XLog.i("[%s] onStartCommand() called with: intent.getAction() = [%s]", TAG, intent.getAction());
 
-        if (CallNotificationManager.ACTION_DECLINE_CALL.equals(intent.getAction())) {
+        if (ACTION_DECLINE_CALL.equals(intent.getAction())) {
+            XLog.i("[%s] onStartCommand, intent action: %s", TAG, ACTION_DECLINE_CALL);
             sendEvent("RNCallKitPerformEndCallAction", null);
             CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
-        } else if (CallNotificationManager.ACTION_CLICK.equals(intent.getAction())) {
+        } else if (ACTION_CLICK.equals(intent.getAction())) {
+            XLog.i("[%s] onStartCommand, intent action: %s", TAG, ACTION_CLICK);
             // click will start service ,then start app,inject action here
             // while click accept button will start app directly
             startApp();
             CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
-        } else if (CallNotificationManager.ACTION_ACCEPT_CALL.equals(intent.getAction())) {
+        } else if (ACTION_ACCEPT_CALL.equals(intent.getAction())) {
+            XLog.i("[%s] onStartCommand, intent action: %s", TAG, ACTION_ACCEPT_CALL);
             sendEvent("RNCallKitPerformAnswerCallAction", null);
             startApp();
             CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
         } else {
+            XLog.i("[%s] onStartCommand, intent action: %s", TAG, "default");
             Notification callNotification = CallNotificationManager.getInstance().createCallNotification(this);
             if (callNotification != null) {
                 if (VERSION.SDK_INT >= VERSION_CODES.Q) {
@@ -88,6 +99,8 @@ public class OffLineCallNotificationService extends Service {
     }
 
     public void wakeup() {
+        XLog.i("[%s] wakeup", TAG);
+
         PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
         int flag = PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE;
         wakeLock = powerManager.newWakeLock(flag, "ZegoPrebuiltCall::WakelockTag");
@@ -97,6 +110,8 @@ public class OffLineCallNotificationService extends Service {
     }
 
     public void startApp() {
+        XLog.i("[%s] startApp", TAG);
+
         Intent intent = null;
         try {
             intent = new Intent(this, Class.forName(getLauncherActivity()));

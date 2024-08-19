@@ -75,7 +75,7 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const refuseFailHandle = (error) => {
-    console.log(`Refuse Call Invitation failed, code: ${error.code}, message: ${error.message}`);
+    zloginfo(`Refuse Call Invitation failed, code: ${error.code}, message: ${error.message}`);
     refuseHandle();
   }
   const onAccectCallback = (data) => {
@@ -100,7 +100,7 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const acceptFailHandle = (error) => {
-    console.log(`Accept Call Invitation failed, code: ${error.code}, message: ${error.message}`);
+    zloginfo(`Accept Call Invitation failed, code: ${error.code}, message: ${error.message}`);
     refuseHandle();
   }
   const pressHandle = () => {

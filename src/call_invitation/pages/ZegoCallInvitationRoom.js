@@ -37,7 +37,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     routeParams.inviter = route.params.inviter;
     routeParams.invitationID = route.params.invitationID;
   }
-  console.log('#####ZegoUIKitPrebuiltCallInCallScreen#######', routeParams, route.params);
+  zloginfo('#####ZegoUIKitPrebuiltCallInCallScreen#######', routeParams, route.params);
   const {
     origin,
     roomID,

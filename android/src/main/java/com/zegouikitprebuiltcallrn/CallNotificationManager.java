@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat.Action;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReadableMap;
 
 public class CallNotificationManager {
@@ -67,18 +68,18 @@ public class CallNotificationManager {
     }
 
     public void showCallNotification(Context context, String title, String message) {
-        Log.i(TAG, "showCallNotification() called with: context = [" + context + "]");
+        XLog.i("[%s] showCallNotification() called with: context = [%s]", TAG, context);
 
         this.notificationTitle = title;
         this.notificationMessage = message;
         createCallNotificationChannel(context);
         ContextCompat.startForegroundService(context, new Intent(context, OffLineCallNotificationService.class));
         isNotificationShowed = true;
-        Log.i(TAG, "showCallNotification, startForegroundService");
+        XLog.i("[%s] showCallNotification, startForegroundService", TAG);
     }
 
     public void showCallBackgroundNotification(Context context, String title, String message) {
-        Log.i(TAG, "showCallBackgroundNotification() called with: context = [" + context + "]");
+        XLog.i("[%s] showCallBackgroundNotification() called with: context = [%s]", TAG, context);
 
         this.notificationTitle = title;
         this.notificationMessage = message;

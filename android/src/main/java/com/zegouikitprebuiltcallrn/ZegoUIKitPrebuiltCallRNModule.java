@@ -1,6 +1,8 @@
 package com.zegouikitprebuiltcallrn;
 
 import androidx.annotation.NonNull;
+
+import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -60,6 +62,8 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void displayIncomingCall(String title, String message) {
+        XLog.i(String.format("[%s] displayIncomingCall", NAME));
+
         CallNotificationManager
             .getInstance()
             .showCallNotification(reactContext, title, message);

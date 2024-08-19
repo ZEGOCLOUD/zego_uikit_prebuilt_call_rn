@@ -1,13 +1,13 @@
-import { getLocalDateFormat } from './timer';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 
 export const zloginfo = (...msg) => {
-  console.log(getLocalDateFormat() + ' ZEGOUIKit[INFO]: ', ...msg);
+  ZegoUIKit.kitLogInfo('PrebuiltCall', ...msg);
 };
 
 export const zlogwarning = (...msg) => {
-  console.warn(getLocalDateFormat() + ' ZEGOUIKit[WARNING]: ', ...msg);
+  ZegoUIKit.kitLogWarning('PrebuiltCall', ...msg);
 };
 
 export const zlogerror = (...msg) => {
-  console.error(getLocalDateFormat() + ' ZEGOUIKit[ERROR]: ', ...msg);
+  ZegoUIKit.kitLogError('PrebuiltCall', ...msg);
 };

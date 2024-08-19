@@ -294,7 +294,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         setIsCallMemberListVisable(false);
     };
     const onSwitchCamera = () => {
-        console.log('onSwitchCamera', isFrontCamera);
+        zloginfo('onSwitchCamera', isFrontCamera);
+        
         // Default rear camera
         const result = !isFrontCamera;
         stateData.current.isFrontCamera = result;
