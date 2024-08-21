@@ -1,1 +1,1 @@
-export const getPackageVersion = () => {return "undefine";};
+export const getPackageVersion = () => {return "undefine";}; // Avoid manual modification.
