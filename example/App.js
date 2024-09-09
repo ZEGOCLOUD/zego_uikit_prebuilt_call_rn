@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Im
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import KeyCenter from './KeyCenter';
-import { getFirstInstallTime } from 'react-native-device-info'
+import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as ZIM from 'zego-zim-react-native';
@@ -264,6 +264,7 @@ function HomeScreen(props) {
   }, [])
 
   return (
+
     <TouchableWithoutFeedback onPress={blankPressedHandle}>
       <View style={styles.container}>
         <Text>Your user id: {userID}</Text>
@@ -297,6 +298,9 @@ function HomeScreen(props) {
             ZegoUIKitPrebuiltCallService.uninit();
           }}></Button>
         </View>
+        <View style={{ marginTop: 30 }}>
+          <Text>App Version: {DeviceInfo.getVersion()}.{DeviceInfo.getBuildNumber()}</Text>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -307,7 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: "gray"
+    backgroundColor: '#A3A3A3'
   },
   inputContainer: {
     flexDirection: 'row',
