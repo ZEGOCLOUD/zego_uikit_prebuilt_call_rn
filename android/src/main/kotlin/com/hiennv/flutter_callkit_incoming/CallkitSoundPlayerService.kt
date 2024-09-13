@@ -9,7 +9,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
-import android.text.TextUtils
+import com.zegouikitprebuiltcallrn.utils.RingtoneUtils
 
 class CallkitSoundPlayerService : Service() {
 
@@ -128,7 +128,7 @@ class CallkitSoundPlayerService : Service() {
         mediaPlayer?.setDataSource(applicationContext, uri)
     }
 
-    private fun getRingtoneUri(fileName: String) = try {
+    /*private fun getRingtoneUri(fileName: String) = try {
         if (TextUtils.isEmpty(fileName)) {
             RingtoneManager.getActualDefaultRingtoneUri(
                 this@CallkitSoundPlayerService,
@@ -167,5 +167,7 @@ class CallkitSoundPlayerService : Service() {
         } catch (e: Exception) {
             null
         }
-    }
+    }*/
+
+    private fun getRingtoneUri(fileName: String) = RingtoneUtils.getRingtone(applicationContext, fileName)
 }

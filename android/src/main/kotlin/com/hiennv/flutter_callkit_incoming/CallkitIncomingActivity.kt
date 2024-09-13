@@ -30,6 +30,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.text.TextUtils
 import android.util.Log
+import com.zegouikitprebuiltcallrn.R
 
 
 class CallkitIncomingActivity : Activity() {

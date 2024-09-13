@@ -53,7 +53,7 @@ export default class OfflineCallEventListener {
             }
 
             if (cancelInvitation) {
-              RNCallKit.endCall();
+              RNCallKit.dismissCallNotification();
               this._isDisplayingCall = false;
               this._currentCallID = data.zim_call_id;
             } else {
@@ -69,8 +69,6 @@ export default class OfflineCallEventListener {
                   // When the app launch, ZIM will send the online invite again
                   // Then we can read the offline data to decide if need to join the room directly
                   CallInviteHelper.getInstance().setOfflineData(data);
-
-                  RNCallKit.endCall();
               });
               RNCallKit.addEventListener('endCall', async () => {
                   this._isDisplayingCall = false;
@@ -153,7 +151,7 @@ export default class OfflineCallEventListener {
                   this.reportEndCallWithUUID(CallInviteHelper.getInstance().getCurrentCallUUID(), 2);
                   this._isDisplayingCall = false;
                 } else {
-                  RNCallKit.endCall();
+                  RNCallKit.dismissCallNotification();
                 }
             }
         });
@@ -226,8 +224,6 @@ export default class OfflineCallEventListener {
             
             CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
             ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
-  
-            RNCallKit.endCall();
         });
         RNCallKit.addEventListener('endCall', () => {
             CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
@@ -306,7 +302,7 @@ export default class OfflineCallEventListener {
         }, TAG);
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
             if (Platform.OS === 'android') {
-                RNCallKit.endCall();
+                RNCallKit.dismissCallNotification();
             }
             
             const callUUID = CallInviteHelper.getInstance().getCurrentCallUUID();

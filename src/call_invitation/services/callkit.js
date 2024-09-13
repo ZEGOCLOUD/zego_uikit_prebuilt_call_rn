@@ -78,11 +78,11 @@ class RNCallKit {
     ZegoUIKitPrebuiltCallRNModule.displayIncomingCall(title, message);
   };
 
-  endCall = () => {
+  dismissCallNotification = () => {
     if (Platform.OS === 'ios') {
       return;
     }
-    ZegoUIKitPrebuiltCallRNModule.endCall();
+    ZegoUIKitPrebuiltCallRNModule.dismissCallNotification();
   };
 
   requestSystemAlertWindow = (message, allow, deny) => {

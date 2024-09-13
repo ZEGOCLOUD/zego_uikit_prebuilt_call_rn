@@ -1,4 +1,6 @@
-package com.zegouikitprebuiltcallrn;
+package com.zegouikitprebuiltcallrn.callstyle;
+
+import static com.zegouikitprebuiltcallrn.utils.RingtoneUtils.getRingtone;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -7,7 +9,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
@@ -21,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReadableMap;
+import com.zegouikitprebuiltcallrn.utils.XLogWrapper;
 
 public class CallNotificationManager {
     private static final String TAG = "CallNotificationManager";
@@ -68,14 +70,17 @@ public class CallNotificationManager {
     }
 
     public void showCallNotification(Context context, String title, String message) {
-        XLog.i("[%s] showCallNotification() called with: context = [%s]", TAG, context);
+        XLogWrapper.i(TAG, "showCallNotification() called with: context = [%s], title = '%s', message = '%s'", context, title, message);
 
         this.notificationTitle = title;
         this.notificationMessage = message;
+
+        // 设置通知效果，铃声、振动等
         createCallNotificationChannel(context);
+
         ContextCompat.startForegroundService(context, new Intent(context, OffLineCallNotificationService.class));
         isNotificationShowed = true;
-        XLog.i("[%s] showCallNotification, startForegroundService", TAG);
+        XLogWrapper.i(TAG, "showCallNotification, startForegroundService");
     }
 
     public void showCallBackgroundNotification(Context context, String title, String message) {
@@ -93,7 +98,8 @@ public class CallNotificationManager {
         String channelID = callNotificationChannelID;
         String channelName = callNotificationChannelName;
         String channelDesc = callNotificationChannelDesc;
-        Uri ringtone = getRingtone(context);
+        Uri ringtone = getRingtone(context, this.soundName);
+        XLogWrapper.i(TAG, "getRingtone: %s", ringtone);
 
         if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelID, channelName,
@@ -103,41 +109,6 @@ public class CallNotificationManager {
             channel.setDescription(channelDesc);
             NotificationManagerCompat.from(context).createNotificationChannel(channel);
         }
-    }
-
-    public Uri retrieveSoundResourceUri(Context context, String soundSource) {
-        Uri uri = null;
-        if (TextUtils.isEmpty(soundSource)) {
-            uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        } else {
-            int soundResourceId = AudioUtils.getAudioResourceId(context, soundSource);
-            if (soundResourceId > 0) {
-                uri = Uri.parse("android.resource://" + context.getPackageName() + "/" + soundResourceId);
-            } else {
-                uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            }
-        }
-        return uri;
-    }
-
-    public Uri getRingtone(Context context) {
-        String soundSource = "resource://raw/" + getSoundName(this.soundName);
-        Uri ringtone = retrieveSoundResourceUri(context, soundSource);
-        return ringtone;
-    }
-
-    public static String getSoundName(String sound) {
-        if (TextUtils.isEmpty(sound)) {
-            return "zego_incoming";
-        }
-        String[] splits = sound.split("\\.");
-        String suffixStr = "";
-        if (splits != null && splits.length > 1) {
-            suffixStr = sound.substring(0, sound.length() - (splits[splits.length - 1].length() + 1));
-        } else {
-            suffixStr = sound;
-        }
-        return suffixStr;
     }
 
     public void dismissCallNotification(Context context) {
@@ -195,7 +166,7 @@ public class CallNotificationManager {
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             builder.setCategory(NotificationCompat.CATEGORY_CALL);
             builder.setOngoing(true).setAutoCancel(true);
-            builder.setSound(getRingtone(context));
+            builder.setSound(getRingtone(context, this.soundName));
 
             NotificationCompat.Action.Builder acceptAction = new Action.Builder(
                 // The icon that will be displayed on the button (or not, depends on the Android version)

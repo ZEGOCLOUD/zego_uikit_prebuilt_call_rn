@@ -13,8 +13,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
-import com.hiennv.flutter_callkit_incoming.R
 import com.hiennv.flutter_callkit_incoming.Utils
+import com.zegouikitprebuiltcallrn.R
 import kotlin.math.min
 
 

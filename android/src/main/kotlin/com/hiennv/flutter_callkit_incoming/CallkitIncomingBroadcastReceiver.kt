@@ -7,11 +7,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import com.zegouikitprebuiltcallrn.utils.XLogWrapper
+import com.zegouikitprebuiltcallrn.ZegoUIKitPrebuiltCallRNModule
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
-        private const val TAG = "CallkitIncomingReceiver"
+        private const val TAG = "CallkitIncomingBroadcastReceiver"
         var silenceEvents = false
 
         fun getIntent(context: Context, action: String, data: Bundle?) =
@@ -76,7 +79,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission", "LongLogTag")
     override fun onReceive(context: Context, intent: Intent) {
         val callkitNotificationManager = CallkitNotificationManager(context)
         val action = intent.action ?: return
@@ -212,6 +215,38 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 "missedCallNotification" to notification,
                 "android" to android
         )
-        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
+
+//        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
+        sendEventRN(event, data)
+    }
+
+    private fun sendEventRN(event: String, data: Bundle) {
+        val context = ZegoUIKitPrebuiltCallRNModule.reactContext
+        if (!context.hasActiveCatalystInstance()) {
+            return;
+        }
+
+        var eventName: String? = null
+        var eventParams: Any? = null
+
+        when (event) {
+            CallkitConstants.ACTION_CALL_DECLINE -> {
+                eventName = "RNCallKitPerformEndCallAction"
+                eventParams = null
+            }
+            CallkitConstants.ACTION_CALL_TIMEOUT -> {
+                eventName = "RNCallKitPerformEndCallAction"
+                eventParams = true
+            }
+            CallkitConstants.ACTION_CALL_ACCEPT -> {
+                eventName = "RNCallKitPerformAnswerCallAction"
+                eventParams = null
+            }
+        }
+
+        if (eventName != null) {
+            XLogWrapper.i(TAG, "send event, name: %s, params: %s", eventName, eventParams)
+            context.getJSModule<RCTDeviceEventEmitter>(RCTDeviceEventEmitter::class.java).emit(eventName, eventParams)
+        }
     }
 }

@@ -29,7 +29,7 @@
     <!-- Permissions required by the App -->
 
     <application>
-        <service android:name=".OffLineCallNotificationService"
+        <service android:name=".callstyle.OffLineCallNotificationService"
             android:foregroundServiceType="dataSync">
         </service>
 

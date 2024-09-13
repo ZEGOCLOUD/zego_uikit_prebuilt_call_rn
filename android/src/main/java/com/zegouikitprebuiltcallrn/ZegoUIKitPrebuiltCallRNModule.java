@@ -2,13 +2,14 @@ package com.zegouikitprebuiltcallrn;
 
 import androidx.annotation.NonNull;
 
-import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.zegouikitprebuiltcallrn.customview.CustomCallNotificationManager;
+import com.zegouikitprebuiltcallrn.utils.XLogWrapper;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -57,21 +58,23 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setupCallKit(ReadableMap options) {
-        CallNotificationManager.getInstance().setupOptions(options);
+        XLogWrapper.i(NAME, "setupCallKit");
+
+        CustomCallNotificationManager.getInstance().setupOptions(options);
     }
 
     @ReactMethod
     public void displayIncomingCall(String title, String message) {
-        XLog.i(String.format("[%s] displayIncomingCall", NAME));
+        XLogWrapper.i(NAME, "displayIncomingCall");
 
-        CallNotificationManager
-            .getInstance()
-            .showCallNotification(reactContext, title, message);
+        CustomCallNotificationManager.getInstance().showCallNotification(reactContext, title, message);
     }
 
     @ReactMethod
-    public void endCall() {
-        CallNotificationManager.getInstance().dismissCallNotification(reactContext);
+    public void dismissCallNotification() {
+        XLogWrapper.i(NAME, "dismissCallNotification");
+
+        CustomCallNotificationManager.getInstance().dismissCallNotification(reactContext);
     }
 
     @ReactMethod

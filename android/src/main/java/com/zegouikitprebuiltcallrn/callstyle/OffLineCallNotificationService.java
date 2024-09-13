@@ -1,8 +1,8 @@
-package com.zegouikitprebuiltcallrn;
+package com.zegouikitprebuiltcallrn.callstyle;
 
-import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_ACCEPT_CALL;
-import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_CLICK;
-import static com.zegouikitprebuiltcallrn.CallNotificationManager.ACTION_DECLINE_CALL;
+import static com.zegouikitprebuiltcallrn.callstyle.CallNotificationManager.ACTION_ACCEPT_CALL;
+import static com.zegouikitprebuiltcallrn.callstyle.CallNotificationManager.ACTION_CLICK;
+import static com.zegouikitprebuiltcallrn.callstyle.CallNotificationManager.ACTION_DECLINE_CALL;
 
 import android.app.Notification;
 import android.app.Service;
@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import com.elvishew.xlog.XLog;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.zegouikitprebuiltcallrn.ZegoUIKitPrebuiltCallRNModule;
 
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +52,7 @@ public class OffLineCallNotificationService extends Service {
             @Override
             public void run() {
                 CallNotificationManager.getInstance().dismissCallNotification(getApplicationContext());
-                sendEvent("RNCallKitPerformEndCallAction", true);
+                sendEvent("RNCallKitPerformEndCallAction", true);   // timeout
             }
         };
     }

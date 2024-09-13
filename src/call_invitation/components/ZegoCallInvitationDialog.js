@@ -71,7 +71,7 @@ export default function ZegoCallInvitationDialog(props) {
   const refuseHandle = () => {
     CallInviteHelper.getInstance().refuseCall(callID)
     if (Platform.OS === 'android') {
-        RNCallKit.endCall();
+        RNCallKit.dismissCallNotification();
     }
   };
   const refuseFailHandle = (error) => {
@@ -96,7 +96,7 @@ export default function ZegoCallInvitationDialog(props) {
   const acceptHandle = () => {
     CallInviteHelper.getInstance().acceptCall(callID, {...extendData, inviteType, inviter});
     if (Platform.OS === 'android') {
-        RNCallKit.endCall();
+        RNCallKit.dismissCallNotification();
     }
   };
   const acceptFailHandle = (error) => {
