@@ -61,6 +61,11 @@ public class CustomCallNotificationManager {
         ));
         XLogWrapper.i(TAG, "androidParams: %s", androidParams);
 
+        HashMap<String, Object> missedCallParams = new HashMap<>(Map.of(
+            "showNotification", false
+        ));
+        XLogWrapper.i(TAG, "missedCallParams: %s", missedCallParams);
+
         HashMap<String, Object> dataMap = new HashMap<>(Map.of(
             "id", UUID.randomUUID().toString(),
             "nameCaller", title,
@@ -72,7 +77,7 @@ public class CustomCallNotificationManager {
             "textDecline", this.incomingDeclineButtonText,
 //            "extra", new HashMap<String, Object>(),
 //            "headers", new HashMap<String, Object>(),
-//            "missedCallNotification", NotificationParams,
+            "missedCallNotification", missedCallParams,
             "android", androidParams
         ));
         XLogWrapper.i(TAG, "dataMap: %s", dataMap);
