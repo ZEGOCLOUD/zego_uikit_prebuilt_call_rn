@@ -9,24 +9,27 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- Permissions required by the App -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
 
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.REORDER_TASKS" />
-
+    <!-- Permissions required by the Notification -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Permissions required by the Notification with custom view -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
 
-    <!-- Permissions required by the App -->
+    <!-- Permissions required by the Notification with call style -->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />-->
+<!--    <uses-permission android:name="android.permission.GET_TASKS" />-->
+<!--    <uses-permission android:name="android.permission.REORDER_TASKS" />-->
+<!--    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />-->
+<!--    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />-->
 
     <application>
         <service android:name=".callstyle.OffLineCallNotificationService"

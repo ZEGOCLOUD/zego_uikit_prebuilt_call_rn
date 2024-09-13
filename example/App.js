@@ -23,6 +23,8 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn'
 
 const Stack = createNativeStackNavigator();
 
+const notificationStyle = 'CustomView';
+
 
 const storeUserInfo = async (info) => {
   await AsyncStorage.setItem("userID", info.userID)
@@ -140,11 +142,13 @@ const onUserLogin = async (userID, userName, props) => {
       }
     }
   ).then(() => {
-    ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
-      message: 'We need your consent for the following permissions in order to use the offline call function properly',
-      allow: 'Allow',
-      deny: 'Deny',
-    });
+    if (notificationStyle === 'CallStyle') {
+      ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
+        message: 'We need your consent for the following permissions in order to use the offline call function properly',
+        allow: 'Allow',
+        deny: 'Deny',
+      });
+    }
   });
 }
 
