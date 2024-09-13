@@ -2,7 +2,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { PermissionsAndroid, AppState, Platform } from 'react-native';
 import InnerTextHelper from '../services/inner_text_helper';
 import CallInviteHelper from './call_invite_helper';
-import { zloginfo } from '../../utils/logger';
+import { zloginfo, zlogdebug } from '../../utils/logger';
 import ZegoPrebuiltPlugin from './plugins'
 import { setCategory } from 'react-native-sound';
 import ZegoUIKitPrebuiltCallService from '../../services';
@@ -227,7 +227,12 @@ export default class OfflineCallEventListener {
         });
         RNCallKit.addEventListener('endCall', () => {
             CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
-            ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined)
+            ZegoUIKit.getSignalingPlugin().refuseInvitation(
+              this._currentCallData.inviter.id, 
+              undefined
+            ).then(() => {
+              zloginfo('[setupOnlineCallKit] refuse invitation success')
+            })
         }); 
       }
     }
@@ -393,13 +398,13 @@ export default class OfflineCallEventListener {
             inviterID, 
             JSON.stringify({callID: callID})
           ).then(() => {
-            zloginfo('[setAndroidOfflineDataHandler] refuse invitation success')
+            zloginfo('[refuseOfflineInvitation] refuse invitation success')
             if (Platform.OS === 'android') {
               ZegoUIKit.getSignalingPlugin().uninit()
             }
         })
         .catch(() => {
-            zloginfo('[setAndroidOfflineDataHandler] refuse invitation failed.')
+            zloginfo('[refuseOfflineInvitation] refuse invitation failed.')
             if (Platform.OS === 'android') {
               ZegoUIKit.getSignalingPlugin().uninit()
             }

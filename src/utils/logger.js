@@ -11,3 +11,7 @@ export const zlogwarning = (...msg) => {
 export const zlogerror = (...msg) => {
   ZegoUIKit.kitLogError('PrebuiltCall', ...msg);
 };
+
+export const zlogdebug = (...msg) => {
+  ZegoUIKit.kitLogInfo('PrebuiltCall', ...msg);
+};

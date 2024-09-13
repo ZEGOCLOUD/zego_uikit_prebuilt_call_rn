@@ -66,6 +66,8 @@ class RNCallKit {
     if (Platform.OS === 'ios') {
       return;
     }
+
+    zloginfo('call ZegoUIKitPrebuiltCallRNModule.setupCallKit');
     ZegoUIKitPrebuiltCallRNModule.setupCallKit(options);
   }
 
