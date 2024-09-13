@@ -15,7 +15,6 @@ export default class OfflineCallEventListener {
     config = {};
     _currentCallData = {};
     _isSystemCalling = false;
-    _callEndByAnswer = false;
     _isDisplayingCall = false;
     _currentCallID = ''; // For Android.
 
@@ -65,7 +64,6 @@ export default class OfflineCallEventListener {
               RNCallKit.addEventListener('answerCall', () => {
                   zloginfo('Answer call on offline mode');
 
-                  this._callEndByAnswer = true;
                   this._isDisplayingCall = false;
 
                   // When the app launch, ZIM will send the online invite again
@@ -78,9 +76,7 @@ export default class OfflineCallEventListener {
                   this._isDisplayingCall = false;
 
                   // Do your normal `Hang Up` actions here
-                  if (!this._callEndByAnswer) {
-                      this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
-                  }
+                  this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
               });
               const invitees = data.invitees;
               this.displayIncomingCall(data.zim_call_id, data.call_name, data.inviter.name, data.type, invitees.length);
@@ -109,7 +105,6 @@ export default class OfflineCallEventListener {
             signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
                 zloginfo("onCallKitAnswerCall", data)
 
-                this._callEndByAnswer = true;
                 this._isDisplayingCall = false;
 
                 // The report succeeds regardless of the direct service scenario
@@ -226,9 +221,7 @@ export default class OfflineCallEventListener {
         RNCallKit.removeEventListener('answerCall')
         RNCallKit.removeEventListener('endCall')
   
-        RNCallKit.addEventListener('answerCall', () => {
-            this._callEndByAnswer = true;
-  
+        RNCallKit.addEventListener('answerCall', () => {  
             zloginfo('Answer call on background mode: ', this._currentCallData)
             
             CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
@@ -237,11 +230,8 @@ export default class OfflineCallEventListener {
             RNCallKit.endCall();
         });
         RNCallKit.addEventListener('endCall', () => {
-            if (!this._callEndByAnswer) {
-                CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
-                ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined)
-            }
-            this._callEndByAnswer = false;
+            CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
+            ZegoUIKit.getSignalingPlugin().refuseInvitation(this._currentCallData.inviter.id, undefined)
         }); 
       }
     }
@@ -410,15 +400,12 @@ export default class OfflineCallEventListener {
             zloginfo('[setAndroidOfflineDataHandler] refuse invitation success')
             if (Platform.OS === 'android') {
               ZegoUIKit.getSignalingPlugin().uninit()
-
-              this._callEndByAnswer = false;
             }
         })
         .catch(() => {
             zloginfo('[setAndroidOfflineDataHandler] refuse invitation failed.')
             if (Platform.OS === 'android') {
               ZegoUIKit.getSignalingPlugin().uninit()
-              this._callEndByAnswer = false;
             }
         });
     }
