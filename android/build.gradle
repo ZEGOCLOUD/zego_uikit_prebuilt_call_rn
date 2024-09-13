@@ -137,6 +137,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     implementation "com.elvishew:xlog:1.11.1"
+    
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
 }
 
 if (isNewArchitectureEnabled()) {
