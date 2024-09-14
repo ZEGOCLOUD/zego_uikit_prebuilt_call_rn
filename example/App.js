@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Image, } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import KeyCenter from './KeyCenter';
 import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info'
@@ -266,6 +267,19 @@ function HomeScreen(props) {
       }
     })
   }, [])
+
+  useFocusEffect(
+    React.useCallback(() => {
+        getUserInfo().then((info) => {
+            if (info) {
+              setUserID(info.userID)
+            }
+        })
+        
+        return () => {
+        };
+    }, [])
+  );
 
   return (
 
