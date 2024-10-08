@@ -4,10 +4,16 @@ import { zloginfo } from '../../utils/logger';
 const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 const eventEmitter = new NativeEventEmitter(ZegoUIKitPrebuiltCallRNModule);
 
-const answerCall = handler =>
-  eventEmitter.addListener('RNCallKitPerformAnswerCallAction', (data) => handler(data));
-const endCall = handler =>
-  eventEmitter.addListener('RNCallKitPerformEndCallAction', (data) => handler(data));
+const answerCall = (handler) =>
+  eventEmitter.addListener('RNCallKitPerformAnswerCallAction', (data) => {
+    zloginfo('[EventListener] receive RNCallKitPerformAnswerCallAction from NativeModule')
+    handler(data)
+  });
+const endCall = (handler) =>
+  eventEmitter.addListener('RNCallKitPerformEndCallAction', (data) => {
+    zloginfo('[EventListener] receive RNCallKitPerformEndCallAction from NativeModule')
+    handler(data)
+  });
 
 export const listeners = {
   answerCall,

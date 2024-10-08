@@ -42,6 +42,8 @@ const _storeLoginInfo = async () => {
 
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins) => {
+    zloginfo('[ZegoPrebuiltPlugins] init');
+    
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
     _install(plugins);
@@ -81,6 +83,8 @@ const ZegoPrebuiltPlugins = {
     }
   },
   uninit: () => {
+    zloginfo('[ZegoPrebuiltPlugins] uninit');
+
     delete _appInfo.appID;
     delete _appInfo.appSign;
     delete _localUser.userID;

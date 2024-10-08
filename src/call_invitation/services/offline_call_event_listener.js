@@ -62,7 +62,7 @@ export default class OfflineCallEventListener {
 
               this._isDisplayingCall = true;
               RNCallKit.addEventListener('answerCall', () => {
-                  zloginfo('Answer call on offline mode');
+                  zloginfo('answerCall on offline mode for android');
 
                   this._isDisplayingCall = false;
 
@@ -71,6 +71,8 @@ export default class OfflineCallEventListener {
                   CallInviteHelper.getInstance().setOfflineData(data);
               });
               RNCallKit.addEventListener('endCall', async () => {
+                  zloginfo('endCall on offline mode for android');
+
                   this._isDisplayingCall = false;
 
                   // Do your normal `Hang Up` actions here
@@ -387,6 +389,7 @@ export default class OfflineCallEventListener {
         const loginInfo = await ZegoPrebuiltPlugin.loadLoginInfoFromLocalEncryptedStorage()
         
         if (loginInfo) {
+          zloginfo('[setAndroidOfflineDataHandler] will ZegoPrebuiltPlugin.init and login for refuseOfflineInvitation');
           await ZegoPrebuiltPlugin.init(loginInfo.appID, loginInfo.appSign, loginInfo.userID, loginInfo.userName, plugins)
           
           ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(this.config.certificateIndex);
