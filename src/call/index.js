@@ -145,7 +145,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         TimingHelper.getInstance().increaseDuration()
         typeof onDurationUpdate === 'function' && onDurationUpdate(TimingHelper.getInstance().getDuration());
     }, 1000)
-    
+
     if (stateData.current.callbackID) {
         stateData.current.callbackID = 'ZegoUIKitPrebuiltCall' +
             String(Math.floor(Math.random() * 10000));
@@ -280,7 +280,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         // we need to reset duration when call is ended from minimize
         if (isFromMinimize) {
             TimingHelper.getInstance().resetDuration()
-        } 
+        }
         // we need to reset duration when the call is normal ended.
         else if (!MinimizingHelper.getInstance().getIsMinimizeSwitch()) {
             TimingHelper.getInstance().resetDuration()
@@ -295,7 +295,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     };
     const onSwitchCamera = () => {
         zloginfo('onSwitchCamera', isFrontCamera);
-        
+
         // Default rear camera
         const result = !isFrontCamera;
         stateData.current.isFrontCamera = result;
@@ -363,6 +363,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             stateData.current.useSpeakerWhenJoining = (type === 0);
         });
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
+          zloginfo('[ZegoUIKitPrebuiltCall] onPrebuiltDestroy', callbackID);
             ZegoUIKit.leaveRoom();
             ZegoUIKit.onJoinRoom(callbackID);
             ZegoUIKit.onOnlySelfInRoom(callbackID);
@@ -470,7 +471,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     return (
         <View style={[styles.container, styles.fillParent]}>
           <View style={styles.foregroundContainer} pointerEvents='none'>
-            <ZegoPrebuiltForegroundView 
+            <ZegoPrebuiltForegroundView
               style={styles.foregroundView}
               isDurationVisible={isDurationVisible}
             />
@@ -498,7 +499,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   onOpenCallMemberList={onOpenCallMemberList}
                   onSwitchCamera={onSwitchCamera}
                   onMessagePress={() => {
-                    setTextInputVisable(true); 
+                    setTextInputVisable(true);
                     setIsMenubarVisable(false);
                     setTopIsMenubarVisable(false);
                   }}
@@ -548,8 +549,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   useSpeakerWhenJoining={useSpeakerWhenJoining}
                   onMorePress={() => { hideCountdown = 5; }}
                   onSwitchCamera={onSwitchCamera}
-                  onMessagePress={() => { 
-                    setTextInputVisable(true); 
+                  onMessagePress={() => {
+                    setTextInputVisable(true);
                     setIsMenubarVisable(false);
                     setTopIsMenubarVisable(false);
                   }}

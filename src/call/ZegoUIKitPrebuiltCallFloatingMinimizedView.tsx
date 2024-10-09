@@ -11,7 +11,8 @@ import {
 import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "./services/minimizing_helper";
 import { zloginfo } from "../utils/logger";
-  
+import PrebuiltHelper from './services/prebuilt_helper';
+
 export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     const window = useWindowDimensions();
     const {
@@ -76,7 +77,7 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     });
 
     const callbackID = 'ZegoMinimizeRoom' + String(Math.floor(Math.random() * 10000));
-    
+
     const layoutHandle = useCallback((e) => {
         const  { x, y, width, height } = e.nativeEvent.layout;
         zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] layoutHandle', x, y, width, height);
@@ -136,6 +137,14 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID);
         }
     }, [isInit]);
+
+    useEffect(() => {
+      ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
+        zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] onOnlySelfInRoom')
+        const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+        isMinimize && PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+      })
+    }, [])
     return (
         <Animated.View
             style={[
