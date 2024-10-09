@@ -72,7 +72,7 @@ public class CustomCallNotificationManager {
 //            "appName", "",
             "handle", message,
 //            "type", 0,
-            "duration", 30*1000,
+            "duration", 60*1000,
             "textAccept", this.incomingAcceptButtonText,
             "textDecline", this.incomingDeclineButtonText,
 //            "extra", new HashMap<String, Object>(),

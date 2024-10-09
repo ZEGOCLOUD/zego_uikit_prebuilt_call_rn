@@ -32,7 +32,9 @@ export default class OfflineCallEventListener {
         ZegoUIKit.logComponentsVersion(new Map([['PrebuiltCall', getPackageVersion()]]));
         const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
 
+        // https://doc-zh.zego.im/article/17416
         signalingPlugin.getInstance().setBackgroundMessageHandler();
+        signalingPlugin.getInstance().setThroughMessageReceivedHandler();
 
         signalingPlugin.getInstance().setAndroidOfflineDataHandler(async (data) => {
             zloginfo('OfflineDataHandler: ', data);
