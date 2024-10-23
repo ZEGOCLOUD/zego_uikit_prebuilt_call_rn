@@ -3,11 +3,13 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 import { zlogerror, zloginfo } from '../../utils/logger';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { eventEmitter, EventName } from '../../utils/EventEmitter';
 
 const _appInfo = {};
 const _localUser = {};
 let _pluginConnectionState;
 let ZIMKitPlugin = null;
+
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
   plugins.forEach(plugin => {
@@ -42,8 +44,12 @@ const _storeLoginInfo = async () => {
 
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins) => {
-    zloginfo('[ZegoPrebuiltPlugins] init');
-    
+    zloginfo('[ZegoPrebuiltPlugins] init', {
+      appID,
+      userID,
+      userName,
+    });
+
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
     _install(plugins);
@@ -60,9 +66,12 @@ const ZegoPrebuiltPlugins = {
     _localUser.userName = userName;
     _storeLoginInfo();
 
-    return ZegoUIKit.getSignalingPlugin().login(userID, userName).then(() => {
-      zloginfo('[Plugins] login success.');
-    });
+    return ZegoUIKit.getSignalingPlugin()
+      .login(userID, userName)
+      .then(() => {
+        zloginfo('[Plugins] login success.');
+        eventEmitter.emit(EventName.LOGINED, { userID, userName });
+      });
   },
   reconnectIfDisconnected: () => {
     zloginfo(
