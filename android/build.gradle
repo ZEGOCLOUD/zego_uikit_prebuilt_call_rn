@@ -1,54 +1,21 @@
-buildscript {
-    ext.kotlin_version = '1.9.10'
-    ext.compileSdkVersion = 33
-
-    repositories {
-      google()
-      mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-def isNewArchitectureEnabled() {
-  return rootProject.hasProperty("newArchEnabled") &&  rootProject.getProperty("newArchEnabled") == "true"
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-if (isNewArchitectureEnabled()) {
-  apply plugin: 'com.facebook.react'
-}
+buildscript {
+  repositories {
+      google()
+      mavenCentral()
+  }
 
-def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ZegoUikitRn_' + name]
-}
-
-def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ZegoUikitRn_' + name]).toInteger()
+  dependencies {
+    classpath("com.android.tools.build:gradle")
+    classpath("com.facebook.react:react-native-gradle-plugin")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+  }
 }
 
 android {
-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
-
-  defaultConfig {
-    minSdkVersion getExtOrIntegerDefault('minSdkVersion')
-    targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
-    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-  }
-  buildTypes {
-    release {
-      minifyEnabled false
-    }
-  }
-
-  lintOptions {
-    disable 'GradleCompatible'
-  }
+  compileSdkVersion rootProject.ext.compileSdkVersion
 
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -59,96 +26,24 @@ android {
 repositories {
   mavenCentral()
   google()
-
-  def found = false
-  def defaultDir = null
-  def androidSourcesName = 'React Native sources'
-
-  if (rootProject.ext.has('reactNativeAndroidRoot')) {
-    defaultDir = rootProject.ext.get('reactNativeAndroidRoot')
-  } else {
-    defaultDir = new File(
-      projectDir,
-      '/../../../node_modules/react-native/android'
-    )
-  }
-
-  if (defaultDir.exists()) {
-    maven {
-      url defaultDir.toString()
-      name androidSourcesName
-    }
-
-    logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
-    found = true
-  } else {
-    def parentDir = rootProject.projectDir
-
-    1.upto(5, {
-      if (found) return true
-      parentDir = parentDir.parentFile
-
-      def androidSourcesDir = new File(
-        parentDir,
-        'node_modules/react-native'
-      )
-
-      def androidPrebuiltBinaryDir = new File(
-        parentDir,
-        'node_modules/react-native/android'
-      )
-
-      if (androidPrebuiltBinaryDir.exists()) {
-        maven {
-          url androidPrebuiltBinaryDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
-        found = true
-      } else if (androidSourcesDir.exists()) {
-        maven {
-          url androidSourcesDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
-        found = true
-      }
-    })
-  }
-
-  if (!found) {
-    throw new GradleException(
-      "${project.name}: unable to locate React Native android sources. " +
-      "Ensure you have you installed React Native as a dependency in your project and try again."
-    )
-  }
 }
 
-
 dependencies {
-    //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"
-    // From node_modules
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation("com.facebook.react:react-android")
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.10.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    // There may be version conflicts with modules in node_modules
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.ext.kotlinVersion"
+    // implementation 'androidx.core:core-ktx:1.13.1'
+    // implementation 'androidx.appcompat:appcompat:1.7.0'
 
-    implementation "com.elvishew:xlog:1.11.1"
-    
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+
+    implementation "com.elvishew:xlog:1.11.1"
 }
 
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "ZegoUIKitPrebuiltCall"
-    codegenJavaPackageName = "com.zegouikitprebuiltcallrn"
-  }
-}
+apply plugin: "com.facebook.react.rootproject"
