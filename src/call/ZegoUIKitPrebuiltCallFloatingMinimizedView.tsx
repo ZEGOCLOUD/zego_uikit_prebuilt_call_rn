@@ -77,8 +77,8 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     });
 
     const callbackID = 'ZegoMinimizeRoom' + String(Math.floor(Math.random() * 10000));
-
-    const layoutHandle = useCallback((e) => {
+    
+    const layoutHandle = useCallback((e: any) => {
         const  { x, y, width, height } = e.nativeEvent.layout;
         zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] layoutHandle', x, y, width, height);
         setFloatViewInfo({ width, height });
