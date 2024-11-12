@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Image, } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { useFocusEffect } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import KeyCenter from './KeyCenter';
 import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info'
@@ -79,11 +78,15 @@ const onUserLogin = async (userID, userName, props) => {
         enabled: true,
         detectSeconds: 5,
       },
-      onIncomingCallDeclineButtonPressed: (navigation) => {
+      showDeclineButton: true,
+      innerText: {
 
       },
+      onIncomingCallDeclineButtonPressed: (navigation) => {
+        console.log('[onIncomingCallDeclineButtonPressed]');
+      },
       onIncomingCallAcceptButtonPressed: (navigation) => {
-
+        console.log('[onIncomingCallAcceptButtonPressed]');
       },
       onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
         console.log('[onOutgoingCallCancelButtonPressed]+++',navigation, callID, invitees, type);
@@ -112,6 +115,7 @@ const onUserLogin = async (userID, userName, props) => {
       requireConfig: (data) => {
         console.log('requireConfig, callID: ', data.callID);
         return {
+          turnOnMicrophoneWhenJoining: false,
           // foregroundBuilder: () => <ZegoCountdownLabel maxDuration={10} onCountdownFinished={() => { console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true); }} />,
           onCallEnd: (callID, reason, duration) => {
             console.log('########CallWithInvitation onCallEnd', callID, reason, duration);
@@ -129,6 +133,7 @@ const onUserLogin = async (userID, userName, props) => {
           topMenuBarConfig: {
             buttons: [
               ZegoMenuBarButtonName.minimizingButton,
+              // ZegoMenuBarButtonName.showMemberListButton
             ],
           },
           onWindowMinimized: () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { PermissionsAndroid, Alert, Text, BackHandler, TouchableOpacity } from 'react-native';
+import { Alert, BackHandler, PermissionsAndroid, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
-import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageView, ZegoLayoutMode, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
@@ -14,7 +14,6 @@ import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 import Timer from "../utils/timer"
-import { useNavigation } from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake'
 import { useKeyboard } from '../utils/keyboard';
 import { ZegoCallEndReason } from '../services/defines';
@@ -277,6 +276,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         timingTimer.start()
     }, []);
     const destroyCallTimingTimer = useCallback((isFromMinimize) => {
+        zloginfo('[ZegoUIKitPrebuiltCall] destroyCallTimingTimer, isFromMinimize:', isFromMinimize)
+
         // we need to reset duration when call is ended from minimize
         if (isFromMinimize) {
             TimingHelper.getInstance().resetDuration()
@@ -363,7 +364,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             stateData.current.useSpeakerWhenJoining = (type === 0);
         });
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
-          zloginfo('[ZegoUIKitPrebuiltCall] onPrebuiltDestroy', callbackID);
+            zloginfo('[ZegoUIKitPrebuiltCall] onPrebuiltDestroy', callbackID);
+            
+            zloginfo('[ZegoUIKitPrebuiltCall] leave room, tag: onPrebuiltDestroy')
             ZegoUIKit.leaveRoom();
             ZegoUIKit.onJoinRoom(callbackID);
             ZegoUIKit.onOnlySelfInRoom(callbackID);
@@ -389,6 +392,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
 
+                zloginfo(`[ZegoUIKitPrebuiltCall] joinRoom: ${callID}`)
                 if (appSign) {
                     ZegoUIKit.joinRoom(callID);
                 } else {
@@ -412,8 +416,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         // Initialize after use
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
         return () => {
+            // zloginfo('[ZegoUIKitPrebuiltCall] useEffect return')
+            zloginfo('[ZegoUIKitPrebuiltCall] destroy')
+
             const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
             if (!isMinimizeSwitch) {
+                zloginfo('[ZegoUIKitPrebuiltCall] leave room, tag: !isMinimizeSwitch')
                 ZegoUIKit.leaveRoom();
                 ZegoUIKit.onJoinRoom(callbackID);
                 ZegoUIKit.onOnlySelfInRoom(callbackID);
@@ -424,6 +432,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 PrebuiltHelper.getInstance().clearState();
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
+                
+                zloginfo('[ZegoUIKitPrebuiltCall] KeepAwake deactivate')
                 KeepAwake.deactivate();
             }
             destroyCallTimingTimer(false);
