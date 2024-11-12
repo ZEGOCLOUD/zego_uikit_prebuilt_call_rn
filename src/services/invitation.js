@@ -27,7 +27,16 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     } = options;
 
     const localUser = ZegoPrebuiltPlugins.getLocalUser();
-    const roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
+    const roomID = (callID && callID.length > 0) ? callID : `call_${localUser.userID}_${Date.now()}`;
+
+    const nonNullNotificationTitle = notificationTitle ?? InnerTextHelper.instance().getIncomingCallDialogTitle(
+      localUser.userName,
+      isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
+      invitees.length);
+    const nonNullNotificationMessage = notificationMessage ?? InnerTextHelper.instance().getIncomingCallDialogMessage(
+      isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
+      invitees.length);
+
     const data = JSON.stringify({
       call_id: roomID,
       call_name: callName,
@@ -37,6 +46,8 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       type: isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
       inviter: {id: localUser.userID, name: localUser.userName},
       custom_data: customData,
+      notificationTitle: nonNullNotificationTitle,
+      notificationMessage: nonNullNotificationMessage,
     });
     const inviteeIDs = invitees.map(invitee => {
       return invitee.userID
@@ -46,14 +57,8 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     // set notification config.
     const notificationConfig = {
       resourceID, 
-      title: notificationTitle ?? InnerTextHelper.instance().getIncomingCallDialogTitle(
-        localUser.userName,
-        isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
-        invitees.length), 
-      message: notificationMessage ?? InnerTextHelper.instance().getIncomingCallDialogMessage(
-        isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
-        invitees.length
-      )
+      title: nonNullNotificationTitle, 
+      message: nonNullNotificationMessage
     }
 
     return new Promise((resolve, reject) => {

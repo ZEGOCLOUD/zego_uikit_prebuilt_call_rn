@@ -32,16 +32,22 @@ export default function ZegoCallInvitationDialog(props) {
   const [callID, setCallID] = useState('');
 
   const getDialogTitle = () => {
-    const count = extendData.invitees ? extendData.invitees.length : 0;
-    if (extendData.call_name) {
+    if (extendData.notificationTitle && extendData.notificationTitle.length > 0) {
+      return extendData.notificationTitle;
+    } else if (extendData.call_name && extendData.call_name.length > 0) {
       return extendData.call_name;
     } else {
+      const count = extendData.invitees ? extendData.invitees.length : 0;
       return InnerTextHelper.instance().getIncomingCallDialogTitle(inviter.name, inviteType, count);
     }
   }
   const getDialogMessage = () => {
-    const count = extendData.invitees ? extendData.invitees.length : 0;
-    return InnerTextHelper.instance().getIncomingCallDialogMessage(inviteType, count)
+    if (extendData.notificationMessage && extendData.notificationMessage.length > 0) {
+      return extendData.notificationMessage;
+    } else {
+      const count = extendData.invitees ? extendData.invitees.length : 0;
+      return InnerTextHelper.instance().getIncomingCallDialogMessage(inviteType, count)
+    }
   };
   const getShotName = (name) => {
     if (!name) {
@@ -130,7 +136,7 @@ export default function ZegoCallInvitationDialog(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(
         callbackID,
         async ({ callID: invitationID, type, inviter, data }) => {
-          zloginfo(`onInvitationReceived implement by ${TAG}`);
+          zloginfo(`onInvitationReceived implement by ${TAG}, callID: ${invitationID}, isVideoCall: ${type}, inviter: ${inviter}, data: ${data}`);
 
           let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
