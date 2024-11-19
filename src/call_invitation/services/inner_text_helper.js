@@ -1,4 +1,5 @@
 
+import { zloginfo } from "../../utils/logger";
 import { ZegoInvitationType } from "./defines";
 
 export default class InnerTextHelper {
@@ -66,6 +67,9 @@ export default class InnerTextHelper {
             incomingCallPageDeclineButton,
             incomingCallPageAcceptButton,
         }
+
+        zloginfo(`[InnerTextHelper][init] incomingGroupVoiceCallDialogTitle: ${this._innerText.incomingGroupVoiceCallDialogTitle}, incomingGroupVideoCallDialogTitle: ${this._innerText.incomingGroupVideoCallDialogTitle}`)
+        zloginfo(`[InnerTextHelper][init] incomingVoiceCallDialogTitle: ${this._innerText.incomingVoiceCallDialogTitle}, incomingVideoCallDialogTitle: ${this._innerText.incomingVideoCallDialogTitle}`)
     }
     uninit() {
         this._innerText = {}

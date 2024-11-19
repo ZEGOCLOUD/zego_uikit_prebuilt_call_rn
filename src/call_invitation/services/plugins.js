@@ -69,7 +69,7 @@ const ZegoPrebuiltPlugins = {
     return ZegoUIKit.getSignalingPlugin()
       .login(userID, userName)
       .then(() => {
-        zloginfo('[Plugins] login success.');
+        zloginfo(`[Plugins] login success. userID: ${userID}, userName: ${userName}`);
         eventEmitter.emit(EventName.LOGINED, { userID, userName });
       });
   },

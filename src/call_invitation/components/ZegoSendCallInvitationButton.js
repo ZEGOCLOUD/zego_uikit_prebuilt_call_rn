@@ -80,7 +80,12 @@ export default function ZegoSendCallInvitationButton(props) {
   };
 
   const loginHandler = ({ userID, userName }) => {
-    if (localUser.userID === userID) return;
+    if (localUser.userID === userID) {
+      zloginfo(`[ZegoSendCallInvitationButton][loginHandler] userID not changed, userID: ${userID}`)
+      return;
+    }
+
+    zloginfo(`[ZegoSendCallInvitationButton][loginHandler] userID: ${userID}, userName: ${userName}`)
     setLocalUser({ userID, userName });
   };
 
