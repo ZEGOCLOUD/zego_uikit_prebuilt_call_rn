@@ -1,8 +1,10 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.os.Bundle
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
 
+@Keep
 @Suppress("UNCHECKED_CAST")
 data class Data(val args: Map<String, Any?>) {
 

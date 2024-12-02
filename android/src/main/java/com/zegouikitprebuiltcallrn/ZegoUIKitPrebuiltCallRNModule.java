@@ -1,5 +1,6 @@
 package com.zegouikitprebuiltcallrn;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 
+@Keep
 @ReactModule(name = ZegoUIKitPrebuiltCallRNModule.NAME)
 public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     public static final String NAME = "ZegoUIKitPrebuiltCallRNModule";

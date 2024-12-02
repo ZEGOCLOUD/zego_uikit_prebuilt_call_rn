@@ -1,5 +1,6 @@
 package com.zegouikitprebuiltcallrn;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
 
 import im.zego.uikit.libuikitreport.ReportUtil;
 
+@Keep
 @ReactModule(name = CallReportRNModule.NAME)
 public class CallReportRNModule extends ReactContextBaseJavaModule  {
     public static final String NAME = "CallReportRNModule";
