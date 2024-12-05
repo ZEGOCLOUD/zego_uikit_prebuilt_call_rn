@@ -12,6 +12,8 @@ export default function LoginScreen(props) {
     const navigation = useNavigation();
     const [userID, setUserID] = useState('');
     const [userName, setUserName] = useState('');
+    const [isLoginBtnDisable, setLoginBtnDisable] = useState(false);
+    const [loginBtnTitle, setLoginBtnTitle] = useState('Login');
   
     const storeUserInfo = async (info) => {
       await AsyncStorage.setItem("userID", info.userID)
@@ -19,15 +21,22 @@ export default function LoginScreen(props) {
     }
 
     const loginHandler = () => {
+      setLoginBtnDisable(true)
+      setLoginBtnTitle('Logging in...')
   
       // Store user info to auto login
       storeUserInfo({ userID, userName })
   
       // Init the call service
-      onUserLogin(userID, userName, props).then(() => {
+      onUserLogin(userID, userName, props)
+      .then(() => {
         // Jump to HomeScreen to make new call
         navigation.navigate('HomeScreen', { userID });
       })
+      .finally(() => {
+        setLoginBtnDisable(false);
+        setLoginBtnTitle('Login')
+      });
     }
   
     useEffect(() => {
@@ -46,7 +55,11 @@ export default function LoginScreen(props) {
         <Text>userName: {userName}</Text>
       </View>
       <View style={{ width: 160 }}>
-        <Button title='Login' onPress={loginHandler}></Button>
+        <Button
+          title={loginBtnTitle}
+          disabled={isLoginBtnDisable}
+          onPress={loginHandler}
+        />
       </View>
     </View>;
 }
