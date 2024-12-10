@@ -17,7 +17,6 @@ public class ZegoUIKitPrebuiltCallRNPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new ZegoUIKitPrebuiltCallRNModule(reactContext));
-        modules.add(new CallReportRNModule(reactContext));
         return modules;
     }
 
