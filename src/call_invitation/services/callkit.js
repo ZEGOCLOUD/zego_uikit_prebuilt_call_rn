@@ -90,6 +90,8 @@ class RNCallKit {
     if (Platform.OS === 'ios') {
       return;
     }
+
+    zloginfo('call ZegoUIKitPrebuiltCallRNModule.dismissCallNotification');
     ZegoUIKitPrebuiltCallRNModule.dismissCallNotification();
   };
 

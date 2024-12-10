@@ -73,6 +73,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   } : requireDefaultConfig(callInvitationData);
 
   const _onCallEnd = (callID, reason, duration) => {
+    // reason 0-localHangUp, 1-remoteHangUp, 2-kickOut
     zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
     if (reason === ZegoCallEndReason.localHangUp) {
       hangUpHandle();

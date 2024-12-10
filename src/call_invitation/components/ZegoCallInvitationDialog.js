@@ -49,7 +49,7 @@ export default function ZegoCallInvitationDialog(props) {
       return InnerTextHelper.instance().getIncomingCallDialogMessage(inviteType, count)
     }
   };
-  const getShotName = (name) => {
+  const getShortName = (name) => {
     if (!name) {
       return '';
     }
@@ -220,7 +220,7 @@ export default function ZegoCallInvitationDialog(props) {
                 <View style={styles.avatar}>
                   {
                     !avatarBuilder ? 
-                    <Text style={styles.nameLabel}>{getShotName(inviter.name)} </Text> :
+                    <Text style={styles.nameLabel}>{getShortName(inviter.name)} </Text> :
                     <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                       <Delegate
                         to={avatarBuilder}
@@ -266,7 +266,7 @@ export default function ZegoCallInvitationDialog(props) {
               <View style={styles.fullAvatar}>
                 {
                   !avatarBuilder ? 
-                  <Text style={styles.fullNameLabel}>{getShotName(inviter.name)}</Text> :
+                  <Text style={styles.fullNameLabel}>{getShortName(inviter.name)}</Text> :
                   <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                       <Delegate
                         to={avatarBuilder}

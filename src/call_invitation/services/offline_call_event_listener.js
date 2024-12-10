@@ -369,7 +369,7 @@ export default class OfflineCallEventListener {
           return;
         }
         this._currentCallID = callID;
-        zloginfo(`DisplayIncomingCall, callID: ${callID}, inviterName: ${inviterName}, type: ${type}`);
+        zloginfo(`DisplayIncomingCall, callID: ${callID}, callName: ${callName}, inviterName: ${inviterName}, type: ${type}, inviteesCount: ${inviteesCount}`);
         
         const title = callName ? callName : InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, inviteesCount);
         const message = InnerTextHelper.instance().getIncomingCallDialogMessage(type, inviteesCount);

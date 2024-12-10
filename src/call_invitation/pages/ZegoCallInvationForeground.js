@@ -18,7 +18,7 @@ export default function ZegoCallInvationForeground(props) {
   } = props;
   const userName = invitee.userName;
 
-  const getShotName = (name) => {
+  const getShortName = (name) => {
     if (!name) {
       return '';
     }
@@ -45,7 +45,7 @@ export default function ZegoCallInvationForeground(props) {
         : <View style={styles.avatar}>
           {
             !avatarBuilder ?
-            <Text style={styles.nameLabel}>{getShotName(userName)}</Text> :
+            <Text style={styles.nameLabel}>{getShortName(userName)}</Text> :
             <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <Delegate
                 to={avatarBuilder}
