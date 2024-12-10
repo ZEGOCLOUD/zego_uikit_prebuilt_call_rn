@@ -232,11 +232,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         when (event) {
             CallkitConstants.ACTION_CALL_DECLINE -> {
                 eventName = "RNCallKitPerformEndCallAction"
-                eventParams = null
+                eventParams = "refuse"
             }
             CallkitConstants.ACTION_CALL_TIMEOUT -> {
                 eventName = "RNCallKitPerformEndCallAction"
-                eventParams = true
+                eventParams = "timeout"
             }
             CallkitConstants.ACTION_CALL_ACCEPT -> {
                 eventName = "RNCallKitPerformAnswerCallAction"

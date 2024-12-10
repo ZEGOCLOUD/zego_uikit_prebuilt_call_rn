@@ -1,5 +1,6 @@
 import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
 import { zloginfo } from '../../utils/logger';
+import PrebuiltCallReport from '../../utils/report';
 
 const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 const eventEmitter = new NativeEventEmitter(ZegoUIKitPrebuiltCallRNModule);
@@ -77,13 +78,17 @@ class RNCallKit {
     ZegoUIKitPrebuiltCallRNModule.setupCallKit(options);
   }
 
-  displayIncomingCall = (title, message) => {
+  displayIncomingCall = (title, message, callID, appState) => {
     if (Platform.OS === 'ios') {
       return;
     }
     
     zloginfo('call ZegoUIKitPrebuiltCallRNModule.displayIncomingCall');
     ZegoUIKitPrebuiltCallRNModule.displayIncomingCall(title, message);
+    PrebuiltCallReport.reportEvent('call/displayNotification', {
+      'call_id': callID,
+      'app_state': appState
+    })
   };
 
   dismissCallNotification = () => {

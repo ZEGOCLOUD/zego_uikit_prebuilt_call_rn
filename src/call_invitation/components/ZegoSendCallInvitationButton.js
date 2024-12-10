@@ -8,6 +8,7 @@ import InnerTextHelper from '../services/inner_text_helper';
 import ZegoUIKitPrebuiltCallInvitation from '../../services/invitation';
 import { zloginfo } from '../../utils/logger';
 import { eventEmitter, EventName } from '../../utils/EventEmitter';
+import PrebuiltCallReport from '../../utils/report';
 
 export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
@@ -56,6 +57,12 @@ export default function ZegoSendCallInvitationButton(props) {
     invitationID,
     invitees: successfulInvitees,
   }) => {
+    PrebuiltCallReport.reportEvent('call/invite', {
+      'call_id': invitationID,
+      'room_id': callID,
+      'source': 'button'
+    })
+
     ZegoUIKitPrebuiltCallInvitation.getInstance().onInvitationSent(
       navigation,
       invitationID,

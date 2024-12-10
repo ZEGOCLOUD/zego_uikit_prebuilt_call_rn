@@ -5,6 +5,7 @@ buildscript {
     repositories {
       google()
       mavenCentral()
+      maven { url 'https://storage.zego.im/maven' }
     }
 
     dependencies {
@@ -137,6 +138,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     implementation "com.elvishew:xlog:1.11.1"
+
+    // for uikit reporot
+    implementation("com.google.code.gson:gson:2.10.1")
+    compileOnly("im.zego:uikitreport:0.2.7")
     
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'

@@ -8,6 +8,7 @@ import { setCategory } from 'react-native-sound';
 import ZegoUIKitPrebuiltCallService from '../../services';
 import RNCallKit from './callkit';
 import { getPackageVersion } from '../../utils/package_version';
+import PrebuiltCallReport from '../../utils/report';
 
 export default class OfflineCallEventListener {
     _instance;
@@ -51,6 +52,11 @@ export default class OfflineCallEventListener {
                 // reject call.
                 zloginfo('OfflineDataHandler: busy, reject call invitation.');
                 this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
+                PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                  'call_id': data.zim_call_id,
+                  'app_state': 'restarted',
+                  'action': 'busy'
+                })
                 return;
             }
 
@@ -58,6 +64,11 @@ export default class OfflineCallEventListener {
               RNCallKit.dismissCallNotification();
               this._isDisplayingCall = false;
               this._currentCallID = data.zim_call_id;
+              PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                'call_id': data.zim_call_id,
+                'app_state': 'restarted',
+                'action': 'inviterCancel'
+              })
             } else {
               RNCallKit.removeEventListener('answerCall');
               RNCallKit.removeEventListener('endCall');
@@ -71,17 +82,29 @@ export default class OfflineCallEventListener {
                   // When the app launch, ZIM will send the online invite again
                   // Then we can read the offline data to decide if need to join the room directly
                   CallInviteHelper.getInstance().setOfflineData(data);
+
+                  PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                    'call_id': data.zim_call_id,
+                    'app_state': 'restarted',
+                    'action': 'accept'
+                  })
               });
-              RNCallKit.addEventListener('endCall', async () => {
-                  zloginfo('endCall on offline mode for android');
+              RNCallKit.addEventListener('endCall', async (eventParam) => {
+                  zloginfo(`endCall on offline mode for android, eventParams: ${eventParam}`);
 
                   this._isDisplayingCall = false;
 
                   // Do your normal `Hang Up` actions here
                   this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
+
+                  PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                    'call_id': data.zim_call_id,
+                    'app_state': 'restarted',
+                    'action': eventParam
+                  })
               });
               const invitees = data.invitees;
-              this.displayIncomingCall(data.zim_call_id, data.call_name, data.inviter.name, data.type, invitees.length);
+              this.displayIncomingCall(data.zim_call_id, data.call_name, data.inviter.name, data.type, invitees.length, 'restarted');
             }
         })
 
@@ -228,14 +251,27 @@ export default class OfflineCallEventListener {
             
             CallInviteHelper.getInstance().acceptCall(this._currentCallData.callID, this._currentCallData);
             ZegoUIKit.getSignalingPlugin().acceptInvitation(this._currentCallData.inviter.id, undefined)
+            PrebuiltCallReport.reportEvent('call/respondInvitation', {
+              'call_id': this._currentCallData.callID,
+              'app_state': AppState.currentState,
+              'action': 'accept'
+            })
         });
-        RNCallKit.addEventListener('endCall', () => {
+        RNCallKit.addEventListener('endCall', (eventParam) => {
+            zloginfo(`endCall on background mode, eventParam:${eventParam}`)
+
             CallInviteHelper.getInstance().refuseCall(this._currentCallData.callID);
             ZegoUIKit.getSignalingPlugin().refuseInvitation(
               this._currentCallData.inviter.id, 
               undefined
             ).then(() => {
               zloginfo('[setupOnlineCallKit] refuse invitation success')
+            })
+
+            PrebuiltCallReport.reportEvent('call/respondInvitation', {
+              'call_id': this._currentCallData.callID,
+              'app_state': AppState.currentState,
+              'action': eventParam
             })
         }); 
       }
@@ -313,7 +349,12 @@ export default class OfflineCallEventListener {
             if (Platform.OS === 'android') {
                 RNCallKit.dismissCallNotification();
             }
-            
+            PrebuiltCallReport.reportEvent('call/respondInvitation', {
+              'call_id': callID,
+              'app_state': AppState.currentState,
+              'action': 'inviterCancel'
+            })
+
             const callUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
             zloginfo(`onInvitationCanceled, uuid: ${callUUID}`);
             // We need to close the callkit window
@@ -359,11 +400,11 @@ export default class OfflineCallEventListener {
             return;
         }
         if (this._isSystemCalling) {
-          this.displayIncomingCall(callID, callName, inviterName, type, invitees.length);
+          this.displayIncomingCall(callID, callName, inviterName, type, invitees.length, AppState.currentState);
         }
     }
 
-    displayIncomingCall(callID, callName, inviterName, type, inviteesCount) {
+    displayIncomingCall(callID, callName, inviterName, type, inviteesCount, appState) {
         if (this._currentCallID === callID) {
           zloginfo(`DisplayIncomingCall busy, callID: ${callID}`);
           return;
@@ -373,9 +414,9 @@ export default class OfflineCallEventListener {
         
         const title = callName ? callName : InnerTextHelper.instance().getIncomingCallDialogTitle(inviterName, type, inviteesCount);
         const message = InnerTextHelper.instance().getIncomingCallDialogMessage(type, inviteesCount);
-        zloginfo(`DisplayIncomingCall, title: ${title}, message: ${message}`);
+        zloginfo(`DisplayIncomingCall, title: ${title}, message: ${message}, appState: ${appState}`);
 
-        RNCallKit.displayIncomingCall(title, message);
+        RNCallKit.displayIncomingCall(title, message, callID, appState);
     }
     
     reportEndCallWithUUID(callUUID, reason) {

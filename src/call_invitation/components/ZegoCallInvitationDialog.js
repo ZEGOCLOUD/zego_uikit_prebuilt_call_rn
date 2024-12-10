@@ -15,6 +15,7 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService from "../../services";
 import RNCallKit from '../services/callkit';
+import PrebuiltCallReport from '../../utils/report';
 
 export default function ZegoCallInvitationDialog(props) {
   const TAG = 'ZegoCallInvitationDialog';
@@ -80,9 +81,23 @@ export default function ZegoCallInvitationDialog(props) {
         RNCallKit.dismissCallNotification();
     }
   };
+  const refuseSuccHandle = () => {
+    zloginfo(`Refuse Call Invitation succ`);
+    refuseHandle();
+    PrebuiltCallReport.reportEvent('call/respondInvitation', {
+      'call_id': callID,
+      'app_state': AppState.currentState,
+      'action': 'refuseSucc'
+    })
+  };
   const refuseFailHandle = (error) => {
     zloginfo(`Refuse Call Invitation failed, code: ${error.code}, message: ${error.message}`);
     refuseHandle();
+    PrebuiltCallReport.reportEvent('call/respondInvitation', {
+      'call_id': callID,
+      'app_state': AppState.currentState,
+      'action': 'refuseFail'
+    })
   }
   const onAccectCallback = (data) => {
     zloginfo("onAccectCallback", data.call_id, data.inviter.id)
@@ -104,10 +119,20 @@ export default function ZegoCallInvitationDialog(props) {
     if (Platform.OS === 'android') {
         RNCallKit.dismissCallNotification();
     }
+    PrebuiltCallReport.reportEvent('call/respondInvitation', {
+      'call_id': callID,
+      'app_state': AppState.currentState,
+      'action': 'acceptSucc'
+    })
   };
   const acceptFailHandle = (error) => {
     zloginfo(`Accept Call Invitation failed, code: ${error.code}, message: ${error.message}`);
     refuseHandle();
+    PrebuiltCallReport.reportEvent('call/respondInvitation', {
+      'call_id': callID,
+      'app_state': AppState.currentState,
+      'action': 'acceptFail'
+    })
   }
   const pressHandle = () => {
     setIsFullScreen(true);
@@ -173,6 +198,10 @@ export default function ZegoCallInvitationDialog(props) {
               setInviter(inviter);
               setExtendData(JSON.parse(data));
               setIsDialogVisable(true);
+              PrebuiltCallReport.reportEvent('call/displayNotification', {
+                'call_id': invitationID,
+                'app_state': AppState.currentState
+              })
               BellManage.vibrate();
               if (AppState.currentState !== 'background') {
                 BellManage.playIncomingSound();
@@ -239,7 +268,7 @@ export default function ZegoCallInvitationDialog(props) {
                   showDeclineButton ? <View style={styles.refuse}>
                     <ZegoRefuseInvitationButton
                       inviterID={inviter.id}
-                      onPressed={refuseHandle}
+                      onPressed={refuseSuccHandle}
                       onFailure={refuseFailHandle}
                       data={JSON.stringify({
                         inviterID: inviter.id,
@@ -283,7 +312,7 @@ export default function ZegoCallInvitationDialog(props) {
                 showDeclineButton ? <View style={styles.fullRefuse}>
                   <ZegoRefuseInvitationButton
                     inviterID={inviter.id}
-                    onPressed={refuseHandle}
+                    onPressed={refuseSuccHandle}
                     onFailure={refuseFailHandle}
                     data={JSON.stringify({
                       inviterID: inviter.id,

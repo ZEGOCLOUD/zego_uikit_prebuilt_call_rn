@@ -1,18 +1,21 @@
-import ZegoPrebuiltPlugins from "../call_invitation/services/plugins";
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
-import CallInviteStateManage from '../call_invitation/services/invite_state_manager';
-import BellManage from '../call_invitation/services/bell';
-import InnerTextHelper from '../call_invitation/services/inner_text_helper';
-import OfflineCallEventListener from '../call_invitation/services/offline_call_event_listener';
 import { AppState } from 'react-native';
-import { zloginfo } from '../utils/logger';
 // import GetAppName from 'react-native-get-app-name';
-import TimingHelper from "./timing_helper";
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../call/services/minimizing_helper";
-import HangupHelper from "../call_invitation/services/hangup_helper";
-import ZegoUIKitPrebuiltCallInvitation from "./invitation";
+import BellManage from '../call_invitation/services/bell';
 import RNCallKit from '../call_invitation/services/callkit'
+import HangupHelper from "../call_invitation/services/hangup_helper";
+import InnerTextHelper from '../call_invitation/services/inner_text_helper';
+import CallInviteStateManage from '../call_invitation/services/invite_state_manager';
+import OfflineCallEventListener from '../call_invitation/services/offline_call_event_listener';
+import ZegoPrebuiltPlugins from "../call_invitation/services/plugins";
+import { zloginfo } from '../utils/logger';
+import PrebuiltCallReport from '../utils/report';
+import { getRnVersion } from '../utils/version';
+import {getPackageVersion} from '../utils/package_version';
 import { ZegoCallEndReason } from "./defines";
+import ZegoUIKitPrebuiltCallInvitation from "./invitation";
+import TimingHelper from "./timing_helper";
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -93,9 +96,23 @@ export default class ZegoUIKitPrebuiltCallService {
         // Enable offline notification
         ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
 
+        PrebuiltCallReport.create(appID, appSign, {
+          'platform': 'rn',
+          'platform_version': getRnVersion(),
+          'uikit_version': ZegoUIKit.getVersion(),
+          'call_version': getPackageVersion(),
+          'user_id': userID
+        });
+        
+        const eventBegin = Date.now();
         return new Promise((resolve, reject) => {
           setTimeout(() => {
             ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins).then(() => {
+              PrebuiltCallReport.reportEvent('call/init', {
+                'error': 0,
+                'msg': '',
+                'start_time': eventBegin
+              });
               resolve();
 
               OfflineCallEventListener.getInstance().init(this.config);
@@ -107,12 +124,18 @@ export default class ZegoUIKitPrebuiltCallService {
               this.isInit = true;
               this.notifyInit();
             }).catch(() => {
+              PrebuiltCallReport.reportEvent('call/init', {
+                'error': -1,
+                'msg': 'unknown',
+                'start_time': eventBegin
+              });
               reject();
             });
           }, 500);
         });
     }
     uninit() {
+        PrebuiltCallReport.reportEvent('call/unInit', null);
         if (this.isInit) {
             ZegoPrebuiltPlugins.uninit();
             BellManage.releaseIncomingSound();
@@ -179,9 +202,7 @@ export default class ZegoUIKitPrebuiltCallService {
     }
 
     sendCallInvitation(invitees, isVideoCall, navigation, options) {
-      return ZegoUIKitPrebuiltCallInvitation
-        .getInstance()
-        .sendCallInvitation(
+      return ZegoUIKitPrebuiltCallInvitation.getInstance().sendCallInvitation(
         invitees, 
         isVideoCall, 
         navigation, 

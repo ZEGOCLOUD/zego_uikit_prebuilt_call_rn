@@ -5,6 +5,7 @@ import CallInviteStateManage from "../call_invitation/services/invite_state_mana
 import InnerTextHelper from "../call_invitation/services/inner_text_helper";
 import { zloginfo } from "../utils/logger";
 import OfflineCallEventListener from "../call_invitation/services/offline_call_event_listener";
+import PrebuiltCallReport from "../utils/report";
 
 
 export default class ZegoUIKitPrebuiltCallInvitation {
@@ -64,6 +65,12 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     return new Promise((resolve, reject) => {
       ZegoUIKit.getSignalingPlugin().sendInvitation(inviteeIDs, timeout, type, data, notificationConfig)
       .then(({ code, message, callID, errorInvitees }) => {
+        PrebuiltCallReport.reportEvent('call/invite', {
+          'call_id': callID,
+          'room_id': callID,
+          'source': 'sendCallInvitation'
+        })
+
         zloginfo(
           `[CallInvitation]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
           );
