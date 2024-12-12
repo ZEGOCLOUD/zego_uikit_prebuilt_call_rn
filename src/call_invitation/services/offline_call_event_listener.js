@@ -118,6 +118,11 @@ export default class OfflineCallEventListener {
                 zloginfo('setIOSOfflineDataHandler: busy, reject call invitation.');
                 ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, JSON.stringify({callID: data.zim_call_id}));
                 this.reportEndCallWithUUID(callUUID, 2);
+                PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                  'call_id': data.zim_call_id,
+                  'app_state': 'restarted',
+                  'action': 'busy'
+                })
                 return;
             }
 
@@ -151,6 +156,12 @@ export default class OfflineCallEventListener {
                         ZegoUIKit.getSignalingPlugin().acceptInvitation(data.inviter.id, undefined)
                     }
                 }
+
+                PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                  'call_id': data.zim_call_id,
+                  'app_state': 'restarted',
+                  'action': 'accept'
+                })
             });
             signalingPlugin.getInstance().onCallKitEndCall((action) => {
                 this._isDisplayingCall = false;
@@ -168,6 +179,12 @@ export default class OfflineCallEventListener {
                 }
                 // The report succeeds regardless of the direct service scenario
                 action.fulfill();
+
+                PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                  'call_id': data.zim_call_id,
+                  'app_state': 'restarted',
+                  'action': 'refuse'
+                })
             })
         });
 
