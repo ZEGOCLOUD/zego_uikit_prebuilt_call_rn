@@ -84,7 +84,7 @@ android {
         applicationId "com.zegocloud.zegouikit.example.prebuiltcall"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode versCode.toInteger()
         versionName versName
     }
     signingConfigs {

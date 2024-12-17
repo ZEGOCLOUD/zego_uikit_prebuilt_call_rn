@@ -1,16 +1,15 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
-    View,
-    Text,
-    Image,
     Animated,
+    LayoutChangeEvent,
     PanResponder,
     StyleSheet,
     useWindowDimensions,
+    View,
 } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
+import { zlogdebug, zloginfo } from "../utils/logger";
 import MinimizingHelper from "./services/minimizing_helper";
-import { zloginfo } from "../utils/logger";
 import PrebuiltHelper from './services/prebuilt_helper';
 
 export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
@@ -77,10 +76,10 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     });
 
     const callbackID = 'ZegoMinimizeRoom' + String(Math.floor(Math.random() * 10000));
-
-    const layoutHandle = useCallback((e) => {
+    
+    const layoutHandle = useCallback((e: LayoutChangeEvent) => {
         const  { x, y, width, height } = e.nativeEvent.layout;
-        zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] layoutHandle', x, y, width, height);
+        // zlogdebug('[ZegoUIKitPrebuiltCallFloatingMinimizedView] layoutHandle', x, y, width, height);
         setFloatViewInfo({ width, height });
     }, []);
     const pressedHandle = async () => {
