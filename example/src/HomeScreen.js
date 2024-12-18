@@ -5,10 +5,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info'
 import Orientation from 'react-native-orientation-locker';
 
-import ZegoUIKit from '@zegocloud/zego-uikit-rn'
-import ZegoUIKitPrebuiltCallService, {
-    ZegoSendCallInvitationButton,
-} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import ZegoUIKit, { ZegoToast, ZegoToastType } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKitPrebuiltCallService, { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 import { onUserLogin } from './common';
 
@@ -17,6 +15,10 @@ export default function HomeScreen(props) {
     const [userID, setUserID] = useState('')
     const [invitees, setInvitees] = useState([]);
     const viewRef = useRef(null);
+    const [isToastVisable, setIsToastVisable] = useState(false);
+    const [toastExtendedData, setToastExtendedData] = useState({});  
+    const toastInvisableTimeoutRef = useRef(null);
+
     const blankPressedHandle = () => {
       viewRef.current.blur();
     };
@@ -37,9 +39,15 @@ export default function HomeScreen(props) {
         return undefined
       }
     }
-  
+    
+    const resetToastInvisableTimeout = () => {
+      clearTimeout(toastInvisableTimeoutRef.current)
+      toastInvisableTimeoutRef.current = setTimeout(() => {
+        setIsToastVisable(false)
+      }, 3 * 1000);
+    }
+
     useEffect(() => {
-  
       Orientation.addOrientationListener((orientation) => {
         var orientationValue = 0;
         if (orientation === 'PORTRAIT') {
@@ -79,7 +87,6 @@ export default function HomeScreen(props) {
     );
   
     return (
-  
       <TouchableWithoutFeedback onPress={blankPressedHandle}>
         <View style={styles.container}>
           <Text>Your user id: {userID}</Text>
@@ -97,6 +104,16 @@ export default function HomeScreen(props) {
               isVideoCall={false}
               resourceID={"zego_data"}
               showWaitingPageWhenGroupCall={true}
+              onPressed={ (errorCode, errorMessage, errorInvitees) => {
+                if (errorCode == 0) {
+                  clearTimeout(toastInvisableTimeoutRef.current)
+                  setIsToastVisable(false)
+                } else {
+                  setIsToastVisable(true)
+                  setToastExtendedData({type: ZegoToastType.error, text: `error: ${errorCode}\n\n${errorMessage}`})
+                  resetToastInvisableTimeout()
+                }
+              }}
             />
             <ZegoSendCallInvitationButton
               invitees={invitees.map((inviteeID) => {
@@ -105,6 +122,16 @@ export default function HomeScreen(props) {
               isVideoCall={true}
               resourceID={"zego_data"}    
               showWaitingPageWhenGroupCall={true}
+              onPressed={ (errorCode, errorMessage, errorInvitees) => {
+                if (errorCode == 0) {
+                  clearTimeout(toastInvisableTimeoutRef.current)
+                  setIsToastVisable(false)
+                } else {
+                  setIsToastVisable(true)
+                  setToastExtendedData({type: ZegoToastType.error, text: `error: ${errorCode}\n\n${errorMessage}`})
+                  resetToastInvisableTimeout()
+                }
+              }}
             />
           </View>
           <View style={{ width: 220, marginTop: 100 }}>
@@ -116,6 +143,11 @@ export default function HomeScreen(props) {
           <View style={{ marginTop: 30 }}>
             <Text>App Version: {DeviceInfo.getVersion()}.{DeviceInfo.getBuildNumber()}</Text>
           </View>
+          <ZegoToast
+            visable={isToastVisable}
+            type={toastExtendedData.type}
+            text={toastExtendedData.text}
+          />
         </View>
       </TouchableWithoutFeedback>
     );
