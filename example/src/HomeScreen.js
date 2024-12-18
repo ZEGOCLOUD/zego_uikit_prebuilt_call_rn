@@ -23,7 +23,8 @@ export default function HomeScreen(props) {
       viewRef.current.blur();
     };
     const changeTextHandle = value => {
-      setInvitees(value ? value.split(',') : []);
+      let filteredList = value.split(',').map(item => item.trim()).filter(item => item !== '')
+      setInvitees(filteredList);
     };
   
     const getUserInfo = async () => {
