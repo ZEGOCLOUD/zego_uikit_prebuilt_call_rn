@@ -3,6 +3,7 @@ import { Image, View } from 'react-native';
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 
+import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService, {
     ZegoMenuBarButtonName,
     ZegoMultiCertificate,
@@ -80,10 +81,13 @@ export const onUserLogin = async (userID, userName, props) => {
         onOutgoingCallTimeout: (callID, invitees) => {
           console.log('[onOutgoingCallTimeout]+++', callID, invitees);
         },
-        requireConfig: (data) => {
-          console.log('requireConfig, callID: ', data.callID);
+        requireConfig: (callInvitationData) => {
+          console.log('requireConfig, callID: ', callInvitationData.callID);
           return {
             turnOnMicrophoneWhenJoining: false,
+            layout: {
+              mode: (callInvitationData.invitees && callInvitationData.invitees.length > 1) ? ZegoLayoutMode.gallery : ZegoLayoutMode.pictureInPicture,
+            },
             // foregroundBuilder: () => <ZegoCountdownLabel maxDuration={10} onCountdownFinished={() => { console.log("Countdown finished!!"); ZegoUIKitPrebuiltCallService.hangUp(true); }} />,
             onCallEnd: (callID, reason, duration) => {
               console.log('########CallWithInvitation onCallEnd', callID, reason, duration);
@@ -124,4 +128,4 @@ export const onUserLogin = async (userID, userName, props) => {
         });
       }
     });
-  }
+}

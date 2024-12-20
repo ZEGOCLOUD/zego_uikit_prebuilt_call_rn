@@ -142,7 +142,7 @@ export default function ZegoSendCallInvitationButton(props) {
       custom_data: '',
     });
     setData(_data);
-  }, [localUser, roomID]);
+  }, [localUser, roomID, invitees]);
 
   return (
     <View style={styles.container}>
