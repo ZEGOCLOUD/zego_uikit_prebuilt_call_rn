@@ -172,6 +172,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
             invitees: getInviteeIDList(),
             inviter,
             invitationID,
+            useFrontFacingCamera: ZegoUIKit.isUsingFrontFacingCamera()
           });
         // });
       }

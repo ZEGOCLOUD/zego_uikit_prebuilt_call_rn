@@ -66,6 +66,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         avatarBuilder,
         foregroundBuilder: prebuiltForegroundBuilder,
         messageItemBuilder,
+        useFrontFacingCamera = true
     } = config;
     const {
         showMicrophoneStateOnView = true,
@@ -112,7 +113,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     const stateData = useRef(PrebuiltHelper.getInstance().getStateData());
 
-    const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || true);
+    const [isFrontCamera, setIsFrontCamera] = useState(stateData.current.isFrontCamera || useFrontFacingCamera);
     const [turnOnCameraWhenJoining, setTurnOnCameraWhenJoining] =
         useState(
             stateData.current.turnOnCameraWhenJoining !== undefined ?

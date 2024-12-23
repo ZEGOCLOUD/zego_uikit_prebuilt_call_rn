@@ -36,6 +36,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     routeParams.invitees = route.params.invitees;
     routeParams.inviter = route.params.inviter;
     routeParams.invitationID = route.params.invitationID;
+    routeParams.useFrontFacingCamera = route.params.useFrontFacingCamera;
   }
   zloginfo('#####ZegoUIKitPrebuiltCallInCallScreen#######', routeParams, route.params);
   const {
@@ -45,6 +46,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     invitees,
     inviter,
     invitationID,
+    useFrontFacingCamera
   } = routeParams;
   const callInvitationData = {
     type: isVideoCall
@@ -204,6 +206,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       callID={roomID}
       config={{
         ...config,
+        useFrontFacingCamera,
         onJoinRoom: () => {
           zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onJoinRoom');
           // If I am not the person who initiated the call, then set a timer to hang up according to the configuration settings
