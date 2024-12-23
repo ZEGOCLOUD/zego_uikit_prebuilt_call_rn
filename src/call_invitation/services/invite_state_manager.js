@@ -1,6 +1,7 @@
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './plugins';
 import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
+import { ZIMCallState } from 'zego-zim-react-native';
 
 // completed: Someone ran out of time, accepted or declined an invitation
 // uncompleted: Others did not accept or reject the invitation, and the invitation did not time out
@@ -69,6 +70,7 @@ const CallInviteStateManage = {
         // update _invitationMap
         const inviteDetails = CallInviteStateManage._invitationMap.get(callID);
         if (inviteDetails) {
+          zloginfo(`[InviteStateManage][onInvitationResponseTimeout], callID: ${callID}, inviteDetails: ${inviteDetails}`)
           invitees.forEach((invitee) => {
             inviteDetails.invitees.set(invitee.id, InviteState.missed);
           });
@@ -76,6 +78,7 @@ const CallInviteStateManage = {
             CallInviteStateManage._judgeInviteCompleted(callID)
               ? InviteState.completed
               : InviteState.uncompleted;
+          zloginfo(`[InviteStateManage][onInvitationResponseTimeout], callID: ${callID}, set inviteState: ${inviteDetails.inviteState}`)
           CallInviteStateManage._notifyInviteCompletedWithNobody(callID);
         }
       }
@@ -263,22 +266,32 @@ const CallInviteStateManage = {
     inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID
   ) => {
     zloginfo('######isOncall######', JSON.stringify(...CallInviteStateManage._invitationMap));
+    zloginfo(`[InviteStateManage][isOncall] _invitationMap.size: ${CallInviteStateManage._invitationMap.size}`)
+
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
     for (let index = 0, len = callIDs.length; index < len; index++) {
       const currentCallID = callIDs[index];
       if (currentCallID !== newCallID) {
-        const stateDetails =
-          CallInviteStateManage._invitationMap.get(currentCallID);
-        if (stateDetails) {
-          const inviteState = stateDetails.invitees.get(inviteeID);
-          if (
-            inviteState === InviteState.pending ||
-            inviteState === InviteState.accepted
-          ) {
-            isOn = true;
-            break;
-          }
+        const stateDetails = CallInviteStateManage._invitationMap.get(currentCallID);
+        if (!stateDetails) {
+          continue
+        }
+
+        if (stateDetails.inviterID === inviteeID && stateDetails.inviteState == InviteState.uncompleted) {
+          isOn = true;
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === inviteeID, stateDetails: ${JSON.stringify(stateDetails)}`)
+          break;
+        }
+
+        const inviteState = stateDetails.invitees.get(inviteeID);
+        if (
+          inviteState === InviteState.pending ||
+          inviteState === InviteState.accepted
+        ) {
+          isOn = true;
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: inviteeID pending or accepted, stateDetails: ${JSON.stringify(stateDetails)}`)
+          break;
         }
       }
     }
@@ -296,7 +309,7 @@ const CallInviteStateManage = {
         .then((data) => {
             zloginfo(`queryCallList, nextFlag: ${data.nextFlag}, count: ${data.callList.length}`);
             for (const info of data.callList) {
-                if (info.state === 1) {
+                if (info.state === ZIMCallState.Started) {
                     continue;
                 }
                 zloginfo(`call info:`, info.callID, info.caller, info.state, info.extendedData);
