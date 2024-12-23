@@ -5,6 +5,7 @@ import * as ZPNs from 'zego-zpns-react-native';
 
 import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService, {
+    ZegoInvitationType,
     ZegoMenuBarButtonName,
     ZegoMultiCertificate,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
@@ -84,7 +85,8 @@ export const onUserLogin = async (userID, userName, props) => {
         requireConfig: (callInvitationData) => {
           console.log('requireConfig, callID: ', callInvitationData.callID);
           return {
-            turnOnMicrophoneWhenJoining: false,
+            turnOnMicrophoneWhenJoining: true,
+            turnOnCameraWhenJoining: (callInvitationData.type === ZegoInvitationType.videoCall) ? true : false,
             layout: {
               mode: (callInvitationData.invitees && callInvitationData.invitees.length > 1) ? ZegoLayoutMode.gallery : ZegoLayoutMode.pictureInPicture,
             },
