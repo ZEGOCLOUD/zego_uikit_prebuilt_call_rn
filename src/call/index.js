@@ -335,6 +335,15 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         return true;
     }
 
+    const _getCacheAVUserListWhenMinimizeSwitched = () => {
+        if (isMinimizeSwitch) {
+            hasStreamUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn))
+            return sortAudioVideo(hasStreamUsers)
+        } else {
+            return null
+        }
+    }
+
     useEffect(() => {
         zloginfo(`[ZegoUIKitPrebuiltCall] useEffect`)
 
@@ -524,9 +533,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
               audioVideoConfig={{
                   showSoundWavesInAudioMode: showSoundWavesInAudioMode,
                   useVideoViewAspectFill: useVideoViewAspectFill,
-                  cacheAudioVideoUserList: isMinimizeSwitch ?
-                      ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn)) :
-                      null
+                  cacheAudioVideoUserList: _getCacheAVUserListWhenMinimizeSwitched()
               }}
               layout={layout}
               avatarBuilder={avatarBuilder}
