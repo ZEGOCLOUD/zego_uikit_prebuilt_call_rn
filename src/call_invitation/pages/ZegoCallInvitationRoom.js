@@ -27,6 +27,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
   const { requireConfig, avatarBuilder, requireInviterConfig } = initConfig;
   const { route } = props;
+
   const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
   let routeParams = PrebuiltHelper.getInstance().getRouteParams();
   if (!isMinimizeSwitch) {
@@ -37,8 +38,11 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     routeParams.inviter = route.params.inviter;
     routeParams.invitationID = route.params.invitationID;
     routeParams.useFrontFacingCamera = route.params.useFrontFacingCamera;
+  } else {
+    routeParams.useFrontFacingCamera = ZegoUIKit.isUsingFrontFacingCamera();
   }
   zloginfo('#####ZegoUIKitPrebuiltCallInCallScreen#######', routeParams, route.params);
+
   const {
     origin,
     roomID,
