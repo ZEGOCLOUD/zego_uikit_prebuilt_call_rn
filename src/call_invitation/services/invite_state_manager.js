@@ -265,8 +265,8 @@ const CallInviteStateManage = {
     newCallID,
     inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID
   ) => {
-    zloginfo('######isOncall######', JSON.stringify(...CallInviteStateManage._invitationMap));
-    zloginfo(`[InviteStateManage][isOncall] _invitationMap.size: ${CallInviteStateManage._invitationMap.size}`)
+    zloginfo('######isOncall######', newCallID);
+    zloginfo(`[InviteStateManage][isOncall] _invitationMap.size: ${CallInviteStateManage._invitationMap.size}, _invitationMap: ${JSON.stringify(...CallInviteStateManage._invitationMap)}`)
 
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
@@ -280,7 +280,7 @@ const CallInviteStateManage = {
 
         if (stateDetails.inviterID === inviteeID && stateDetails.inviteState == InviteState.uncompleted) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === inviteeID, stateDetails: ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === inviteeID, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
 
@@ -290,38 +290,12 @@ const CallInviteStateManage = {
           inviteState === InviteState.accepted
         ) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: inviteeID pending or accepted, stateDetails: ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: inviteeID pending or accepted, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
       }
     }
     return isOn;
-  },
-
-  // query call list, and delete ended call data
-  deleteEndedCall: () => {
-    if (CallInviteStateManage._invitationMap.size == 0) {
-        zloginfo('no call data');
-        return;
-    }
-    return new Promise((resolve, reject) => {
-        ZegoUIKit.getSignalingPlugin().queryCallList(5)
-        .then((data) => {
-            zloginfo(`queryCallList, nextFlag: ${data.nextFlag}, count: ${data.callList.length}`);
-            for (const info of data.callList) {
-                if (info.state === ZIMCallState.Started) {
-                    continue;
-                }
-                zloginfo(`call info:`, info.callID, info.caller, info.state, info.extendedData);
-                CallInviteStateManage._invitationMap.delete(info.callID);
-            }
-            resolve();
-        })
-        .catch((error) => {
-            zloginfo(`queryCallList error: ${error}`);
-            reject(error);
-        });
-    });
   },
 
   onSomeoneAcceptedInvite: (callbackID, callback) => {

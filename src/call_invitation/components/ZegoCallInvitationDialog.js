@@ -166,11 +166,6 @@ export default function ZegoCallInvitationDialog(props) {
           let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
           const offlineData = CallInviteHelper.getInstance().getOfflineData();
-
-          if (onCall) {
-            await CallInviteStateManage.deleteEndedCall();
-            onCall = CallInviteStateManage.isOncall(invitationID);
-          }
           zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] onCall: ${onCall}, onRoom: ${onRoom}, offlineData: ${offlineData}`);
 
           if (onCall || (!offlineData && onRoom)) {
