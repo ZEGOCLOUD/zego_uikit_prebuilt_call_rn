@@ -45,10 +45,8 @@ export default function ZegoSendCallInvitationButton(props) {
   const [localUser, setLocalUser] = useState({
     ...ZegoPrebuiltPlugins.getLocalUser(),
   });
-  const [data, setData] = useState('');
-  const [roomID, setRoomID] = useState('');
 
-  const [forceRender, setForceRender] = useState(Date.now());
+  let _roomID = ''
 
   const onPress = ({
     errorCode,
@@ -68,13 +66,12 @@ export default function ZegoSendCallInvitationButton(props) {
       invitationID,
       invitees,
       successfulInvitees,
-      roomID,
+      _roomID,
       isVideoCall,
       callName,
       showWaitingPageWhenGroupCall
     );
 
-    setForceRender(Date.now());
     if (typeof onPressed === 'function') {
       onPressed(errorCode, errorMessage, errorInvitees);
     }
@@ -126,15 +123,12 @@ export default function ZegoSendCallInvitationButton(props) {
     };
   }, []);
 
-  useEffect(() => {
-    const _roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
+  const updateData = () => {
+    _roomID = callID ?? `call_${localUser.userID}_${Date.now()}`;
     zloginfo(`ZegoSendCallInvitationButton _roomID: ${_roomID}`);
-    setRoomID(_roomID);
-  }, [localUser, callID]);
 
-  useEffect(() => {
     const _data = JSON.stringify({
-      call_id: roomID,
+      call_id: _roomID,
       call_name: callName,
       invitees: invitees.map((invitee) => {
         return { user_id: invitee.userID, user_name: invitee.userName };
@@ -145,8 +139,9 @@ export default function ZegoSendCallInvitationButton(props) {
       inviter: { id: localUser.userID, name: localUser.userName },
       custom_data: '',
     });
-    setData(_data);
-  }, [localUser, roomID, invitees]);
+
+    return _data
+  }
 
   return (
     <View style={styles.container}>
@@ -159,7 +154,7 @@ export default function ZegoSendCallInvitationButton(props) {
             ? ZegoInvitationType.videoCall
             : ZegoInvitationType.voiceCall
         }
-        data={data}
+        onRequestData={() => {return updateData()}}
         timeout={timeout}
         onWillPressed={onWillPressed}
         onPressed={onPress}
