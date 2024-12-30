@@ -1,17 +1,15 @@
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
+
+const module = 'PrebuiltCall'
 
 export const zloginfo = (...msg) => {
-  ZegoUIKit.kitLogInfo('PrebuiltCall', ...msg);
+  ZegoUIKitLogger.logInfo(module, ...msg);
 };
 
 export const zlogwarning = (...msg) => {
-  ZegoUIKit.kitLogWarning('PrebuiltCall', ...msg);
+  ZegoUIKitLogger.logWarning(module, ...msg);
 };
 
 export const zlogerror = (...msg) => {
-  ZegoUIKit.kitLogError('PrebuiltCall', ...msg);
-};
-
-export const zlogdebug = (...msg) => {
-  ZegoUIKit.kitLogInfo('PrebuiltCall', ...msg);
+  ZegoUIKitLogger.logError(module, ...msg);
 };

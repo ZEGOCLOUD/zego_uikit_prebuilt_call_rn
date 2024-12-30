@@ -1,6 +1,6 @@
 import { AppState } from 'react-native';
 // import GetAppName from 'react-native-get-app-name';
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import ZegoUIKit, {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../call/services/minimizing_helper";
 import BellManage from '../call_invitation/services/bell';
 import RNCallKit from '../call_invitation/services/callkit'
@@ -113,6 +113,7 @@ export default class ZegoUIKitPrebuiltCallService {
                 'msg': '',
                 'start_time': eventBegin
               });
+              ZegoUIKitLogger.logSetUserID(ZegoPrebuiltPlugins.getLocalUser().userID)
               resolve();
 
               OfflineCallEventListener.getInstance().init(this.config);
