@@ -133,7 +133,8 @@ export default class OfflineCallEventListener {
 
             // This cannot be written in the answer call, dialog cannot get
             signalingPlugin.getInstance().onCallKitAnswerCall((action) => {
-                zloginfo("onCallKitAnswerCall", data)
+                zloginfo("onCallKitAnswerCall, data:", data)
+                zloginfo("onCallKitAnswerCall, action:", action)
 
                 this._isDisplayingCall = false;
 
@@ -170,7 +171,9 @@ export default class OfflineCallEventListener {
                 if (data && data.inviter) {
                     if (this._currentCallData && this._currentCallData.zim_call_id) {
                         this._currentCallData = {}
-                        this.refuseOfflineInvitation(plugins, data.inviter.id, data.zim_call_id);
+                        // When the screen is locked and a call is hung up, there is not enough time to ensure login before rejecting, 
+                        // and usually automatic login has already been completed by this time.
+                        ZegoUIKit.getSignalingPlugin().refuseInvitation(data.inviter.id, JSON.stringify({callID: data.zim_call_id}));
                         CallInviteHelper.getInstance().refuseCall(data.zim_call_id);
                     } else {
                         zloginfo('######ZegoUIKitPrebuiltCallService.hangUp');
@@ -449,7 +452,7 @@ export default class OfflineCallEventListener {
         const loginInfo = await ZegoPrebuiltPlugin.loadLoginInfoFromLocalEncryptedStorage()
         
         if (loginInfo) {
-          zloginfo('[setAndroidOfflineDataHandler] will ZegoPrebuiltPlugin.init and login for refuseOfflineInvitation');
+          zloginfo('[setAndroidOfflineDataHandler] will execute ZegoPrebuiltPlugin.init and login before refuseOfflineInvitation');
           await ZegoPrebuiltPlugin.init(loginInfo.appID, loginInfo.appSign, loginInfo.userID, loginInfo.userName, plugins)
           
           ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(this.config.certificateIndex);
