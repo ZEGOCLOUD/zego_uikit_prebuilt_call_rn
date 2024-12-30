@@ -143,7 +143,8 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   };
 
   useEffect(() => {
-    zloginfo('ZegoUIKitPrebuiltCallInCallScreen init');
+    zloginfo(`ZegoUIKitPrebuiltCallInCallScreen useEffect`);
+
     const callbackID =
       'ZegoUIKitPrebuiltCallInCallScreen ' + String(Math.floor(Math.random() * 10000));
     
@@ -181,7 +182,8 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     })
 
     return () => {
-      zloginfo('ZegoUIKitPrebuiltCallInCallScreen destroy');
+      zloginfo('ZegoUIKitPrebuiltCallInCallScreen useEffect return');
+
       HangupHelper.getInstance().onAutoJump(callbackID);
       CallInviteStateManage.onSomeoneAcceptedInvite(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);

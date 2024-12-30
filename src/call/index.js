@@ -335,6 +335,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     }
 
     useEffect(() => {
+        zloginfo(`[ZegoUIKitPrebuiltCall] useEffect`)
+
         ZegoUIKit.onJoinRoom(callbackID, onJoinRoom);
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
             const duration = TimingHelper.getInstance().getDuration();
@@ -415,9 +417,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
         // Initialize after use
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
+
         return () => {
-            // zloginfo('[ZegoUIKitPrebuiltCall] useEffect return')
-            zloginfo('[ZegoUIKitPrebuiltCall] destroy')
+            zloginfo('[ZegoUIKitPrebuiltCall] useEffect return')
 
             const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
             if (!isMinimizeSwitch) {

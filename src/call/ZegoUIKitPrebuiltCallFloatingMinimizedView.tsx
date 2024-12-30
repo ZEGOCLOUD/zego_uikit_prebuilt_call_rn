@@ -8,7 +8,7 @@ import {
     View,
 } from 'react-native';
 import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
-import { zlogdebug, zloginfo } from "../utils/logger";
+import { zloginfo } from "../utils/logger";
 import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from './services/prebuilt_helper';
 
@@ -79,7 +79,6 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     
     const layoutHandle = useCallback((e: LayoutChangeEvent) => {
         const  { x, y, width, height } = e.nativeEvent.layout;
-        // zlogdebug('[ZegoUIKitPrebuiltCallFloatingMinimizedView] layoutHandle', x, y, width, height);
         setFloatViewInfo({ width, height });
     }, []);
     const pressedHandle = async () => {

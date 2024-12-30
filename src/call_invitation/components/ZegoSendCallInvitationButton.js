@@ -97,6 +97,8 @@ export default function ZegoSendCallInvitationButton(props) {
   };
 
   useEffect(() => {
+    zloginfo(`[ZegoSendCallInvitationButton] useEffect`)
+
     const unsubscribe1 = navigation.addListener('blur', () => {
       zloginfo(
         `[Navigation] ZegoSendCallInvitationButton blur, isVideoCall: ${isVideoCall}`
@@ -115,6 +117,8 @@ export default function ZegoSendCallInvitationButton(props) {
     eventEmitter.on(EventName.LOGINED, loginHandler);
 
     return () => {
+      zloginfo(`[ZegoSendCallInvitationButton] useEffect return`)
+
       unsubscribe1();
       unsubscribe2();
       unsubscribe3();

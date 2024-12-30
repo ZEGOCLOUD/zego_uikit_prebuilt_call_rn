@@ -2,7 +2,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { PermissionsAndroid, AppState, Platform } from 'react-native';
 import InnerTextHelper from '../services/inner_text_helper';
 import CallInviteHelper from './call_invite_helper';
-import { zloginfo, zlogdebug } from '../../utils/logger';
+import { zloginfo } from '../../utils/logger';
 import ZegoPrebuiltPlugin from './plugins'
 import { setCategory } from 'react-native-sound';
 import ZegoUIKitPrebuiltCallService from '../../services';
