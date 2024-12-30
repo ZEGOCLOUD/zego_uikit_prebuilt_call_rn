@@ -93,11 +93,10 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   useEffect(() => {
     BellManage.playOutgoingSound();
     ZegoUIKit.init(appID, appSign, { userID, userName }).then(() => {
-      ZegoUIKit.turnCameraOn('', isVideoCall);
-      ZegoUIKit.turnMicrophoneOn('', true);
-      ZegoUIKit.setAudioOutputToSpeaker(true);
       grantPermissions(() => {
-        // ZegoUIKit.joinRoom(roomID);
+        ZegoUIKit.turnCameraOn('', isVideoCall);
+        ZegoUIKit.turnMicrophoneOn('', true);
+        ZegoUIKit.setAudioOutputToSpeaker(true);
       });
     });
     const unsubscribe1 = navigation.addListener('blur', () => {  
