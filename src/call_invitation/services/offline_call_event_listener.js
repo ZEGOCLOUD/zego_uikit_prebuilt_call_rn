@@ -366,6 +366,8 @@ export default class OfflineCallEventListener {
             }
         }, TAG);
         ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
+            zloginfo(`onInvitationCanceled implement by ${TAG}, callID: ${callID}, inviter: ${JSON.stringify(inviter)}, data: ${JSON.stringify(data)}`);
+
             if (Platform.OS === 'android') {
                 RNCallKit.dismissCallNotification();
             }
@@ -384,8 +386,9 @@ export default class OfflineCallEventListener {
                 this.reportEndCallWithUUID(callUUID, 2);
             }
             if (typeof onIncomingCallCanceled == 'function') {
-                const roomID = JSON.parse(data).call_id;
-                onIncomingCallCanceled(roomID, { userID: inviter.id, userName: inviter.name })
+              let dataParse = data ? JSON.parse(data) : undefined
+              let roomID = dataParse ? dataParse.call_id : undefined
+              onIncomingCallCanceled(roomID, { userID: inviter.id, userName: inviter.name })
             }
         });
         ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {

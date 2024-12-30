@@ -213,7 +213,8 @@ export default function ZegoCallInvitationDialog(props) {
         setIsDialogVisable(false);
         setIsFullScreen(false);
       });
-      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, () => {
+      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, (result) => {
+        zloginfo(`[ZegoCallInvitationDialog] onInvitationCanceled, result: ${JSON.stringify(result)}`);
         BellManage.stopIncomingSound();
         BellManage.cancleVirate();
         setIsDialogVisable(false);

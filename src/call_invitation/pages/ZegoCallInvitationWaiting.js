@@ -6,7 +6,7 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 import ZegoCallInvationForeground from './ZegoCallInvationForeground';
 import BellManage from '../services/bell';
-import { zloginfo } from '../../utils/logger';
+import { zloginfo, zlogwarning } from '../../utils/logger';
 import CallInviteStateManage from '../services/invite_state_manager';
 import { useNavigation } from '@react-navigation/native';
 import ZegoUIKitPrebuiltCallService from '../../services';
@@ -123,6 +123,8 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   }
 
   useEffect(() => {
+    zloginfo(`ZegoUIKitPrebuiltCallWaitingScreen useEffect, invitationID: ${invitationID}`);
+
     const callbackID =
       'ZegoUIKitPrebuiltCallWaitingScreen' + String(Math.floor(Math.random() * 10000));
     if (invitees.length === 1) {
@@ -146,6 +148,21 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
           CallInviteStateManage.initInviteData();
           navigation.goBack();
         }
+      });
+
+      // After the caller initiates a call and then loses network connectivity, 
+      // the server will cancel the call and notify both the caller and the callee that the call has been canceled.
+      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, (result) => {
+        zloginfo(`[ZegoUIKitPrebuiltCallWaitingScreen] onInvitationCanceled, result: ${JSON.stringify(result)}`);
+        if (result.callID !== invitationID) {
+          zlogwarning('[ZegoUIKitPrebuiltCallWaitingScreen] onInvitationCanceled, callID not match')
+          return
+        }
+
+        ZegoUIKit.uninit();
+        BellManage.stopOutgoingSound();
+        CallInviteStateManage.initInviteData();
+        navigation.goBack();
       });
     } else {
       // CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
@@ -184,6 +201,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     return () => {
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
+      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
       BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
