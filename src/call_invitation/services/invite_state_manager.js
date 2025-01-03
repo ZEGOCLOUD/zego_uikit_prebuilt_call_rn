@@ -274,7 +274,7 @@ const CallInviteStateManage = {
     // determine for onInvitationReceived
     if (newCallID && CallInviteStateManage._isInviteCalling) {
       isOn = true;
-      zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: _isInviteCalling === true`)
+      zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}, reason: _isInviteCalling === true`)
       return isOn
     }
 
@@ -291,7 +291,7 @@ const CallInviteStateManage = {
 
         if (stateDetails.inviterID === localUserID && stateDetails.inviteState == InviteState.uncompleted) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === localUserID, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}, reason: stateDetails.inviterID === localUserID, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
 
@@ -301,11 +301,12 @@ const CallInviteStateManage = {
           inviteState === InviteState.accepted
         ) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: localUserID pending or accepted, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}, reason: localUserID pending or accepted, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
       }
     }
+    zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}`)
     return isOn;
   },
 

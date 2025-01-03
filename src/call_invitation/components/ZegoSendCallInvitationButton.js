@@ -49,25 +49,23 @@ export default function ZegoSendCallInvitationButton(props) {
 
   let _roomID = ''
 
-  const isCanSendInvitation = async () => {
+  const isCanSendInvitation = () => {
+    let canSendInvitation = false
+
     let isOnCall = CallInviteStateManage.isOncall()
     if (isOnCall) {
-      return false
+      canSendInvitation = false
+    } else if (!onWillPressed) {
+      canSendInvitation = true
+    } else if (typeof onWillPressed === 'function') {
+      canSendInvitation = onWillPressed();
+    } else {
+      // don't support promise
+      canSendInvitation = false
     }
 
-    if (typeof onWillPressed === 'function') {
-      return onWillPressed();
-    } else if (typeof onWillPressed === 'object' && typeof (onWillPressed.then) === 'function' && typeof (onWillPressed.catch) === 'function') {
-      let canSendInvitation = true;
-      try {
-        canSendInvitation = await onWillPressed;
-      } catch (error) {
-        canSendInvitation = false;
-      }
-      return canSendInvitation
-    } else {
-      return true
-    }
+    zloginfo('isCanSendInvitation', canSendInvitation)
+    return canSendInvitation
   }
 
   const onPress = ({
