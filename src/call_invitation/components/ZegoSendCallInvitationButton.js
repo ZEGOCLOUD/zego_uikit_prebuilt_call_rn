@@ -9,6 +9,7 @@ import ZegoUIKitPrebuiltCallInvitation from '../../services/invitation';
 import { zloginfo } from '../../utils/logger';
 import { eventEmitter, EventName } from '../../utils/EventEmitter';
 import PrebuiltCallReport from '../../utils/report';
+import CallInviteStateManage from '../services/invite_state_manager';
 
 export default function ZegoSendCallInvitationButton(props) {
   const navigation = useNavigation();
@@ -47,6 +48,27 @@ export default function ZegoSendCallInvitationButton(props) {
   });
 
   let _roomID = ''
+
+  const isCanSendInvitation = async () => {
+    let isOnCall = CallInviteStateManage.isOncall()
+    if (isOnCall) {
+      return false
+    }
+
+    if (typeof onWillPressed === 'function') {
+      return onWillPressed();
+    } else if (typeof onWillPressed === 'object' && typeof (onWillPressed.then) === 'function' && typeof (onWillPressed.catch) === 'function') {
+      let canSendInvitation = true;
+      try {
+        canSendInvitation = await onWillPressed;
+      } catch (error) {
+        canSendInvitation = false;
+      }
+      return canSendInvitation
+    } else {
+      return true
+    }
+  }
 
   const onPress = ({
     errorCode,
@@ -156,7 +178,7 @@ export default function ZegoSendCallInvitationButton(props) {
         }
         onRequestData={() => {return updateData()}}
         timeout={timeout}
-        onWillPressed={onWillPressed}
+        onWillPressed={() => {return isCanSendInvitation()}}
         onPressed={onPress}
         onFailure={onFailure}
         resourceID={_resourceID}
