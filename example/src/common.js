@@ -45,7 +45,7 @@ export const onUserLogin = async (userID, userName, props) => {
           
         },
         requireInviterConfig: {
-          enabled: true,
+          enabled: false,
           detectSeconds: 5,
         },
         showDeclineButton: true,
