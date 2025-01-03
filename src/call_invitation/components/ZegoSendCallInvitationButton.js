@@ -105,6 +105,10 @@ export default function ZegoSendCallInvitationButton(props) {
     }
   };
 
+  const onRequestStatusChanged = (isInviteCalling) => {
+    CallInviteStateManage.setOutgoingCallStatus(isInviteCalling)
+  }
+
   const loginHandler = ({ userID, userName }) => {
     if (localUser.userID === userID) {
       zloginfo(`[ZegoSendCallInvitationButton][loginHandler] userID not changed, userID: ${userID}`)
@@ -181,6 +185,7 @@ export default function ZegoSendCallInvitationButton(props) {
         onWillPressed={() => {return isCanSendInvitation()}}
         onPressed={onPress}
         onFailure={onFailure}
+        onRequestStatusChanged={onRequestStatusChanged}
         resourceID={_resourceID}
         width={width}
         height={height}

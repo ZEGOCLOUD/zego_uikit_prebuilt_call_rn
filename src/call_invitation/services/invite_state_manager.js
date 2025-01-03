@@ -22,6 +22,8 @@ const CallInviteStateManage = {
   _invitationMap: new Map(), // callID -> state detail
   _onInviteCompletedWithNobodyMap: new Map(),
   _onSomeoneAcceptedInviteMap: new Map(),
+  _isInviteCalling: false,
+
   _notifyInviteCompletedWithNobody: (callID) => {
     const stateDetails = CallInviteStateManage._invitationMap.get(callID);
     if (stateDetails) {
@@ -188,6 +190,10 @@ const CallInviteStateManage = {
   initInviteData: () => {
     CallInviteStateManage._invitationMap.clear();
   },
+  setOutgoingCallStatus: (isInviteCalling) => {
+    zloginfo('[CallInviteStateManage][setOutgoingCallStatus]', isInviteCalling)
+    CallInviteStateManage._isInviteCalling = isInviteCalling
+  },
   // This interface is called after the invitation is received and the invitation is successfully sent
   addInviteData: (invitationID, inviterID, invitees) => {
     const temp = new Map();
@@ -261,13 +267,18 @@ const CallInviteStateManage = {
     return auto;
   },
   // Determine whether a call is being made
-  isOncall: (
-    newCallID,
-    inviteeID = ZegoPrebuiltPlugins.getLocalUser().userID
-  ) => {
-    zloginfo('######isOncall######', newCallID);
-    zloginfo(`[InviteStateManage][isOncall] _invitationMap.size: ${CallInviteStateManage._invitationMap.size}, _invitationMap: ${JSON.stringify(...CallInviteStateManage._invitationMap)}`)
+  isOncall: (newCallID) => {
+    let localUserID = ZegoPrebuiltPlugins.getLocalUser().userID
+    zloginfo('[InviteStateManage]######isOncall######', newCallID);
 
+    // determine for onInvitationReceived
+    if (newCallID && CallInviteStateManage._isInviteCalling) {
+      isOn = true;
+      zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: _isInviteCalling === true`)
+      return isOn
+    }
+
+    zloginfo(`[InviteStateManage][isOncall] _invitationMap.size: ${CallInviteStateManage._invitationMap.size}, _invitationMap: ${JSON.stringify(...CallInviteStateManage._invitationMap)}`)
     let isOn = false;
     const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
     for (let index = 0, len = callIDs.length; index < len; index++) {
@@ -278,19 +289,19 @@ const CallInviteStateManage = {
           continue
         }
 
-        if (stateDetails.inviterID === inviteeID && stateDetails.inviteState == InviteState.uncompleted) {
+        if (stateDetails.inviterID === localUserID && stateDetails.inviteState == InviteState.uncompleted) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === inviteeID, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: stateDetails.inviterID === localUserID, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
 
-        const inviteState = stateDetails.invitees.get(inviteeID);
+        const inviteState = stateDetails.invitees.get(localUserID);
         if (
           inviteState === InviteState.pending ||
           inviteState === InviteState.accepted
         ) {
           isOn = true;
-          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: inviteeID pending or accepted, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
+          zloginfo(`[InviteStateManage][isOncall] set isOn: ${isOn}, reason: localUserID pending or accepted, stateDetails: ${currentCallID} ${JSON.stringify(stateDetails)}`)
           break;
         }
       }
