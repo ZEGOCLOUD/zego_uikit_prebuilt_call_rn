@@ -33,7 +33,7 @@
     "@zegocloud/zego-uikit-prebuilt-call-rn": "link:../",
     "@zegocloud/zego-uikit-rn": "link:../../../",
     "zego-callkit-react-native": "^1.0.6",
-    "zego-express-engine-reactnative": "^3.17.1",
+    "zego-express-engine-reactnative": "^3.17.2",
     "zego-zim-react-native": "2.18.2",
     "zego-zpns-react-native": "^2.6.6",
 
