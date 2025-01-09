@@ -118,7 +118,7 @@ export default function ZegoSendCallInvitationButton(props) {
   };
 
   useEffect(() => {
-    zloginfo(`[ZegoSendCallInvitationButton] useEffect`)
+    zloginfo(`[ZegoSendCallInvitationButton] useEffect, callName: ${callName}`)
 
     const unsubscribe1 = navigation.addListener('blur', () => {
       zloginfo(

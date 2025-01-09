@@ -68,7 +68,7 @@ export default function HomeScreen(props) {
           setUserID(info.userID)
           onUserLogin(info.userID, info.userName, props)
         } else {
-          //  Back to the login screen if not login before
+          // Back to the login screen if not login before
           props.navigation.navigate('LoginScreen');
         }
       })

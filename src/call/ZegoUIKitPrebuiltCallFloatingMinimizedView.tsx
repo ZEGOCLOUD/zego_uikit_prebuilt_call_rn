@@ -142,6 +142,9 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
         const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
         isMinimize && PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
       })
+      return () => {
+        ZegoUIKit.onOnlySelfInRoom(callbackID)
+      }
     }, [])
     return (
         <Animated.View

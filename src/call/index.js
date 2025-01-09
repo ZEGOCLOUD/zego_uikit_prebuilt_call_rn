@@ -337,7 +337,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     const _getCacheAVUserListWhenMinimizeSwitched = () => {
         if (isMinimizeSwitch) {
-            hasStreamUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn))
+            let hasStreamUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn))
             return sortAudioVideo(hasStreamUsers)
         } else {
             return null
