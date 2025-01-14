@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-prebuilt-call-rn",
-  "version": "6.3.1",
+  "version": "6.3.2",
   "description": "PrebuiltCall is a full-featured call kit that provides a ready-made call invitation, voice/video chat, device detection, etc. You can easily add a voice/video call to your app within 30 minutes.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -85,7 +85,6 @@
   "peerDependencies": {
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
-    "@zegocloud/zego-uikit-rn": ">=2.17.0",
     "react": "*",
     "react-delegate-component": "*",
     "react-native": "*",
@@ -93,7 +92,8 @@
     "react-native-screens": ">=3.0.0",
     "react-native-sound": "*",
     "react-native-encrypted-storage": "*",
-    "react-native-keep-awake": "*"
+    "react-native-keep-awake": "*",
+    "@zegocloud/zego-uikit-rn": ">=2.17.1"
   },
   "jest": {
     "preset": "react-native",

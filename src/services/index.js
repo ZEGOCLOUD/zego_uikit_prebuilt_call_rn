@@ -93,8 +93,11 @@ export default class ZegoUIKitPrebuiltCallService {
             }
         );
 
-        // Enable offline notification
-        ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
+        let zpnsPlugin = plugins.find(item => (item.ZPNsPushSourceType))
+        if (zpnsPlugin) {
+          // Enable offline notification
+          ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
+        }
 
         PrebuiltCallReport.create(appID, appSign, {
           'platform': 'rn',
