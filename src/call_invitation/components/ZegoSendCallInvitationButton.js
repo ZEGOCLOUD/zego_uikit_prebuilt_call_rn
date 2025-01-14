@@ -6,7 +6,7 @@ import ZegoPrebuiltPlugins from '../services/plugins';
 import { useNavigation } from '@react-navigation/native';
 import InnerTextHelper from '../services/inner_text_helper';
 import ZegoUIKitPrebuiltCallInvitation from '../../services/invitation';
-import { zloginfo } from '../../utils/logger';
+import { zloginfo, zlogwarning } from '../../utils/logger';
 import { eventEmitter, EventName } from '../../utils/EventEmitter';
 import PrebuiltCallReport from '../../utils/report';
 import CallInviteStateManage from '../services/invite_state_manager';
@@ -54,6 +54,9 @@ export default function ZegoSendCallInvitationButton(props) {
 
     let isOnCall = CallInviteStateManage.isOncall()
     if (isOnCall) {
+      canSendInvitation = false
+    } else if (callID && typeof callID !== 'string') {
+      zlogwarning('[ZegoSendCallInvitationButton][isCanSendInvitation] callID should be string')
       canSendInvitation = false
     } else if (!onWillPressed) {
       canSendInvitation = true
