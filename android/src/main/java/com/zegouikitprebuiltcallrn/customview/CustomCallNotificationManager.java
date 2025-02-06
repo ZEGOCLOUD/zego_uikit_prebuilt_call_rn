@@ -20,6 +20,7 @@ public class CustomCallNotificationManager {
     private String soundName = "";
     private String incomingAcceptButtonText = "Accept";
     private String incomingDeclineButtonText = "Decline";
+    public String currentShowCallID = "";
 
     private CustomCallNotificationManager() {
     }
@@ -46,8 +47,8 @@ public class CustomCallNotificationManager {
         }
     }
 
-    public void showCallNotification(Context context, String title, String message) {
-        XLogWrapper.i(TAG, "showCallNotification() called with: context = [%s], title = '%s', message = '%s'", context, title, message);
+    public void showCallNotification(Context context, String callID, String title, String message, int timeout) {
+        XLogWrapper.i(TAG, "showCallNotification() called with: context = [%s], callID = '%s', title = '%s', message = '%s'", context, callID, title, message);
 
         HashMap<String, Object> androidParams = new HashMap<>(Map.of(
             "isCustomNotification", true,
@@ -67,12 +68,12 @@ public class CustomCallNotificationManager {
         XLogWrapper.i(TAG, "missedCallParams: %s", missedCallParams);
 
         HashMap<String, Object> dataMap = new HashMap<>(Map.of(
-            "id", UUID.randomUUID().toString(),
+            "id", callID,
             "nameCaller", title,
 //            "appName", "",
             "handle", message,
 //            "type", 0,
-            "duration", 60*1000,
+            "duration", timeout * 1000,
             "textAccept", this.incomingAcceptButtonText,
             "textDecline", this.incomingDeclineButtonText,
 //            "extra", new HashMap<String, Object>(),
@@ -90,13 +91,18 @@ public class CustomCallNotificationManager {
                 data.toBundle()
             )
         );
+
+        currentShowCallID = callID;
+        XLogWrapper.i(TAG, String.format("showCallNotification, set currentShowCallID: %s", currentShowCallID));
     }
 
     public void dismissCallNotification(Context context) {
-        XLogWrapper.i(TAG, "dismissCallNotification");
+        currentShowCallID = "";
+        XLogWrapper.i(TAG, "dismissCallNotification, set currentShowCallID:");
 
         ArrayList<Data> dataList = SharedPreferencesUtilsKt.getDataActiveCalls(context);
         for (Data data : dataList) {
+            XLogWrapper.i(TAG, String.format("dismissCallNotification, IntentEnded id: %s", data.getId()));
             context.sendBroadcast(
                 CallkitIncomingBroadcastReceiver.Companion.getIntentEnded(
                     context,

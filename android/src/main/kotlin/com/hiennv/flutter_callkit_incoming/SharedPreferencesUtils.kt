@@ -4,17 +4,18 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.fasterxml.jackson.core.type.TypeReference
+import com.zegouikitprebuiltcallrn.utils.XLogWrapper
 
 
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
 private var prefs: SharedPreferences? = null
 private var editor: SharedPreferences.Editor? = null
+private const val TAG = "SharedPreferencesUtils"
 
 private fun initInstance(context: Context) {
     prefs = context.getSharedPreferences(CALLKIT_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
     editor = prefs?.edit()
 }
-
 
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
@@ -27,13 +28,16 @@ fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
         arrayData.add(data)
     }
     putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
+
+    XLogWrapper.i(TAG, String.format("addCall id: %s, count: %d", data.id, arrayData.count()))
 }
 
 fun removeCall(context: Context?, data: Data) {
+    XLogWrapper.i(TAG, String.format("removeCall id: %s", data.id))
+
     val json = getString(context, "ACTIVE_CALLS", "[]")
     Log.d("JSON", json!!)
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    val arrayData: ArrayList<Data> = Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Data>>() {})
     arrayData.remove(data)
     putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
 }
@@ -45,8 +49,10 @@ fun removeAllCalls(context: Context?) {
 
 fun getDataActiveCalls(context: Context?): ArrayList<Data> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    val callList = Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Data>>() {})
+
+    XLogWrapper.i(TAG, String.format("getDataActiveCalls count: %d", callList.count()))
+    return callList
 }
 
 fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {

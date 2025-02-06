@@ -46,6 +46,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       }),
       type: isVideoCall ? ZegoInvitationType.videoCall : ZegoInvitationType.voiceCall,
       inviter: {id: localUser.userID, name: localUser.userName},
+      timeout: timeout,
       custom_data: customData,
       notificationTitle: nonNullNotificationTitle,
       notificationMessage: nonNullNotificationMessage,

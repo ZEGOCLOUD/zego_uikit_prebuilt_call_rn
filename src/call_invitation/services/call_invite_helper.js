@@ -1,5 +1,6 @@
 import CallInviteStateManage from './invite_state_manager';
 import BellManage from './bell';
+import { zloginfo } from '../../utils/logger';
 
 export default class CallInviteHelper {
     _currentCallUUID;
@@ -14,18 +15,14 @@ export default class CallInviteHelper {
     }
 
     setOfflineData(data) {
+        zloginfo('[CallInviteHelper][setOfflineData]', data)
         this._offlineData = data
     }
     getOfflineData() {
         return this._offlineData
     }
-    setCurrentCallUUID(callUUID) {
-        this._currentCallUUID = callUUID;
-    }
-    getCurrentCallUUID() {
-        return this._currentCallUUID;
-    }
     acceptCall(callID, data) {
+        zloginfo(`[CallInviteHelper][acceptCall] callID: ${callID}, data: ${JSON.stringify(data)}`)
         CallInviteStateManage.updateInviteDataAfterAccepted(callID);
         BellManage.stopIncomingSound();
         BellManage.cancleVirate();

@@ -8,8 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.zegouikitprebuiltcallrn.utils.XLogWrapper
 import com.zegouikitprebuiltcallrn.ZegoUIKitPrebuiltCallRNModule
+import com.zegouikitprebuiltcallrn.customview.CustomCallNotificationManager
+import com.zegouikitprebuiltcallrn.utils.XLogWrapper
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -86,13 +87,20 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_INCOMING"))
+                if (CustomCallNotificationManager.getInstance().currentShowCallID.isEmpty()) {
+                    // Just been cleared, not show
+                    XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_INCOMING but currentShowCallID isEmpty"))
+                    return
+                }
+
                 try {
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
                     if (callkitNotificationManager.incomingChannelEnabled()) {
                         val soundPlayerServiceIntent =
-                                Intent(context, CallkitSoundPlayerService::class.java)
+                            Intent(context, CallkitSoundPlayerService::class.java)
                         soundPlayerServiceIntent.putExtras(data)
                         context.startService(soundPlayerServiceIntent)
                     }
@@ -102,6 +110,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_START}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_START"))
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
@@ -111,6 +120,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_ACCEPT"))
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -122,6 +132,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_DECLINE"))
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -133,6 +144,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_ENDED"))
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -144,6 +156,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_TIMEOUT"))
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -157,6 +170,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}" -> {
+                XLogWrapper.i(TAG, String.format("[onReceive] ACTION_CALL_CALLBACK"))
                 try {
                     callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_CALLBACK, data)
@@ -232,11 +246,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         when (event) {
             CallkitConstants.ACTION_CALL_DECLINE -> {
                 eventName = "RNCallKitPerformEndCallAction"
-                eventParams = "refuse"
+                eventParams = "Refuse"
             }
             CallkitConstants.ACTION_CALL_TIMEOUT -> {
                 eventName = "RNCallKitPerformEndCallAction"
-                eventParams = "timeout"
+                eventParams = "Timeout"
             }
             CallkitConstants.ACTION_CALL_ACCEPT -> {
                 eventName = "RNCallKitPerformAnswerCallAction"

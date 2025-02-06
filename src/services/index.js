@@ -17,6 +17,7 @@ import {getPackageVersion} from '../utils/package_version';
 import { ZegoCallEndReason } from "./defines";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 import TimingHelper from "./timing_helper";
+import NotificationHelper from '../call_invitation/services/notification_helper';
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -101,6 +102,8 @@ export default class ZegoUIKitPrebuiltCallService {
           // Enable offline notification
           ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
         }
+
+        NotificationHelper.getInstance().init()
 
         PrebuiltCallReport.create(appID, appSign, {
           'platform': 'rn',

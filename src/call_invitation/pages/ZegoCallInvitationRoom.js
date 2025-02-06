@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import ZegoUIKitPrebuiltCall from '../../call';
-import { ZegoInvitationType } from '../services/defines';
-import BellManage from '../services/bell';
-import CallInviteStateManage from '../services/invite_state_manager';
-import { zloginfo } from '../../utils/logger';
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import { AppState } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+
+import ZegoUIKitPrebuiltCall from '../../call';
+import MinimizingHelper from "../../call/services/minimizing_helper";
+import PrebuiltHelper from "../../call/services/prebuilt_helper";
 import ZegoUIKitPrebuiltCallService from '../../services';
 import {
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
@@ -14,11 +15,13 @@ import {
   GROUP_VOICE_CALL_CONFIG,
   ZegoCallEndReason,
 } from '../../services/defines';
-import CallInviteHelper from '../services/call_invite_helper';
 import TimingHelper from '../../services/timing_helper';
-import PrebuiltHelper from "../../call/services/prebuilt_helper";
-import MinimizingHelper from "../../call/services/minimizing_helper";
+import { zloginfo } from '../../utils/logger';
+import BellManage from '../services/bell';
+import { ZegoInvitationType } from '../services/defines';
 import HangupHelper from '../services/hangup_helper';
+import CallInviteStateManage from '../services/invite_state_manager';
+import NotificationHelper from '../services/notification_helper';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -88,7 +91,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
 
   const _onCallEnd = (callID, reason, duration) => {
     // reason 0-localHangUp, 1-remoteHangUp, 2-kickOut
-    zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd]', callID, reason, duration);
+    zloginfo(`[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd], callID: ${callID}, reason: ${reason}, duration: ${duration}`);
     if (reason === ZegoCallEndReason.localHangUp) {
       hangUpHandle();
     } else {
@@ -116,10 +119,11 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   };
 
   const callEndHandle = () => {
-    const signalingPlugin = ZegoUIKit.getSignalingPlugin().getZegoUIKitSignalingPlugin();
-    const currentCallUUID = CallInviteHelper.getInstance().getCurrentCallUUID();
-    if (signalingPlugin && currentCallUUID) {
-      signalingPlugin.getInstance().reportCallKitCallEnded(currentCallUUID, 2);
+    if (AppState.currentState === 'background') {
+      let currentInCallID = NotificationHelper.getInstance().getCurrentInCallID()
+      if (currentInCallID) {
+        NotificationHelper.getInstance().hangUp(currentInCallID, 'other')
+      }
     }
   };
 
@@ -133,7 +137,6 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees, JSON.stringify({"call_id": roomID, "operation_type": "cancel_invitation"}));
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
-    // navigation.navigate('ZegoInnerChildrenPage');
   };
 
   let hangUpTimer = null;

@@ -164,6 +164,7 @@ export default function ZegoSendCallInvitationButton(props) {
         ? ZegoInvitationType.videoCall
         : ZegoInvitationType.voiceCall,
       inviter: { id: localUser.userID, name: localUser.userName },
+      timeout: timeout,
       custom_data: '',
     });
 

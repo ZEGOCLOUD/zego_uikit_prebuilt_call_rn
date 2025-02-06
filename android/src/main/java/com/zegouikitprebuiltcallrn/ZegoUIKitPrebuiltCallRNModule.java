@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 
 @Keep
@@ -31,7 +32,7 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     public static ReactApplicationContext reactContext;
 
     private AlertDialog alertDialog;
-
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public ZegoUIKitPrebuiltCallRNModule(ReactApplicationContext context) {
         super(context);
@@ -67,17 +68,19 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void displayIncomingCall(String title, String message) {
-        XLogWrapper.i(NAME, "displayIncomingCall");
-
-        CustomCallNotificationManager.getInstance().showCallNotification(reactContext, title, message);
+    public void displayIncomingCall(String callID, String title, String message, int timeout) {
+        mainHandler.post(() -> {
+            XLogWrapper.i(NAME, String.format("displayIncomingCall callID: %s, title: %s, message: %s, timeout: %d", callID, title, message, timeout));
+            CustomCallNotificationManager.getInstance().showCallNotification(reactContext, callID, title, message, timeout);
+        });
     }
 
     @ReactMethod
     public void dismissCallNotification() {
-        XLogWrapper.i(NAME, "dismissCallNotification");
-
-        CustomCallNotificationManager.getInstance().dismissCallNotification(reactContext);
+        mainHandler.post(() -> {
+            XLogWrapper.i(NAME, "dismissCallNotification");
+            CustomCallNotificationManager.getInstance().dismissCallNotification(reactContext);
+        });
     }
 
     @ReactMethod

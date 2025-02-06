@@ -1,4 +1,4 @@
-import { NativeModules, Platform, Vibration } from 'react-native';
+import { NativeModules, Vibration } from 'react-native';
 import Sound from 'react-native-sound';
 import { zloginfo, zlogerror, zlogwarning } from '../../utils/logger';
 
@@ -23,6 +23,7 @@ const BellManage = {
     BellManage._outgoingCallFileName = ringtoneConfig.outgoingCallFileName;
   },
   initIncomingSound: () => {
+    zloginfo('[BellManage][initIncomingSound]')
     // Sound.setCategory('Playback');
     return new Promise((resolve, reject) => {
       BellManage._whooshIncoming = new Sound(
@@ -74,6 +75,10 @@ const BellManage = {
     zloginfo('successfully playing zego_incoming');
   },
   stopIncomingSound: () => {
+    if (!BellManage._whooshIncoming) {
+      zloginfo('[BellManage][stopOutgoingSound] _whooshIncoming is null');
+      return
+    }
     BellManage._whooshIncoming.stop(() => {
       zloginfo('successfully stop playing zego_incoming');
     });
@@ -98,6 +103,7 @@ const BellManage = {
     });
   },
   releaseIncomingSound: () => {
+    zloginfo('[BellManage][releaseIncomingSound]')
     BellManage._whooshIncoming.release();
     BellManage._whooshIncoming = null;
     zloginfo('successfully release the audio player resource');
