@@ -86,7 +86,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
 
   const _onCallEnd = (callID, reason, duration) => {
     // reason 0-localHangUp, 1-remoteHangUp, 2-kickOut
-    zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
+    zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd]', callID, reason, duration);
     if (reason === ZegoCallEndReason.localHangUp) {
       hangUpHandle();
     } else {
@@ -109,6 +109,8 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     }
     
     clearAutoHangUpTimer();
+
+    zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd] process done');
   };
 
   const callEndHandle = () => {

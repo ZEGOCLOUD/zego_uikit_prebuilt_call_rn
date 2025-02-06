@@ -59,6 +59,8 @@ export default class ZegoUIKitPrebuiltCallService {
         OfflineCallEventListener.getInstance().useSystemCallingUI(plugins);
     }
     init(appID, appSign, userID, userName, plugins, config = {}) {
+        ZegoUIKitLogger.logSetUserID(userID)
+
         if (this.isInit) {
             this.notifyInit();
             Object.assign(this.config, config);
@@ -117,7 +119,6 @@ export default class ZegoUIKitPrebuiltCallService {
                 'msg': '',
                 'start_time': eventBegin
               });
-              ZegoUIKitLogger.logSetUserID(ZegoPrebuiltPlugins.getLocalUser().userID)
               resolve();
 
               OfflineCallEventListener.getInstance().init(this.config);

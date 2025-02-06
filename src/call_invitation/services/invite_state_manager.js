@@ -1,7 +1,6 @@
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import ZegoPrebuiltPlugins from './plugins';
-import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
-import { ZIMCallState } from 'zego-zim-react-native';
+import { zloginfo } from '../../utils/logger';
 
 // completed: Someone ran out of time, accepted or declined an invitation
 // uncompleted: Others did not accept or reject the invitation, and the invitation did not time out
@@ -27,7 +26,7 @@ const CallInviteStateManage = {
   _notifyInviteCompletedWithNobody: (callID) => {
     const stateDetails = CallInviteStateManage._invitationMap.get(callID);
     if (stateDetails) {
-      zlogwarning(
+      zloginfo(
         '######_notifyInviteCompletedWithNobody######',
         callID,
         CallInviteStateManage._invitationMap
@@ -92,10 +91,9 @@ const CallInviteStateManage = {
         const inviteDetails = CallInviteStateManage._invitationMap.get(callID);
         if (inviteDetails) {
           inviteDetails.invitees.set(invitee.id, InviteState.rejected);
-          inviteDetails.inviteState =
-            CallInviteStateManage._judgeInviteCompleted(callID)
-              ? InviteState.completed
-              : InviteState.uncompleted;
+          let isInviteCompleted = CallInviteStateManage._judgeInviteCompleted(callID)
+          zloginfo(`[InviteStateManage][onInvitationRefused] isInviteCompleted: ${isInviteCompleted}`)
+          inviteDetails.inviteState = isInviteCompleted ? InviteState.completed : InviteState.uncompleted;
           CallInviteStateManage._notifyInviteCompletedWithNobody(callID);
         }
       }

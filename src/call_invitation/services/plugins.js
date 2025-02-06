@@ -1,5 +1,6 @@
 import ZegoUIKit, {
   ZegoInvitationConnectionState,
+  ZegoUIKitLogger,
 } from '@zegocloud/zego-uikit-rn';
 import { zlogerror, zloginfo } from '../../utils/logger';
 import EncryptedStorage from 'react-native-encrypted-storage';
@@ -44,6 +45,8 @@ const _storeLoginInfo = async () => {
 
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins) => {
+    ZegoUIKitLogger.logSetUserID(userID)
+
     zloginfo('[ZegoPrebuiltPlugins] init', {
       appID,
       userID,
