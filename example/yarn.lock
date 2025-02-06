@@ -5587,6 +5587,11 @@ react-native-screens@^4.13.1:
   version "0.11.5"
   resolved "git+https://github.com/ZEGOCLOUD/react-native-sound.git#0af3beb657e871ed33ef2fbc711d15d2dc70f308"
 
+react-native-uuid@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npmmirror.com/react-native-uuid/-/react-native-uuid-2.0.3.tgz#f85f8a8d68e52e3f1c18ba0f02ec7776f9d4a0da"
+  integrity sha512-f/YfIS2f5UB+gut7t/9BKGSCYbRA9/74A5R1MDp+FLYsuS+OSWoiM/D8Jko6OJB6Jcu3v6ONuddvZKHdIGpeiw==
+
 react-native@0.80.2:
   version "0.80.2"
   resolved "https://registry.npmmirror.com/react-native/-/react-native-0.80.2.tgz#d71b9584ba82c2d691332062fa756f87ec76e2b9"

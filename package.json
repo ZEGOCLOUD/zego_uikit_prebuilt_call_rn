@@ -74,6 +74,7 @@
     "react-native": "0.68.2",
     "react-native-builder-bob": "^0.18.2",
     "react-native-sound": "git+https://github.com/ZEGOCLOUD/react-native-sound.git#v0.11.5",
+    "react-native-uuid": "^2.0.3",
     "redux": "^4.2.0",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2"
@@ -92,6 +93,7 @@
     "react-native-safe-area-context": "*",
     "react-native-screens": ">=4.0.0",
     "react-native-sound": "*",
+    "react-native-uuid": "^2.0.3",
     "@zegocloud/zego-uikit-rn": ">=2.17.12"
   },
   "jest": {
