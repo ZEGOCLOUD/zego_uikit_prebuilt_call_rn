@@ -1,23 +1,22 @@
 import { AppState } from 'react-native';
-// import GetAppName from 'react-native-get-app-name';
 import ZegoUIKit, {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../call/services/minimizing_helper";
 import PrebuiltHelper from '../call/services/prebuilt_helper';
 import BellManage from '../call_invitation/services/bell';
+import CallEventNotifyApp from '../call_invitation/services/callevent_notify_app';
 import RNCallKit from '../call_invitation/services/callkit'
 import HangupHelper from "../call_invitation/services/hangup_helper";
 import InnerTextHelper from '../call_invitation/services/inner_text_helper';
 import CallInviteStateManage from '../call_invitation/services/invite_state_manager';
+import NotificationHelper from '../call_invitation/services/notification_helper';
 import OfflineCallEventListener from '../call_invitation/services/offline_call_event_listener';
 import ZegoPrebuiltPlugins from "../call_invitation/services/plugins";
 import { zloginfo } from '../utils/logger';
 import PrebuiltCallReport from '../utils/report';
-import { getRnVersion } from '../utils/version';
 import {getPackageVersion} from '../utils/package_version';
 import { ZegoCallEndReason } from "./defines";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 import TimingHelper from "./timing_helper";
-import NotificationHelper from '../call_invitation/services/notification_helper';
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -44,6 +43,16 @@ export default class ZegoUIKitPrebuiltCallService {
           // backgroundColor,
           // foregroundBuilder,
         },
+        // onIncomingCallDeclineButtonPressed,
+        // onIncomingCallAcceptButtonPressed,
+        // onIncomingCallReceived,
+        // onIncomingCallCanceled,
+        // onIncomingCallTimeout,
+        // onOutgoingCallCancelButtonPressed,
+        // onOutgoingCallAccepted,
+        // onOutgoingCallRejectedCauseBusy,
+        // onOutgoingCallDeclined,
+        // onOutgoingCallTimeout,
     };
     isInit = false;
     subscription = null;
@@ -70,10 +79,6 @@ export default class ZegoUIKitPrebuiltCallService {
 
         zloginfo(`[ZegoUIKitPrebuiltCallService][init] appID: ${appID}, userID: ${userID}, userName: ${userName}`)
 
-        // GetAppName.getAppName((appName) => {
-            // zloginfo("[init]Here is your app name:", appName)    
-            // this.config.appName = appName;
-        // })
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
         Object.assign(this.config, config);
@@ -106,9 +111,6 @@ export default class ZegoUIKitPrebuiltCallService {
         NotificationHelper.getInstance().init()
 
         PrebuiltCallReport.create(appID, appSign, {
-          'platform': 'rn',
-          'platform_version': getRnVersion(),
-          'uikit_version': ZegoUIKit.getVersion(),
           'call_version': getPackageVersion(),
           'user_id': userID
         });
@@ -125,6 +127,7 @@ export default class ZegoUIKitPrebuiltCallService {
               resolve();
 
               OfflineCallEventListener.getInstance().init(this.config);
+              CallEventNotifyApp.getInstance().init(this.config)
   
               CallInviteStateManage.init();
               BellManage.initRingtoneConfig(ringtoneConfig);

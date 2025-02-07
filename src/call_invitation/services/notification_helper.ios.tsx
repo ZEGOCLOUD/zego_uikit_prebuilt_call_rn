@@ -12,6 +12,7 @@ import PrebuiltCallReport from '../../utils/report';
 import CallInviteHelper from './call_invite_helper';
 import { ZegoInvitationType } from './defines';
 import InnerTextHelper from './inner_text_helper';
+import ZegoPrebuiltPlugins from './plugins';
 
 export type CallStatus = 'waiting' | 'notification' | 'calling';
 
@@ -71,7 +72,7 @@ export default class NotificationHelper {
         if (this._currentCallID && this._currentCallStatus === 'notification') {
             zloginfo(`[NotificationHelper][showOfflineNotification] another call is showing`)
 
-            this._signalingPlugin.refuseInvitation(inviter.id, JSON.stringify({callID}));
+            this._refuse(undefined, callID, roomID, inviter, 'busy', 'restarted')
             this._uikitSignalingPlugin.reportCallKitCallEnded(callUUID, 2)    // 2 - RemoteEnded
 
             PrebuiltCallReport.reportEvent('call/respondInvitation', {
@@ -118,7 +119,7 @@ export default class NotificationHelper {
         zloginfo(`[NotificationHelper][showOnlineNotification], callerName: ${callerName}`);
         
         let cxCallUpdate = { } as CXCallUpdate;
-        cxCallUpdate.localizedCallerName = '** ' + callerName
+        cxCallUpdate.localizedCallerName = callerName
         cxCallUpdate.hasVideo = (type === ZegoInvitationType.videoCall)
         this._uikitSignalingPlugin.reportIncomingCall(cxCallUpdate, notifyUuid);
         zloginfo(`[NotificationHelper][showOnlineNotification] reportIncomingCall callID: ${callID}`)
@@ -180,6 +181,9 @@ export default class NotificationHelper {
         }
         zloginfo(`[NotificationHelper][_onCallKitEndCall] callData: ${JSON.stringify(this._callData)}, state: ${AppState.currentState}`)
         
+        // Offline incoming calls are not supported (too early), and online incoming calls rely on ZegoCallInvitationDialog
+        // CallEventNotifyApp.getInstance().notifyIncomingCallDeclineButtonPressed()
+        
         if (this._currentCallID && this._currentCallStatus === 'calling') {
             // click accept and hangup
             this.hangUp(this._currentCallID, 'onCallKitEndCall')
@@ -193,45 +197,58 @@ export default class NotificationHelper {
             // click decline button from notification
         
             // @ts-ignore
-            let { callID, inviter } = this._callData;
+            let { callID, roomID, inviter } = this._callData;
             this._callData = undefined
 
             zloginfo(`[NotificationHelper][_onCallKitEndCall] will refuse after signalingPlugin login succ, callbackID: ${this._callbackID}`)
-            this._signalingPlugin.onLoginSuccess(this._callbackID, () => {
-                // tell caller
-                this._signalingPlugin.refuseInvitation(inviter.id, JSON.stringify({callID}))
-                .then((result: ZegoPluginResult) => {
-                    zloginfo(`[NotificationHelper][_onCallKitEndCall] refuseInvitation then, code: ${result.code}, message: ${result.message}`)
-
-                    PrebuiltCallReport.reportEvent('call/respondInvitation', {
-                        'call_id': callID,
-                        'app_state': AppState.currentState,
-                        'action': 'refuse'
-                    })
-            
-                    CallInviteHelper.getInstance().refuseCall(callID);
-                    this._currentCallID = ''
-                    this._currentCallStatus = 'waiting'
-                    zloginfo(`[NotificationHelper][_onCallKitEndCall] set _currentCallID: ${this._currentCallID}, status: ${this._currentCallStatus}`)
-
-                    // tell ios decline completion
-                    action.fulfill();
-                })
-                .catch((error: ZIMError) => {
-                    zloginfo(`[NotificationHelper][_onCallKitEndCall] refuseInvitation catch, error: ${error.code}, message: ${error.message}`)
-
-                    CallInviteHelper.getInstance().refuseCall(callID);
-                    this._currentCallID = ''
-                    this._currentCallStatus = 'waiting'
-                    zloginfo(`[NotificationHelper][_onCallKitEndCall] set _currentCallID: ${this._currentCallID}, status: ${this._currentCallStatus}`)
-
-                    // tell ios decline fail
-                    action.fail();
-                })
-
-                this._signalingPlugin.onLoginSuccess(this._callbackID)
-            })
+            this._refuse(action, callID, roomID, inviter, 'refuse', AppState.currentState)
         }
+    }
+
+    _refuse(action: CXAction, callID: string, roomID: string, inviter: any, reason: string, appState: string) {
+        this._signalingPlugin.onLoginSuccess(this._callbackID, () => {
+            // tell caller
+            this._signalingPlugin.refuseInvitation(inviter.id, JSON.stringify({
+                callID, 
+                call_id: roomID,
+                // @ts-ignore
+                'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+            }))
+            .then((result: ZegoPluginResult) => {
+                zloginfo(`[NotificationHelper][_onCallKitEndCall] refuseInvitation then, code: ${result.code}, message: ${result.message}`)
+
+                PrebuiltCallReport.reportEvent('call/respondInvitation', {
+                    'call_id': callID,
+                    'app_state': appState,
+                    'action': reason
+                })
+        
+                CallInviteHelper.getInstance().refuseCall(callID);
+                this._currentCallID = ''
+                this._currentCallStatus = 'waiting'
+                zloginfo(`[NotificationHelper][_onCallKitEndCall] set _currentCallID: ${this._currentCallID}, status: ${this._currentCallStatus}`)
+
+                // tell ios decline completion
+                if (action) {
+                    action.fulfill();
+                }
+            })
+            .catch((error: ZIMError) => {
+                zloginfo(`[NotificationHelper][_onCallKitEndCall] refuseInvitation catch, error: ${error.code}, message: ${error.message}`)
+
+                CallInviteHelper.getInstance().refuseCall(callID);
+                this._currentCallID = ''
+                this._currentCallStatus = 'waiting'
+                zloginfo(`[NotificationHelper][_onCallKitEndCall] set _currentCallID: ${this._currentCallID}, status: ${this._currentCallStatus}`)
+
+                // tell ios decline fail
+                if (action) {
+                    action.fail();
+                }
+            })
+
+            this._signalingPlugin.onLoginSuccess(this._callbackID)
+        })
     }
 
     _onCallKitAnswerCall(action: CXAction) {
@@ -255,7 +272,12 @@ export default class NotificationHelper {
 
             setCategory('PlayAndRecord');
             CallInviteHelper.getInstance().acceptCall(callID, {call_id: roomID, type, inviter, invitees});
-            ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, JSON.stringify({callID}))
+            ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, JSON.stringify({
+                callID, 
+                call_id: roomID,
+                // @ts-ignore
+                'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+            }))
             .then((result: ZegoPluginResult) => {
                 zloginfo(`[NotificationHelper][_onCallKitAnswerCall] acceptInvitation then, code: ${result.code}, message: ${result.message}`)
 

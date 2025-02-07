@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, Modal, TouchableOpacity, AppState, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import Delegate from 'react-delegate-component';
 
 import ZegoUIKit, {
@@ -13,12 +12,13 @@ import ZegoUIKitPrebuiltCallService from "../../services";
 import { zloginfo } from '../../utils/logger';
 import PrebuiltCallReport from '../../utils/report';
 import BellManage from '../services/bell';
-import RNCallKit from '../services/callkit';
+import CallEventNotifyApp from '../services/callevent_notify_app';
 import CallInviteHelper from '../services/call_invite_helper'
 import { ZegoInvitationType } from '../services/defines';
 import InnerTextHelper from '../services/inner_text_helper'
 import CallInviteStateManage from '../services/invite_state_manager';
 import NotificationHelper from '../services/notification_helper';
+import ZegoPrebuiltPlugins from '../services/plugins';
 
 export default function ZegoCallInvitationDialog(props) {
   const TAG = 'ZegoCallInvitationDialog';
@@ -34,6 +34,7 @@ export default function ZegoCallInvitationDialog(props) {
   const [inviter, setInviter] = useState({});
   const [extendData, setExtendData] = useState({});
   const [callID, setCallID] = useState('');
+  const callIDRef = useRef('');
 
   const getDialogTitle = () => {
     if (extendData.notificationTitle && extendData.notificationTitle.length > 0) {
@@ -72,18 +73,12 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const onRefuseCallback = () => {
-    const { onIncomingCallDeclineButtonPressed } = initConfig;
-    if (typeof onIncomingCallDeclineButtonPressed == 'function') {
-      onIncomingCallDeclineButtonPressed(navigation)
-    }
+    CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallDeclineButtonPressed', navigation)
     setIsDialogVisable(false);
     setIsFullScreen(false);
   }
   const refuseHandle = () => {
     CallInviteHelper.getInstance().refuseCall(callID)
-    if (Platform.OS === 'android') {
-        RNCallKit.dismissCallNotification();
-    }
   };
   const refuseSuccHandle = () => {
     zloginfo(`Refuse Call Invitation succ`);
@@ -105,10 +100,8 @@ export default function ZegoCallInvitationDialog(props) {
   }
   const onAcceptCallback = (data) => {
     zloginfo("onAcceptCallback", data.call_id, data.inviter.id)
-    const { onIncomingCallAcceptButtonPressed } = initConfig;
-    if (typeof onIncomingCallAcceptButtonPressed == 'function') {
-      onIncomingCallAcceptButtonPressed(navigation)
-    }
+
+    CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallAcceptButtonPressed', navigation)
     setIsDialogVisable(false);
     setIsFullScreen(false);
 
@@ -121,9 +114,6 @@ export default function ZegoCallInvitationDialog(props) {
   }
   const acceptHandle = () => {
     CallInviteHelper.getInstance().acceptCall(callID, {...extendData, inviteType, inviter});
-    if (Platform.OS === 'android') {
-        RNCallKit.dismissCallNotification();
-    }
     PrebuiltCallReport.reportEvent('call/respondInvitation', {
       'call_id': callID,
       'app_state': AppState.currentState,
@@ -161,45 +151,61 @@ export default function ZegoCallInvitationDialog(props) {
   useEffect(() => {
     if (isInit) {
       zloginfo('[ZegoCallInvitationDialog] Register callbacks after init');
-      const callbackID =
-        'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
-      ZegoUIKit.getSignalingPlugin().onInvitationReceived(
-        callbackID,
-        async ({ callID: invitationID, type, inviter, data }) => {
-          zloginfo(`onInvitationReceived implement by ${TAG}, callID: ${invitationID}, isVideoCall: ${type}, inviter: ${inviter}, data: ${data}`);
+      const callbackID = 'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
+
+      ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, async ({ callID: invitationID, type, inviter, data }) => {
+          zloginfo(`onInvitationReceived implement by ${TAG}, callID: ${invitationID}, isVideoCall: ${type}, inviter: ${JSON.stringify(inviter)}, data: ${data}`);
 
           let onCall = CallInviteStateManage.isOncall(invitationID);
           const onRoom = ZegoUIKit.isRoomConnected();
           const offlineData = CallInviteHelper.getInstance().getOfflineData();
-          zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] onCall: ${onCall}, onRoom: ${onRoom}, offlineData: ${offlineData}`);
+          zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] onCall: ${onCall}, onRoom: ${onRoom}, offlineData: ${offlineData}, currentState: ${AppState.currentState}`);
 
           if (onCall || (!offlineData && onRoom)) {
-            zloginfo(
-              `Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`
-            );
+            zloginfo(`Automatically declining invitations, onCall: ${onCall}, onRoom: ${onRoom}`);
+
             // Automatically declining invitations
+            const dataParsed = data ? JSON.parse(data) : {}
             ZegoUIKit.getSignalingPlugin().refuseInvitation(
               inviter.id,
               JSON.stringify({
                 callID: invitationID,
-                reason: 'busy'
+                reason: 'busy',
+                call_id: dataParsed.call_id,
+                'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
               })
             );
             CallInviteStateManage.updateInviteDataAfterRejected(invitationID);
           } else {
             const currentData = JSON.parse(data);
 
+            CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallReceived', 
+              currentData.call_id, 
+              { userID: currentData.inviter.id, userName: currentData.inviter.name },
+              currentData.type,
+              currentData.invitees.map((invitee) => {
+                return { userID: invitee.user_id, userName: invitee.user_name }
+              }),
+              currentData.custom_data
+            )
+
             if (offlineData && offlineData.call_id === currentData.call_id && offlineData.inviter.id === currentData.inviter.id) {
+              zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] received offline call')
               CallInviteHelper.getInstance().acceptCall(invitationID, offlineData)
-              ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, undefined)
+              ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id, JSON.stringify({
+                call_id: currentData.call_id,
+                'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+              }))
               CallInviteHelper.getInstance().setOfflineData(undefined)
-            } else if (AppState.currentState === 'background') {
+            } else if (AppState.currentState === 'background' || AppState.currentState === 'inactive') {
+              zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] received background call')
               NotificationHelper.getInstance().showOnlineNotification(invitationID, 
                 { roomID: currentData.call_id, 
                 type, 
                 inviter, 
                 invitees: currentData.invitees })
             } else {
+              zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] received normal call, currentState: ${AppState.currentState}`)
               setCallID(invitationID);
               setInviteType(type);
               setInviter(inviter);
@@ -215,32 +221,52 @@ export default function ZegoCallInvitationDialog(props) {
               }
             }
           }
+
+          zloginfo(`onInvitationReceived implement by ${TAG}, process done`);
         },
         TAG
       );
-      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, (result) => {
-        if (AppState.currentState !== 'background') {
-          BellManage.stopIncomingSound();
-          BellManage.cancleVirate();
-          setIsDialogVisable(false);
-          setIsFullScreen(false);
-        } else {
-          NotificationHelper.getInstance().dismissNotification(result.callID, 'Timeout', TAG)
-        }
-      });
-      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, (result) => {
-        zloginfo(`onInvitationCanceled implement by ${TAG}, result: ${JSON.stringify(result)}`);
+      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({data}) => {
+        zloginfo(`onInvitationTimeout implement by ${TAG}, data: ${JSON.stringify(data)}`);
 
-        if (AppState.currentState !== 'background') {
-          zloginfo(`[ZegoCallInvitationDialog] onInvitationCanceled, result: ${JSON.stringify(result)}`);
+        const dataParsed = data ? JSON.parse(data) : {}
+        CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallTimeout',
+          dataParsed.call_id, // may not support yet
+          dataParsed.inviter
+        )
+
+        if (callID === callIDRef.current) {
           BellManage.stopIncomingSound();
           BellManage.cancleVirate();
           setIsDialogVisable(false);
           setIsFullScreen(false);
-        } else {
-          NotificationHelper.getInstance().dismissNotification(result.callID, 'BeCancelled', TAG)
         }
+        NotificationHelper.getInstance().dismissNotification(result.callID, 'Timeout', TAG)
+
+        zloginfo(`onInvitationTimeout implement by ${TAG}, process done`);
       });
+      ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({callID, inviter, data}) => {
+        zloginfo(`onInvitationCanceled implement by ${TAG}, callID: ${callID}, inviter: ${JSON.stringify(inviter)} data: ${data}`);
+
+        let dataParsed = JSON.parse(data)
+        if (ZegoPrebuiltPlugins.getLocalUser().userID != inviter.id) {
+          CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallCanceled',
+            dataParsed.call_id,
+            dataParsed.inviter
+          )
+        }
+
+        if (callID === callIDRef.current) {
+          BellManage.stopIncomingSound();
+          BellManage.cancleVirate();
+          setIsDialogVisable(false);
+          setIsFullScreen(false);
+        } 
+        NotificationHelper.getInstance().dismissNotification(callID, 'BeCancelled', TAG)
+
+        zloginfo(`onInvitationCanceled implement by ${TAG}, process done`);
+      });
+
       return () => {
         ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID);
         ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID);
@@ -250,6 +276,10 @@ export default function ZegoCallInvitationDialog(props) {
       };
     }
   }, [isInit]);
+
+  useEffect(() => {
+    callIDRef.current = callID;
+  }, [callID]);
 
   return (
     <View style={[styles.container, isDialogVisable ? styles.show : null]}>
@@ -291,7 +321,9 @@ export default function ZegoCallInvitationDialog(props) {
                       data={JSON.stringify({
                         inviterID: inviter.id,
                         reason: 'decline',
-                        callID
+                        callID,
+                        call_id: extendData.call_id,
+                        'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
                       })}
                     />
                   </View> : null
@@ -300,6 +332,10 @@ export default function ZegoCallInvitationDialog(props) {
                   <ZegoAcceptInvitationButton
                     icon={getImageSourceByPath()}
                     inviterID={inviter.id}
+                    data={JSON.stringify({
+                      call_id: extendData.call_id,
+                      'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+                    })}
                     onPressed={acceptHandle}
                     onFailure={acceptFailHandle}
                   />
@@ -335,7 +371,9 @@ export default function ZegoCallInvitationDialog(props) {
                     data={JSON.stringify({
                       inviterID: inviter.id,
                       reason: 'decline',
-                      callID
+                      callID,
+                      call_id: extendData.call_id,
+                      'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
                     })}
                   />
                   <Text style={styles.fullRefuseTitle}>{InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton}</Text>
@@ -346,6 +384,10 @@ export default function ZegoCallInvitationDialog(props) {
                 <ZegoAcceptInvitationButton
                   icon={getImageSourceByPath()}
                   inviterID={inviter.id}
+                  data={JSON.stringify({
+                    call_id: extendData.call_id,
+                    'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+                  })}
                   onPressed={acceptHandle}
                   onFailure={acceptFailHandle}
                 />

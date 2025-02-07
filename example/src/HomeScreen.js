@@ -110,6 +110,7 @@ export default function HomeScreen(props) {
               })}
               isVideoCall={false}
               resourceID={"zego_data"}
+              customData={'custom_data'}
               showWaitingPageWhenGroupCall={true}
               onPressed={ (errorCode, errorMessage, errorInvitees) => {
                 if (errorCode == 0) {
@@ -128,6 +129,7 @@ export default function HomeScreen(props) {
               })}
               isVideoCall={true}
               resourceID={"zego_data"}    
+              customData={'custom_data'}
               showWaitingPageWhenGroupCall={true}
               onPressed={ (errorCode, errorMessage, errorInvitees) => {
                 if (errorCode == 0) {

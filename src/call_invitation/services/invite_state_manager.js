@@ -21,7 +21,9 @@ const CallInviteStateManage = {
   _invitationMap: new Map(), // callID -> state detail
   _onInviteCompletedWithNobodyMap: new Map(),
   _onSomeoneAcceptedInviteMap: new Map(),
-  _isInviteCalling: false,
+  
+  // Set to true when making an outgoing call, and reset to false after the call is answered or canceled
+  _inOutgoingCall: false,
 
   _notifyInviteCompletedWithNobody: (callID) => {
     const stateDetails = CallInviteStateManage._invitationMap.get(callID);
@@ -60,6 +62,7 @@ const CallInviteStateManage = {
     CallInviteStateManage._invitationMap.clear();
     CallInviteStateManage._onInviteCompletedWithNobodyMap.clear();
     CallInviteStateManage._onSomeoneAcceptedInviteMap.clear();
+    zloginfo('[CallInviteStateManage][uninit]')
   },
   registerCallback: () => {
     zloginfo('[CallInviteStateManage]registerCallback success');
@@ -123,10 +126,9 @@ const CallInviteStateManage = {
         }
       }
     );
-    ZegoUIKit.getSignalingPlugin().onInvitationReceived(
-      CallInviteStateManage._callbackID,
+    ZegoUIKit.getSignalingPlugin().onInvitationReceived(CallInviteStateManage._callbackID,
       ({ callID, type, inviter, data }) => {
-        zloginfo('onInvitationReceived implement by ' + TAG);
+        zloginfo(`onInvitationReceived implement by ${TAG}, callID: ${callID}, inviter: ${JSON.stringify(inviter)}, data: ${data}`);
 
         data = JSON.parse(data);
         // update _invitationMap
@@ -186,11 +188,12 @@ const CallInviteStateManage = {
   },
   // This call is called after the call invitation has ended or before an invitation starts
   initInviteData: () => {
+    zloginfo('[CallInviteStateManage][initInviteData]')
     CallInviteStateManage._invitationMap.clear();
   },
   setOutgoingCallStatus: (isInviteCalling) => {
     zloginfo('[CallInviteStateManage][setOutgoingCallStatus]', isInviteCalling)
-    CallInviteStateManage._isInviteCalling = isInviteCalling
+    CallInviteStateManage._inOutgoingCall = isInviteCalling
   },
   // This interface is called after the invitation is received and the invitation is successfully sent
   addInviteData: (invitationID, inviterID, invitees) => {
@@ -203,12 +206,13 @@ const CallInviteStateManage = {
       inviteState: InviteState.uncompleted,
       invitees: temp,
     });
-    zloginfo('######addInviteData######', JSON.stringify(...CallInviteStateManage._invitationMap));
+    zloginfo('[CallInviteStateManage][addInviteData]', JSON.stringify(...CallInviteStateManage._invitationMap));
   },
   // This interface is called after the invitation is successfully rejected
   updateInviteDataAfterRejected: (callID) => {
     // update _invitationMap
     CallInviteStateManage._invitationMap.delete(callID);
+    zloginfo('[CallInviteStateManage][updateInviteDataAfterRejected]', JSON.stringify(...CallInviteStateManage._invitationMap));
   },
   // This interface is called after the invitation is successfully accepted
   updateInviteDataAfterAccepted: (invitationID) => {
@@ -218,11 +222,13 @@ const CallInviteStateManage = {
     if (inviteDetails) {
       inviteDetails.invitees.set(localUser.userID, InviteState.accepted);
     }
+    zloginfo('[CallInviteStateManage][updateInviteDataAfterAccepted]', JSON.stringify(...CallInviteStateManage._invitationMap));
   },
   // This interface is called after the invitation is successfully cancel
   updateInviteDataAfterCancel: (invitationID) => {
     // update _invitationMap
     CallInviteStateManage._invitationMap.delete(invitationID);
+    zloginfo('[CallInviteStateManage][updateInviteDataAfterCancel]', JSON.stringify(...CallInviteStateManage._invitationMap));
   },
   isInviteCompleted: (invitationID) => {
     const inviteDetails = CallInviteStateManage._invitationMap.get(invitationID);
@@ -270,9 +276,9 @@ const CallInviteStateManage = {
     zloginfo('[InviteStateManage]######isOncall######', newCallID);
 
     // determine for onInvitationReceived
-    if (newCallID && CallInviteStateManage._isInviteCalling) {
+    if (newCallID && CallInviteStateManage._inOutgoingCall) {
       isOn = true;
-      zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}, reason: _isInviteCalling === true`)
+      zloginfo(`[InviteStateManage][isOncall] isOn: ${isOn}, reason: _inOutgoingCall === true`)
       return isOn
     }
 

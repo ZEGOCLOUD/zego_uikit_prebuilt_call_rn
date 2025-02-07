@@ -35,6 +35,7 @@ export default function ZegoSendCallInvitationButton(props) {
     callName,
     showWaitingPageWhenGroupCall = false,
     resourceID: _resourceID = '',
+    customData,
   } = props;
 
   const getInviteeIDList = () => {
@@ -165,7 +166,7 @@ export default function ZegoSendCallInvitationButton(props) {
         : ZegoInvitationType.voiceCall,
       inviter: { id: localUser.userID, name: localUser.userName },
       timeout: timeout,
-      custom_data: '',
+      custom_data: customData,
     });
 
     return _data

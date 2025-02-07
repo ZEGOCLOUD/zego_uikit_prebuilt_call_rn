@@ -105,8 +105,6 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       successfulInvitees
     );
 
-    OfflineCallEventListener.getInstance().setCurrentRoomID(roomID);
-
     if (allInvitees.length === 1 || showWaitingPageWhenGroupCall) {
       // Jump to call waiting page
       zloginfo('Jump to call waiting page.');
@@ -114,7 +112,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
         roomID,
         isVideoCall,
         invitees: allInvitees,
-        inviter: localUser.userID,
+        inviterID: localUser.userID,
         invitationID: callID,
         callName,
       });

@@ -58,17 +58,17 @@ export const onUserLogin = async (userID, userName, props) => {
         onIncomingCallAcceptButtonPressed: (navigation) => {
           console.log('[onIncomingCallAcceptButtonPressed]');
         },
-        onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
-          console.log('[onOutgoingCallCancelButtonPressed]+++',navigation, callID, invitees, type);
-        },
         onIncomingCallReceived: (callID, inviter, type, invitees, customData) => {
-          console.log('[Incoming call]+++', callID, inviter, type, invitees, customData)
+          console.log('[onIncomingCallReceived]+++', callID, inviter, type, invitees, customData)
         },
         onIncomingCallCanceled: (callID, inviter) => {
           console.log('[onIncomingCallCanceled]+++', callID, inviter);
         },
         onIncomingCallTimeout: (callID, inviter) => {
           console.log('[onIncomingCallTimeout]+++', callID, inviter);
+        },
+        onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
+          console.log('[onOutgoingCallCancelButtonPressed]+++', callID, invitees, type);
         },
         onOutgoingCallAccepted: (callID, invitee) => {
           console.log('[onOutgoingCallAccepted]+++', callID, invitee);

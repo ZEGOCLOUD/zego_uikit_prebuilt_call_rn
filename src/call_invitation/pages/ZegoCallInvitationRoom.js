@@ -22,6 +22,7 @@ import { ZegoInvitationType } from '../services/defines';
 import HangupHelper from '../services/hangup_helper';
 import CallInviteStateManage from '../services/invite_state_manager';
 import NotificationHelper from '../services/notification_helper';
+import ZegoPrebuiltPlugins from '../services/plugins';
 
 export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   const navigation = useNavigation();
@@ -89,9 +90,9 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     routeParams.onDurationUpdate = config.timingConfig?.onDurationUpdate
   }
 
-  const _onCallEnd = (callID, reason, duration) => {
+  const _onCallEnd = (roomID, reason, duration) => {
     // reason 0-localHangUp, 1-remoteHangUp, 2-kickOut
-    zloginfo(`[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd], callID: ${callID}, reason: ${reason}, duration: ${duration}`);
+    zloginfo(`[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd], roomID: ${roomID}, reason: ${reason}, duration: ${duration}`);
     if (reason === ZegoCallEndReason.localHangUp) {
       hangUpHandle();
     } else {
@@ -101,7 +102,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     // callback.
     if (typeof config.onCallEnd == 'function') {
       zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd] notify requireConfig.onCallEnd will')
-      config.onCallEnd(callID, reason, duration);
+      config.onCallEnd(roomID, reason, duration);
       zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd] notify requireConfig.onCallEnd succeed')
     } else {
       const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
@@ -134,7 +135,11 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
       inviter === userID &&
       CallInviteStateManage.isAutoCancelInvite(invitationID)
     ) {
-      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees, JSON.stringify({"call_id": roomID, "operation_type": "cancel_invitation"}));
+      ZegoUIKit.getSignalingPlugin().cancelInvitation(invitees, JSON.stringify({
+        "call_id": roomID, 
+        "operation_type": "cancel_invitation",
+        'inviter': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
+      }));
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
   };
