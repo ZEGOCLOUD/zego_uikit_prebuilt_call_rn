@@ -98,12 +98,16 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     useEffect(() => {
         if (isInit) {
             MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized]')
+
                 setIsVisable(true);
                 const initConfig = MinimizingHelper.getInstance().getInitConfig();
                 const { onWindowMinimized } = initConfig;
 
                 if (typeof onWindowMinimized === 'function') {
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized will')
                     onWindowMinimized();
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized succeed')
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                     setTimeout(() => {
                         ZegoUIKit.forceRenderVideoView();
@@ -111,13 +115,24 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
                 }
             });
             MinimizingHelper.getInstance().onWindowMaximized(callbackID, () => {
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMaximized]')
+
                 setIsVisable(false);
                 const initConfig = MinimizingHelper.getInstance().getInitConfig();
                 const { onWindowMaximized } = initConfig;
 
-                if (typeof onWindowMaximized === 'function') {
+                const routeParams = PrebuiltHelper.getInstance().getRouteParams();
+                // if routeParams is empty, do not call onWindowMaximized, to avoid exception in ZegoUIKitPrebuiltCallInCallScreen
+                // In MinimizeSwitch mode, MinimizeView will gone after clearRouteParams
+                if (typeof onWindowMaximized === 'function' && Object.keys(routeParams).length > 0) {
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMaximized] execute initConfig.onWindowMaximized will')
                     onWindowMaximized();
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMaximized] execute initConfig.onWindowMaximized succeed')
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
+                } else {
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMaximized] onWindowMaximized not a function or routeParams is empty');
+                    // Since the room can't be restored and the option to maximize the entrance has already invisable, to avoid exception leater, the minimized state should be restored to false.
+                    MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
                 }
             });
             MinimizingHelper.getInstance().onEntryNormal(callbackID, () => {

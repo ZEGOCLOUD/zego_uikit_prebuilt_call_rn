@@ -1,4 +1,5 @@
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import { zloginfo } from '../../utils/logger';
 
 export default class MinimizingHelper {
     static _instance: MinimizingHelper;
@@ -31,6 +32,7 @@ export default class MinimizingHelper {
     }
     setIsMinimizeSwitch(isMinimizeSwitch: boolean) {
         this._isMinimizeSwitch = !!isMinimizeSwitch;
+        zloginfo('[MinimizingHelper][setIsMinimizeSwitch] isMinimizeSwitch: ' + this._isMinimizeSwitch);
     }
     getIsMinimizeSwitch() {
         return this._isMinimizeSwitch;
@@ -57,6 +59,8 @@ export default class MinimizingHelper {
         return this._plugins;
     }
     minimizeWindow() {
+        zloginfo('[MinimizingHelper][minimizeWindow]');
+        
         const callbackID = 'MinimizingHelper' + String(Math.floor(Math.random() * 10000));
         this.unRegisterAudioVideoListCallback(callbackID);
         this.registerAudioVideoListCallback(callbackID);

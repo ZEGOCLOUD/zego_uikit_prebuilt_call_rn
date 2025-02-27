@@ -1,3 +1,5 @@
+import { zloginfo } from "../../utils/logger";
+
 export default class PrebuiltHelper {
     static _instance: PrebuiltHelper;
     _stateData: { [index: string]: any } = {
@@ -25,6 +27,7 @@ export default class PrebuiltHelper {
         };
     }
     clearRouteParams() {
+        zloginfo(`[PrebuiltHelper][clearRouteParams]`);
         this._routeParams = {};
     }
     clearNotify() {
