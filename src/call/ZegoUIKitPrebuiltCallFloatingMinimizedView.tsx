@@ -98,21 +98,25 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     useEffect(() => {
         if (isInit) {
             MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
-                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized]')
-
-                setIsVisable(true);
                 const initConfig = MinimizingHelper.getInstance().getInitConfig();
                 const { onWindowMinimized } = initConfig;
-
-                if (typeof onWindowMinimized === 'function') {
-                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized will')
-                    onWindowMinimized();
-                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized succeed')
-                    MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
-                    setTimeout(() => {
-                        ZegoUIKit.forceRenderVideoView();
-                    }, 100);
+                
+                if (typeof onWindowMinimized !== 'function') {
+                    zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] onWindowMinimized is not a function, ignore call it')
+                    return;
                 }
+
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized]')
+                setIsVisable(true);
+                MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
+
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized will')
+                onWindowMinimized();
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized succeed')
+
+                setTimeout(() => {
+                    ZegoUIKit.forceRenderVideoView();
+                }, 100);
             });
             MinimizingHelper.getInstance().onWindowMaximized(callbackID, () => {
                 zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMaximized]')
