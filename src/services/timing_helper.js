@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Platform } from 'react-native';
 
 export default class TimingHelper {
     static _instance;
@@ -24,14 +24,19 @@ export default class TimingHelper {
     }
 
     increaseDuration() {
-        // The timing depends on the hardware, and on machines with poor performance, the timing may be slower than the actual
-        const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)
-        const duration = this._duration + 1
-        if (realDuration >= duration + 1) {
-            this._duration = realDuration;
+        if (Platform.OS === 'android') {
+            // The timing depends on the hardware, and on machines with poor performance, the timing may be slower than the actual
+            const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)
+            const duration = this._duration + 1
+            if (realDuration >= duration + 1) {
+                this._duration = realDuration;
+            } else {
+                this._duration = duration;
+            }
         } else {
-            this._duration = duration;
+            this._duration = Math.floor((Date.now() - this._durationStart) / 1000)
         }
+
         this.notifyDurationUpdate(this._duration)
     }
 
