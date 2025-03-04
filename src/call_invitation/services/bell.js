@@ -1,6 +1,8 @@
+import { NativeModules, Platform, Vibration } from 'react-native';
 import Sound from 'react-native-sound';
-import { Vibration } from 'react-native';
-import { zloginfo, zlogerror } from '../../utils/logger';
+import { zloginfo, zlogerror, zlogwarning } from '../../utils/logger';
+
+const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 
 // console.warn('Sound', Sound);
 // console.warn('Vibration', Vibration);
@@ -58,6 +60,8 @@ const BellManage = {
     });
   },
   playIncomingSound: () => {
+    ZegoUIKitPrebuiltCallRNModule.changeToSpeaker()
+    
     BellManage._whooshIncoming.play((success) => {
       if (success) {
         zloginfo('successfully finished playing zego_incoming');
@@ -75,6 +79,8 @@ const BellManage = {
     });
   },
   playOutgoingSound: () => {
+    ZegoUIKitPrebuiltCallRNModule.changeToReceiver()
+
     BellManage._whooshOutgoing.play((success) => {
       if (success) {
         zloginfo('successfully finished playing zego_outgoing');

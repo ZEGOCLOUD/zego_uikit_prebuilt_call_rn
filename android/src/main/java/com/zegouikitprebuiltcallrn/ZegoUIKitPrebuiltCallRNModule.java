@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -122,6 +123,22 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     @ReactMethod(isBlockingSynchronousMethod = true)
     public int getApiLevelSync() {
         return Build.VERSION.SDK_INT;
+    }
+
+    @ReactMethod
+    public void changeToReceiver() {
+        AudioManager audioManager = (AudioManager)getAppContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setSpeakerphoneOn(false);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        XLogWrapper.i(NAME, "changeToReceiver");
+    }
+
+    @ReactMethod
+    public void changeToSpeaker() {
+        AudioManager audioManager = (AudioManager)getAppContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setSpeakerphoneOn(true);
+        audioManager.setMode(AudioManager.MODE_NORMAL);
+        XLogWrapper.i(NAME, "changeToSpeaker");
     }
 
     private Context getAppContext() {
