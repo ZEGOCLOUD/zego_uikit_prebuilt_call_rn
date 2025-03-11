@@ -7,7 +7,11 @@ import {
     useWindowDimensions,
     View,
 } from 'react-native';
+
 import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
+
+import { ZegoCallEndReason } from '../services/defines';
+import TimingHelper from '../services/timing_helper';
 import { zloginfo } from "../utils/logger";
 import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from './services/prebuilt_helper';
@@ -110,9 +114,9 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
                 setIsVisable(true);
                 MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
 
-                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized will')
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute requireConfig.onWindowMinimized will')
                 onWindowMinimized();
-                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute initConfig.onWindowMinimized succeed')
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onWindowMinimized] execute requireConfig.onWindowMinimized succeed')
 
                 setTimeout(() => {
                     ZegoUIKit.forceRenderVideoView();
@@ -158,10 +162,21 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
     useEffect(() => {
       ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
         zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] onOnlySelfInRoom')
+
         const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
-        isMinimize && PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+        if (isMinimize) {
+            let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+            if (typeof routeParams.onCallEnd == 'function') {
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd will')
+                routeParams.onCallEnd(routeParams.roomID, ZegoCallEndReason.remoteHangUp, TimingHelper.getInstance().getDuration());
+                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd succeed')      
+            }
+    
+            PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+        }
       })
       return () => {
+        // It will never be executed because this view is persistent.
         ZegoUIKit.onOnlySelfInRoom(callbackID)
       }
     }, [])

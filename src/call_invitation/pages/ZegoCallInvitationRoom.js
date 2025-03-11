@@ -79,6 +79,11 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     requireInviterConfig
   } : requireDefaultConfig(callInvitationData);
 
+  // Store requireConfig.onCallEnd in PrebuiltHelper.routeParams, so FloatingMinimizedView can call it before notifyDestroyPrebuilt
+  if (!isMinimizeSwitch && !routeParams.onCallEnd) {
+    routeParams.onCallEnd = config.onCallEnd
+  }
+
   const _onCallEnd = (callID, reason, duration) => {
     // reason 0-localHangUp, 1-remoteHangUp, 2-kickOut
     zloginfo('[ZegoUIKitPrebuiltCallInCallScreen] onCallEnd', callID, reason, duration);
@@ -90,7 +95,9 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
 
     // callback.
     if (typeof config.onCallEnd == 'function') {
+      zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd] notify requireConfig.onCallEnd will')
       config.onCallEnd(callID, reason, duration);
+      zloginfo('[ZegoUIKitPrebuiltCallInCallScreen][_onCallEnd] notify requireConfig.onCallEnd succeed')
     } else {
       const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
       if (isMinimize) {
