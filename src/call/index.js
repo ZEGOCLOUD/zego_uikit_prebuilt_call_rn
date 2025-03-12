@@ -310,18 +310,24 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     useImperativeHandle(ref, () => ({
         hangUp: (showConfirmation = false) => {
+            zloginfo(`[ZegoUIKitPrebuiltCall][hangUp] showConfirmation: ${showConfirmation}`)
+
             if (debounce.current) return;
             if (!showConfirmation) {
+                zloginfo('[ZegoUIKitPrebuiltCall][hangUp] notify requireConfig.onCallEnd will')
                 debounce.current = true;
                 const duration = TimingHelper.getInstance().getDuration();
                 typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
+                zloginfo('[ZegoUIKitPrebuiltCall][hangUp] notify requireConfig.onCallEnd succeed')
                 debounce.current = false;
             } else {
                 debounce.current = true;
                 const temp = onHangUpConfirmation || showLeaveAlert;
                 temp().then(() => {
+                    zloginfo('[ZegoUIKitPrebuiltCall][hangUp] notify requireConfig.onCallEnd will')
                     const duration = TimingHelper.getInstance().getDuration();
                     typeof onCallEnd == 'function' && onCallEnd(callID, ZegoCallEndReason.localHangUp, duration);
+                    zloginfo('[ZegoUIKitPrebuiltCall][hangUp] notify requireConfig.onCallEnd succeed')
                     debounce.current = false;
                 });
             }
@@ -349,17 +355,21 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
         ZegoUIKit.onJoinRoom(callbackID, onJoinRoom);
         ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
+            zloginfo('[ZegoUIKitPrebuiltCall][onOnlySelfInRoom] notify requireConfig.onCallEnd will')
             const duration = TimingHelper.getInstance().getDuration();
             if (typeof onCallEnd == 'function') {
               onCallEnd(callID, ZegoCallEndReason.remoteHangUp, duration);
             }
+            zloginfo('[ZegoUIKitPrebuiltCall][onOnlySelfInRoom] notify requireConfig.onCallEnd succeed')
         });
         ZegoUIKit.onUserJoin(callbackID, onUserJoin);
         ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
-          const duration = TimingHelper.getInstance().getDuration();
-          if (typeof onCallEnd == 'function') {
-            onCallEnd(callID, ZegoCallEndReason.kickOut, duration);
-          }
+            zloginfo('[ZegoUIKitPrebuiltCall][onMeRemovedFromRoom] notify requireConfig.onCallEnd will')
+            const duration = TimingHelper.getInstance().getDuration();
+            if (typeof onCallEnd == 'function') {
+                onCallEnd(callID, ZegoCallEndReason.kickOut, duration);
+            }
+            zloginfo('[ZegoUIKitPrebuiltCall][onMeRemovedFromRoom] notify requireConfig.onCallEnd succeed')
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
         ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {

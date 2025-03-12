@@ -112,6 +112,7 @@ export default class MinimizingHelper {
         })
     }
     notifyMinimize() {
+        zloginfo('[MinimizingHelper][notifyMinimize]')
         this._isMinimize = true;
 
         Object.keys(this._onWindowMinimizeCallbackMap).forEach((callbackID) => {
@@ -121,6 +122,7 @@ export default class MinimizingHelper {
         })
     }
     notifyMaximize() {
+        zloginfo('[MinimizingHelper][notifyMaximize]')
         this._isMinimize = false;
 
         Object.keys(this._onWindowMaximizeCallbackMap).forEach((callbackID) => {
@@ -130,6 +132,7 @@ export default class MinimizingHelper {
         })
     }
     notifyEntryNormal() {
+        zloginfo('[MinimizingHelper][notifyEntryNormal]')
         this._isMinimize = false;
 
         Object.keys(this._onEntryNormalCallbackMap).forEach((callbackID) => {

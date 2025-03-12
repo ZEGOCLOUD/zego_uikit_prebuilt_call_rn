@@ -161,25 +161,42 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
 
     useEffect(() => {
       ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
-        zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] onOnlySelfInRoom')
+        zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] callbackID:', callbackID)
 
         const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
-        if (isMinimize) {
-            let routeParams = PrebuiltHelper.getInstance().getRouteParams();
-            if (typeof routeParams.onCallEnd == 'function') {
-                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd will')
-                routeParams.onCallEnd(routeParams.roomID, ZegoCallEndReason.remoteHangUp, TimingHelper.getInstance().getDuration());
-                zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd succeed')      
-            }
+        let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+        const duration = TimingHelper.getInstance().getDuration()
+        if (isMinimize && typeof routeParams.onCallEnd == 'function') {
+            zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd will')
+            routeParams.onCallEnd(routeParams.roomID, ZegoCallEndReason.remoteHangUp, duration);
+            zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onOnlySelfInRoom] notify requireConfig.onCallEnd succeed')      
     
             PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
         }
       })
+      
+      ZegoUIKit.onMeRemovedFromRoom(callbackID, () => {
+        zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onMeRemovedFromRoom] callbackID:', callbackID)
+
+        const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+        let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+        const duration = TimingHelper.getInstance().getDuration()
+        if (isMinimize && typeof routeParams.onCallEnd == 'function') {
+            zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onMeRemovedFromRoom] notify requireConfig.onCallEnd will')
+            routeParams.onCallEnd(routeParams.roomID, ZegoCallEndReason.kickOut, duration);
+            zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView][onMeRemovedFromRoom] notify requireConfig.onCallEnd succeed')      
+
+            PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+        }
+      });
+
       return () => {
         // It will never be executed because this view is persistent.
         ZegoUIKit.onOnlySelfInRoom(callbackID)
+        ZegoUIKit.onMeRemovedFromRoom(callbackID)
       }
     }, [])
+
     return (
         <Animated.View
             style={[
