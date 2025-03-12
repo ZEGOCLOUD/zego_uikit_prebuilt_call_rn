@@ -2,6 +2,7 @@ import { AppState } from 'react-native';
 // import GetAppName from 'react-native-get-app-name';
 import ZegoUIKit, {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../call/services/minimizing_helper";
+import PrebuiltHelper from '../call/services/prebuilt_helper';
 import BellManage from '../call_invitation/services/bell';
 import RNCallKit from '../call_invitation/services/callkit'
 import HangupHelper from "../call_invitation/services/hangup_helper";
@@ -174,15 +175,30 @@ export default class ZegoUIKitPrebuiltCallService {
         }
     }
     hangUp(showConfirmation = false) {
+        zloginfo(`[ZegoUIKitPrebuiltCallService][hangUp] showConfirmation: ${showConfirmation}`)
+
         const debounce = HangupHelper.getInstance().getDebounce();
         const config = this.config.requireConfig ? this.config.requireConfig({}) : {};
         const { onCallEnd, onHangUpConfirmation, hangUpConfirmInfo } = config;
-        if (debounce) return;
+
+        if (debounce) {
+          zloginfo(`[ZegoUIKitPrebuiltCallService][hangUp] debounce: ${debounce}, return`)
+          return;
+        }
+        
+        let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+        if (!routeParams.roomID) {
+          zloginfo(`[ZegoUIKitPrebuiltCallService][hangUp] can't get roomID from routeParams, return`)
+          return
+        }
+
         if (!showConfirmation) {
             const duration = TimingHelper.getInstance().getDuration();
             HangupHelper.getInstance().setDebounce(true);
             if (typeof onCallEnd == 'function') {
-              onCallEnd('', ZegoCallEndReason.localHangUp, duration);
+              zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd will')
+              onCallEnd(routeParams.roomID, ZegoCallEndReason.localHangUp, duration);
+              zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd succeed')      
             } else {
               HangupHelper.getInstance().notifyAutoJump();
             }
@@ -193,7 +209,9 @@ export default class ZegoUIKitPrebuiltCallService {
             temp().then(() => {
                 const duration = TimingHelper.getInstance().getDuration();
                 if (typeof onCallEnd == 'function') {
-                  onCallEnd('', ZegoCallEndReason.localHangUp, duration);
+                  zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd will')
+                  onCallEnd(routeParams.roomID, ZegoCallEndReason.localHangUp, duration);
+                  zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd succeed')
                 } else {
                   HangupHelper.getInstance().notifyAutoJump();
                 }
