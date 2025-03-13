@@ -121,8 +121,11 @@ export default class NotificationHelper {
         let cxCallUpdate = { } as CXCallUpdate;
         cxCallUpdate.localizedCallerName = callerName
         cxCallUpdate.hasVideo = (type === ZegoInvitationType.videoCall)
-        this._uikitSignalingPlugin.reportIncomingCall(cxCallUpdate, notifyUuid);
-        zloginfo(`[NotificationHelper][showOnlineNotification] reportIncomingCall callID: ${callID}`)
+        this._uikitSignalingPlugin.reportIncomingCall(cxCallUpdate, notifyUuid).then(() => {
+            zloginfo(`[NotificationHelper][showOnlineNotification] reportIncomingCall succeeded, callID: ${callID}`)
+        }).catch((message: string) => {
+            zlogerror(`[NotificationHelper][showOnlineNotification] reportIncomingCall failed, reason: ${message}`)
+        })
         
         this._currentCallID = callID
         this._currentCallStatus = 'notification'
