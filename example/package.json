@@ -36,9 +36,9 @@
     "@zegocloud/zego-uikit-prebuilt-call-rn": "link:../",
     "@zegocloud/zego-uikit-rn": "link:../../../",
     "zego-callkit-react-native": "^1.0.6",
-    "zego-express-engine-reactnative": "^3.19.1",
-    "zego-zim-react-native": "^2.19.0",
-    "zego-zpns-react-native": ">=2.6.6 <2.8.0",
+    "zego-express-engine-reactnative": "^3.19.2",
+    "zego-zim-react-native": "^2.20.0",
+    "zego-zpns-react-native": "^2.8.1",
 
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/native-stack": "^6.11.0",
