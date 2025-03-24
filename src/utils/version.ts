@@ -1,10 +1,20 @@
-import { NativeModules } from "react-native"
+import { NativeModules, Platform } from "react-native"
 
 export const getRnVersion = () => {
-    let rnVersion = NativeModules.PlatformConstants.reactNativeVersion
-    if (rnVersion.prerelease) {
-        return `${rnVersion.major}.${rnVersion.minor}.${rnVersion.patch}.${rnVersion.prerelease}`
-    } else {
-        return `${rnVersion.major}.${rnVersion.minor}.${rnVersion.patch}`    
+    let rnVersion = Platform.constants?.reactNativeVersion || {}
+    if (!rnVersion) {
+      rnVersion = NativeModules.PlatformConstants?.reactNativeVersion || {}
     }
-}
+  
+    let displayVersion = 'unknown'
+    // @ts-ignore
+    if (rnVersion.major !== undefined) { displayVersion = rnVersion.major }
+    // @ts-ignore
+    if (rnVersion.minor !== undefined) { displayVersion += `.${rnVersion.minor}` }
+    // @ts-ignore
+    if (rnVersion.patch !== undefined) { displayVersion += `.${rnVersion.patch}` }
+    // @ts-ignore
+    if (rnVersion.prerelease !== undefined && rnVersion.prerelease !== null) { displayVersion += `.${rnVersion.prerelease}` }
+  
+    return displayVersion
+  }
