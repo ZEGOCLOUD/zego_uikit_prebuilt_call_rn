@@ -18,7 +18,12 @@ export default function ZegoCountdownLabel(props) {
             
             setDuration(Math.max(maxDuration - v, 0))
         });
+
+        return () => {
+            TimingHelper.getInstance().onDurationUpdate("ZegoCountdownLabelDuration");
+        }
     }, [])
+
     return (
         <View style={styles.container} pointerEvents={'box-none'}>
             <SafeAreaView ><Text style={styles.timing}>{durationFormat(duration)}</Text></SafeAreaView>

@@ -194,28 +194,14 @@ export default class ZegoUIKitPrebuiltCallService {
         }
 
         if (!showConfirmation) {
-            const duration = TimingHelper.getInstance().getDuration();
             HangupHelper.getInstance().setDebounce(true);
-            if (typeof onCallEnd == 'function') {
-              zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd will')
-              onCallEnd(routeParams.roomID, ZegoCallEndReason.localHangUp, duration);
-              zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd succeed')      
-            } else {
-              HangupHelper.getInstance().notifyAutoJump();
-            }
+            this._hangupProcess(onCallEnd, routeParams.roomID, ZegoCallEndReason.localHangUp);
             HangupHelper.getInstance().setDebounce(false);
         } else {
             HangupHelper.getInstance().setDebounce(true);
             const temp = onHangUpConfirmation || HangupHelper.getInstance().showLeaveAlert.bind(this, hangUpConfirmInfo);
             temp().then(() => {
-                const duration = TimingHelper.getInstance().getDuration();
-                if (typeof onCallEnd == 'function') {
-                  zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd will')
-                  onCallEnd(routeParams.roomID, ZegoCallEndReason.localHangUp, duration);
-                  zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd succeed')
-                } else {
-                  HangupHelper.getInstance().notifyAutoJump();
-                }
+                this._hangupProcess(onCallEnd, routeParams.roomID, ZegoCallEndReason.localHangUp);
                 HangupHelper.getInstance().setDebounce(false);
             });
         }
@@ -236,5 +222,23 @@ export default class ZegoUIKitPrebuiltCallService {
     requestSystemAlertWindow(alert) {
       // System Alert
       RNCallKit.requestSystemAlertWindow(alert.message, alert.allow, alert.deny);
+    }
+
+    _hangupProcess(onCallEnd, roomID, endReason) {
+      const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+      zloginfo('[ZegoUIKitPrebuiltCallService][_hangupProcess] roomID: ', roomID, 'endReason: ', endReason, 'isMinimize: ', isMinimize)
+      const duration = TimingHelper.getInstance().getDuration();
+
+      if (typeof onCallEnd !== 'function') {
+        HangupHelper.getInstance().notifyAutoJump();
+      } else {
+        zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd will')
+        onCallEnd(roomID, endReason, duration);
+        zloginfo('[ZegoUIKitPrebuiltCallService][hangUp] notify requireConfig.onCallEnd succeed')
+
+        if (isMinimize) {
+          PrebuiltHelper.getInstance().notifyDestroyPrebuilt();
+        }
+      }
     }
 }

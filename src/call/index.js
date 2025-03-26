@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, us
 import { Alert, BackHandler, PermissionsAndroid, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
+import KeepAwake from 'react-native-keep-awake'
+
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageView, ZegoLayoutMode, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
+
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
 import ZegoTopMenuBar from './ZegoTopMenuBar';
@@ -13,8 +16,6 @@ import TimingHelper from "../services/timing_helper";
 import MinimizingHelper from "./services/minimizing_helper";
 import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
-import Timer from "../utils/timer"
-import KeepAwake from 'react-native-keep-awake'
 import { useKeyboard } from '../utils/keyboard';
 import { ZegoCallEndReason } from '../services/defines';
 import { zloginfo } from '../utils/logger';
@@ -140,11 +141,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     var hideCountdownOnTopMenu = 5;
 
     const debounce = useRef(false);
-
-    const timingTimer = new Timer(elapsed => {
-        TimingHelper.getInstance().increaseDuration()
-        typeof onDurationUpdate === 'function' && onDurationUpdate(TimingHelper.getInstance().getDuration());
-    }, 1000)
 
     if (stateData.current.callbackID) {
         stateData.current.callbackID = 'ZegoUIKitPrebuiltCall' +
@@ -273,11 +269,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     };
     const startCallTimingTimer = useCallback(() => {
         if (!enableTiming) return;
-        timingTimer.stop()
-        timingTimer.start()
+        TimingHelper.getInstance().stopTimer()
+        TimingHelper.getInstance().startTimer()
     }, []);
     const destroyCallTimingTimer = useCallback((isFromMinimize) => {
         zloginfo('[ZegoUIKitPrebuiltCall] destroyCallTimingTimer, isFromMinimize:', isFromMinimize)
+        TimingHelper.getInstance().stopTimer()
 
         // we need to reset duration when call is ended from minimize
         if (isFromMinimize) {
@@ -287,7 +284,6 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         else if (!MinimizingHelper.getInstance().getIsMinimizeSwitch()) {
             TimingHelper.getInstance().resetDuration()
         }
-        timingTimer.stop()
     }, []);
     const onOpenCallMemberList = () => {
         setIsCallMemberListVisable(true);
@@ -380,6 +376,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             stateData.current.useSpeakerWhenJoining = (type === 0);
         });
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
+            // Calls are usually initiated from the minimized mode.
             zloginfo('[ZegoUIKitPrebuiltCall] onPrebuiltDestroy', callbackID);
             
             zloginfo('[ZegoUIKitPrebuiltCall] leave room, tag: onPrebuiltDestroy')
@@ -432,6 +429,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         // Initialize after use
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
 
+        TimingHelper.getInstance().onDurationUpdate(callbackID, (duration) => {
+            typeof onDurationUpdate === 'function' && onDurationUpdate(duration);
+        })
+
         return () => {
             zloginfo('[ZegoUIKitPrebuiltCall] useEffect return')
 
@@ -448,11 +449,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 PrebuiltHelper.getInstance().clearState();
                 PrebuiltHelper.getInstance().clearRouteParams();
                 PrebuiltHelper.getInstance().clearNotify();
-                
+                destroyCallTimingTimer(false);
+
                 zloginfo('[ZegoUIKitPrebuiltCall] KeepAwake deactivate')
                 KeepAwake.deactivate();
             }
-            destroyCallTimingTimer(false);
+            TimingHelper.getInstance().onDurationUpdate(callbackID)
             BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
             navigation.setOptions({ gestureEnabled: true });
         }

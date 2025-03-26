@@ -39,6 +39,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
     routeParams.inviter = route.params.inviter;
     routeParams.invitationID = route.params.invitationID;
     routeParams.useFrontFacingCamera = route.params.useFrontFacingCamera;
+    TimingHelper.getInstance().resetDuration()
   } else {
     routeParams.useFrontFacingCamera = ZegoUIKit.isUsingFrontFacingCamera();
   }
@@ -82,6 +83,7 @@ export default function ZegoUIKitPrebuiltCallInCallScreen(props) {
   // Store requireConfig.onCallEnd in PrebuiltHelper.routeParams, so FloatingMinimizedView can call it before notifyDestroyPrebuilt
   if (!isMinimizeSwitch && !routeParams.onCallEnd) {
     routeParams.onCallEnd = config.onCallEnd
+    routeParams.onDurationUpdate = config.timingConfig?.onDurationUpdate
   }
 
   const _onCallEnd = (callID, reason, duration) => {

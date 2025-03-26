@@ -8,6 +8,10 @@ export default function ZegoPrebuiltForegroundView(props) {
     const [duration, setDuration] = useState(TimingHelper.getInstance().getDuration());
     useEffect(() => {
         TimingHelper.getInstance().onDurationUpdate("ZegoPrebuiltForegroundViewDuration", (duration) => setDuration(duration));
+
+        return () => {
+            TimingHelper.getInstance().onDurationUpdate("ZegoPrebuiltForegroundViewDuration");
+        }
     }, [])
 
     return (

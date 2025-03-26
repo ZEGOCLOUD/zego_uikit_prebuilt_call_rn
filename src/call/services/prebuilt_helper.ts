@@ -34,6 +34,7 @@ export default class PrebuiltHelper {
         this._notifyData = {};
     }
     notifyDestroyPrebuilt() {
+        zloginfo('[PrebuiltHelper][notifyDestroyPrebuilt]', this._onPrebuiltDestroyCallbackMap)
         Object.keys(this._onPrebuiltDestroyCallbackMap).forEach((callbackID) => {
             if (this._onPrebuiltDestroyCallbackMap[callbackID]) {
                 this._onPrebuiltDestroyCallbackMap[callbackID]();

@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { zloginfo } from '../utils/logger';
 
 export default class TimingHelper {
     static _instance;
@@ -7,6 +8,7 @@ export default class TimingHelper {
         this._duration = 0;
         this._durationStart = Date.now();
         this._onDurationUpdateCallbackMap = {};
+        this._timer = null;
     }
     
     static getInstance() {
@@ -17,13 +19,34 @@ export default class TimingHelper {
         return TimingHelper._instance;
     }
 
-    resetDuration() {
-        // this._duration = 0;
-        // this._durationStart = Date.now();
-        TimingHelper._instance = null;
+    startTimer() {
+        zloginfo('[TimingHelper][startTimer]')
+        if (!this._timer) {
+            this._durationStart = Date.now();
+            this._timer = setInterval(() => {
+                this._increaseDuration();
+            }, 1000);
+        }
     }
 
-    increaseDuration() {
+    stopTimer() {
+        zloginfo('[TimingHelper][stopTimer]')
+        if (this._timer) {
+            clearInterval(this._timer);
+            this._timer = null;
+            this._durationStart = Date.now();
+        }
+    }
+
+    resetDuration() {
+        zloginfo('[TimingHelper][resetDuration]')
+        this.stopTimer()
+
+        this._duration = 0;
+        this._durationStart = Date.now();
+    }
+
+    _increaseDuration() {
         if (Platform.OS === 'android') {
             // The timing depends on the hardware, and on machines with poor performance, the timing may be slower than the actual
             const realDuration = Math.floor((Date.now() - this._durationStart) / 1000)

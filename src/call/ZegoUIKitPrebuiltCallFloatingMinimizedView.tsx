@@ -95,10 +95,21 @@ export default function ZegoUIKitPrebuiltCallFloatingMinimizedView(props: any) {
             zloginfo('[ZegoUIKitPrebuiltCallFloatingMinimizedView] init success');
             setIsInit(true);
         });
+        TimingHelper.getInstance().onDurationUpdate(callbackID, (duration: number) => {
+            const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+            let routeParams = PrebuiltHelper.getInstance().getRouteParams();
+            if (isMinimize && typeof routeParams.onDurationUpdate == 'function') {
+                routeParams.onDurationUpdate(duration);
+            }
+        })
+
         return () => {
+            // It will never be executed because this view is persistent.
             MinimizingHelper.getInstance().onPrebuiltInit(callbackID);
+            TimingHelper.getInstance().onDurationUpdate(callbackID)
         };
     }, []);
+
     useEffect(() => {
         if (isInit) {
             MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
