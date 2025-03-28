@@ -1,41 +1,21 @@
-
-// android/build.gradle
-
-// based on:
-//
-// * https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle
-//   original location:
-//   - https://github.com/facebook/react-native/blob/0.58-stable/local-cli/templates/HelloWorld/android/build.gradle
-//
-// * https://github.com/facebook/react-native/blob/0.60-stable/template/android/app/build.gradle
-//   original location:
-//   - https://github.com/facebook/react-native/blob/0.58-stable/local-cli/templates/HelloWorld/android/app/build.gradle
-
-def DEFAULT_BUILD_TOOLS_VERSION = "31.0.0"
-def DEFAULT_MIN_SDK_VERSION = 21
-def DEFAULT_COMPILE_SDK_VERSION = 31
-def DEFAULT_TARGET_SDK_VERSION = 31
-def DEFAULT_KOTLIN_VERSION = "1.9.25"
-
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
-
-apply plugin: 'com.android.library'
-
 buildscript {
-    // The Android Gradle plugin is only required when opening the android folder stand-alone.
-    // This avoids unnecessary downloads and potential conflicts when the library is included as a
-    // module dependency in an application project.
-    // ref: https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:build_script_external_dependencies
-    if (project == rootProject) {
-        repositories {
-            google()
+    ext {
+        DEFAULT_BUILD_TOOLS_VERSION = "31.0.0"
+        DEFAULT_MIN_SDK_VERSION = 21
+        DEFAULT_COMPILE_SDK_VERSION = 31
+        DEFAULT_TARGET_SDK_VERSION = 31
+        DEFAULT_KOTLIN_VERSION = "1.8.0"
+
+        safeExtGet = {prop, fallback ->
+            rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
         }
-        dependencies {
-            classpath 'com.android.tools.build:gradle:7.0.4'
-            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${safeExtGet('kotlinVersion', DEFAULT_KOTLIN_VERSION)}"
-        }
+    }
+    
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${safeExtGet('kotlinVersion', (DEFAULT_KOTLIN_VERSION))}"
     }
 }
 
@@ -88,7 +68,6 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     // api fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${safeExtGet('kotlinVersion', DEFAULT_KOTLIN_VERSION)}"
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
