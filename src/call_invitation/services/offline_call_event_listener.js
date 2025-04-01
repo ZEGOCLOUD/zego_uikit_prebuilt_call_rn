@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import ZegoUIKit, { ZegoUIKitLogger } from '@zegocloud/zego-uikit-rn';
 
 import { zloginfo } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
@@ -51,6 +51,8 @@ export default class OfflineCallEventListener {
             NotificationHelper.getInstance().init()
             NotificationHelper.getInstance().showOfflineNotification(data.zim_call_id, callUUID, data)
         });
+
+        ZegoUIKitLogger.logFlush()
     }
 
     init(config) {

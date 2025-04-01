@@ -66,6 +66,9 @@ export default class ZegoUIKitPrebuiltCallService {
         return 'PrebuiltCall';
     }
     useSystemCallingUI(plugins) {
+        zloginfo(`[ZegoUIKitPrebuiltCallService][useSystemCallingUI] plugins: ${plugins}`)
+        ZegoUIKitLogger.logFlush()
+
         OfflineCallEventListener.getInstance().useSystemCallingUI(plugins);
     }
     init(appID, appSign, userID, userName, plugins, config = {}) {
@@ -77,7 +80,7 @@ export default class ZegoUIKitPrebuiltCallService {
             return Promise.resolve();
         }
 
-        zloginfo(`[ZegoUIKitPrebuiltCallService][init] appID: ${appID}, userID: ${userID}, userName: ${userName}`)
+        zloginfo(`[ZegoUIKitPrebuiltCallService][init] appID: ${appID}, userID: ${userID}, userName: ${userName}, plugins: ${plugins}`)
 
         this.appInfo = { appID, appSign };
         this.localUser = { userID, userName };
@@ -102,10 +105,15 @@ export default class ZegoUIKitPrebuiltCallService {
             }
         );
 
-        let zpnsPlugin = plugins.find(item => (item.ZPNsPushSourceType))
-        if (zpnsPlugin) {
+        if (ZegoUIKit.getPluginName('ZPNs')) {
           // Enable offline notification
           ZegoUIKit.getSignalingPlugin().enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex, isIOSSandboxEnvironment, this.config.appName);
+        } else {
+          zloginfo('[ZegoUIKitPrebuiltCallService] ZPNs not installed')
+        }
+
+        if (Platform.OS === 'ios' && !ZegoUIKit.getPluginName('CallKit')) {
+          zloginfo('[ZegoUIKitPrebuiltCallService] iOS CallKit not installed')
         }
 
         NotificationHelper.getInstance().init()
