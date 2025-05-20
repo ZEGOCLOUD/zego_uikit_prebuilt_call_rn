@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "react": "18.3.1",
-    "react-native": "0.76.7"
+    "react-native": "0.76.9"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -20,10 +20,10 @@
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native-community/cli-platform-ios": "15.0.1",
-    "@react-native/babel-preset": "0.76.7",
-    "@react-native/eslint-config": "0.76.7",
-    "@react-native/metro-config": "0.76.7",
-    "@react-native/typescript-config": "0.76.7",
+    "@react-native/babel-preset": "0.76.9",
+    "@react-native/eslint-config": "0.76.9",
+    "@react-native/metro-config": "0.76.9",
+    "@react-native/typescript-config": "0.76.9",
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",
@@ -40,17 +40,17 @@
     "zego-zim-react-native": "^2.20.0",
     "zego-zpns-react-native": "^2.8.1",
 
-    "@react-navigation/native": "^6.0.0",
-    "@react-navigation/native-stack": "^6.11.0",
-    "react-native-safe-area-context": "^4.7.1",
-    "react-native-screens": ">=3.33.0 <3.36.0",
+    "@react-navigation/native": "^7.1.9",
+    "@react-navigation/native-stack": "^7.3.13",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "^4.10.0",
 
-    "@react-native-async-storage/async-storage": "^1.19.1",
+    "@react-native-async-storage/async-storage": "^2.1.2",
     "react-delegate-component": "^1.0.0",
-    "react-native-device-info": "^11.1.0",
+    "react-native-device-info": "^14.0.4",
     "react-native-encrypted-storage": "^4.0.3",
     "react-native-keep-awake": "4.0.0",
-    "react-native-orientation-locker": "^1.6.0",
+    "react-native-orientation-locker": "^1.7.0",
     "react-native-sound": "^0.11.2"
   },
   "engines": {
