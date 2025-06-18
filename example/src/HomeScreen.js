@@ -109,6 +109,7 @@ export default function HomeScreen(props) {
                 return { userID: inviteeID, userName: 'user_' + inviteeID };
               })}
               isVideoCall={false}
+              timeout={60}
               resourceID={"zego_data"}
               customData={'custom_data'}
               showWaitingPageWhenGroupCall={true}
@@ -128,7 +129,8 @@ export default function HomeScreen(props) {
                 return { userID: inviteeID, userName: 'user_' + inviteeID };
               })}
               isVideoCall={true}
-              resourceID={"zego_data"}    
+              timeout={60}
+              resourceID={"zego_data"}
               customData={'custom_data'}
               showWaitingPageWhenGroupCall={true}
               onPressed={ (errorCode, errorMessage, errorInvitees) => {

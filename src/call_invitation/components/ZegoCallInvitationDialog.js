@@ -226,8 +226,8 @@ export default function ZegoCallInvitationDialog(props) {
         },
         TAG
       );
-      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({data}) => {
-        zloginfo(`onInvitationTimeout implement by ${TAG}, data: ${JSON.stringify(data)}`);
+      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({callID: _callID, data}) => {
+        zloginfo(`onInvitationTimeout implement by ${TAG}, callID: ${_callID}, data: ${JSON.stringify(data)}`);
 
         const dataParsed = data ? JSON.parse(data) : {}
         CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallTimeout',
@@ -235,13 +235,13 @@ export default function ZegoCallInvitationDialog(props) {
           dataParsed.inviter
         )
 
-        if (callID === callIDRef.current) {
+        if (_callID === callIDRef.current) {
           BellManage.stopIncomingSound();
           BellManage.cancleVirate();
           setIsDialogVisable(false);
           setIsFullScreen(false);
         }
-        NotificationHelper.getInstance().dismissNotification(result.callID, 'Timeout', TAG)
+        NotificationHelper.getInstance().dismissNotification(_callID, 'Timeout', TAG)
 
         zloginfo(`onInvitationTimeout implement by ${TAG}, process done`);
       });

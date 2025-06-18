@@ -156,7 +156,7 @@ export default class NotificationHelper {
                 zloginfo(`[NotificationHelper][dismissNotification] set _currentCallID: ${this._currentCallID}, status: ${this._currentCallStatus}`)
             }
         } else if (reason === 'BeCancelled' || reason === 'Timeout') {
-            if (callID !== this._currentCallID) {
+            if (!callID || callID !== this._currentCallID) {
                 zloginfo(`[NotificationHelper][dismissNotification] ignore callID: ${callID}`)
                 return
             }
@@ -305,6 +305,7 @@ export default class NotificationHelper {
             .catch((error: ZIMError) => {
                 zloginfo(`[NotificationHelper][_onCallKitAnswerCall] acceptInvitation catch, error: ${error.code}, message: ${error.message}`)
 
+                this.hangUp(callID, 'acceptFailed')
                 CallInviteHelper.getInstance().refuseCall(callID);
                 this._currentCallID = ''
                 this._currentCallStatus = 'waiting'
@@ -317,7 +318,9 @@ export default class NotificationHelper {
     }
 
     hangUp(callID: string, reason: string) {
-        if (reason === 'onCallKitEndCall') {
+        zloginfo(`[NotificationHelper][hangUp] callID: ${callID}, reason: ${reason}`)
+
+        if (reason === 'onCallKitEndCall' || reason === 'acceptFailed') {
             ZegoUIKitPrebuiltCallService.getInstance().hangUp();
         } else {
             let notifyUuid = this._callIDUuidMap.get(callID);

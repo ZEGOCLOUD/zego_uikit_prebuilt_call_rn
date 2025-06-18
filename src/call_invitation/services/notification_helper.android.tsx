@@ -160,7 +160,7 @@ export default class NotificationHelper {
         zloginfo(`[NotificationHelper][dismissNotification] callID: ${callID}, reason: ${reason}, from: ${from}`)
 
         if (reason === 'BeCancelled' || reason === 'Timeout') {
-            if (callID !== this._currentCallID) {
+            if (!callID || callID !== this._currentCallID) {
                 zloginfo(`[NotificationHelper][dismissNotification] ignore callID: ${callID}`)
                 return
             }
