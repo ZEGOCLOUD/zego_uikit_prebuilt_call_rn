@@ -145,8 +145,9 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         navigation.goBack();
 
         let dataParsed = data ? JSON.parse(data) : {}
+        const dataInDataParsed = dataParsed.data ? JSON.parse(dataParsed.data) : {}
         CallEventNotifyApp.getInstance().notifyEvent('onOutgoingCallTimeout',
-          dataParsed.call_id, // may not support yet
+          dataInDataParsed.call_id,
           dataParsed.invitees
         )
 

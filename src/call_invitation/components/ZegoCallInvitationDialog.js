@@ -34,7 +34,7 @@ export default function ZegoCallInvitationDialog(props) {
   const [inviter, setInviter] = useState({});
   const [extendData, setExtendData] = useState({});
   const [callID, setCallID] = useState('');
-  const callIDRef = useRef('');
+  const zimCallIDRef = useRef('');
 
   const getDialogTitle = () => {
     if (extendData.notificationTitle && extendData.notificationTitle.length > 0) {
@@ -226,22 +226,23 @@ export default function ZegoCallInvitationDialog(props) {
         },
         TAG
       );
-      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({callID: _callID, data}) => {
-        zloginfo(`onInvitationTimeout implement by ${TAG}, callID: ${_callID}, data: ${JSON.stringify(data)}`);
+      ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({callID: _zimCallID, data}) => {
+        zloginfo(`onInvitationTimeout implement by ${TAG}, callID: ${_zimCallID}, data: ${JSON.stringify(data)}`);
 
         const dataParsed = data ? JSON.parse(data) : {}
+        const dataInDataParsed = dataParsed.data ? JSON.parse(dataParsed.data) : {}
         CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallTimeout',
-          dataParsed.call_id, // may not support yet
+          dataInDataParsed.call_id,
           dataParsed.inviter
         )
 
-        if (_callID === callIDRef.current) {
+        if (_zimCallID === zimCallIDRef.current) {
           BellManage.stopIncomingSound();
           BellManage.cancleVirate();
           setIsDialogVisable(false);
           setIsFullScreen(false);
         }
-        NotificationHelper.getInstance().dismissNotification(_callID, 'Timeout', TAG)
+        NotificationHelper.getInstance().dismissNotification(_zimCallID, 'Timeout', TAG)
 
         zloginfo(`onInvitationTimeout implement by ${TAG}, process done`);
       });
@@ -256,7 +257,7 @@ export default function ZegoCallInvitationDialog(props) {
           )
         }
 
-        if (callID === callIDRef.current) {
+        if (callID === zimCallIDRef.current) {
           BellManage.stopIncomingSound();
           BellManage.cancleVirate();
           setIsDialogVisable(false);
@@ -278,7 +279,7 @@ export default function ZegoCallInvitationDialog(props) {
   }, [isInit]);
 
   useEffect(() => {
-    callIDRef.current = callID;
+    zimCallIDRef.current = callID;
   }, [callID]);
 
   return (
