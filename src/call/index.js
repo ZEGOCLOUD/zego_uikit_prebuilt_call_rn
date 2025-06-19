@@ -421,7 +421,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             });
 
-        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+        //BackHandler.addEventListener('hardwareBackPress', handleBackButton);
         navigation.setOptions({ gestureEnabled: false });
         KeepAwake.activate();
 
@@ -449,7 +449,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 KeepAwake.deactivate();
             }
             destroyCallTimingTimer(false);
-            BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+            //BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
             navigation.setOptions({ gestureEnabled: true });
         }
     }, []);

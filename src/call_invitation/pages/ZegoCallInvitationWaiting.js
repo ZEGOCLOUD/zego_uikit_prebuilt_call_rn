@@ -194,7 +194,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       }
     );
 
-    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    //BackHandler.addEventListener('hardwareBackPress', handleBackButton);
     navigation.setOptions({ gestureEnabled: false });
 
     return () => {
@@ -203,7 +203,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID);
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID);
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+     // BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
       navigation.setOptions({ gestureEnabled: true });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
