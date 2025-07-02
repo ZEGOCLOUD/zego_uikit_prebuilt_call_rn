@@ -1,4 +1,4 @@
-import { AppState, NativeEventEmitter, NativeModules, PermissionsAndroid } from 'react-native';
+import { AppState, NativeEventEmitter, NativeModules, PermissionsAndroid, Platform } from 'react-native';
 
 import ZegoUIKit, { ZegoPluginResult } from '@zegocloud/zego-uikit-rn';
 import { ZIMError } from 'zego-zim-react-native';
@@ -141,18 +141,30 @@ export default class NotificationHelper {
     }
 
     _displayIncomingCall(callID: string, callerName: string, message: string, timeout: number, appState: string) {
-        PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
-        .then((hasPermission) => {
-            if (hasPermission) {
-                ZegoUIKitPrebuiltCallRNModule.displayIncomingCall(callID, callerName, message, timeout);
-                zloginfo(`[NotificationHelper][_displayIncomingCall] displayIncomingCall callID: ${callID}, state: ${appState}`)
-                PrebuiltCallReport.reportEvent('call/displayNotification', {
-                    'call_id': callID,
-                    'app_state': appState
-                })
+        if (Platform.Version as number < 33) {  // below Android 13
+            if (ZegoUIKitPrebuiltCallRNModule.areNotificationsEnabled()) {
+                this._displayIncomingCallInternal(callID, callerName, message, timeout, appState)                
             } else {
                 zlogwarning(`[NotificationHelper][_displayIncomingCall] displayIncomingCall failed, no permission`)
             }
+        } else {
+            PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+            .then((hasPermission) => {
+                if (hasPermission) {
+                    this._displayIncomingCallInternal(callID, callerName, message, timeout, appState)
+                } else {
+                    zlogwarning(`[NotificationHelper][_displayIncomingCall] displayIncomingCall failed, no permission`)
+                }
+            })
+        }
+    }
+
+    _displayIncomingCallInternal(callID: string, callerName: string, message: string, timeout: number, appState: string) {
+        ZegoUIKitPrebuiltCallRNModule.displayIncomingCall(callID, callerName, message, timeout);
+        zloginfo(`[NotificationHelper][_displayIncomingCall] displayIncomingCall callID: ${callID}, state: ${appState}`)
+        PrebuiltCallReport.reportEvent('call/displayNotification', {
+            'call_id': callID,
+            'app_state': appState
         })
     }
 

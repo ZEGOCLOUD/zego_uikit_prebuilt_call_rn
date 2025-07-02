@@ -2,6 +2,7 @@ package com.zegouikitprebuiltcallrn;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -142,6 +143,11 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
         audioManager.setSpeakerphoneOn(true);
         audioManager.setMode(AudioManager.MODE_NORMAL);
         XLogWrapper.i(NAME, "changeToSpeaker");
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean areNotificationsEnabled() {
+        return NotificationManagerCompat.from(getAppContext()).areNotificationsEnabled();
     }
 
     private Context getAppContext() {
