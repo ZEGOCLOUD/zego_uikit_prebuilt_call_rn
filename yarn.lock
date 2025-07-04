@@ -8245,10 +8245,9 @@ react-native-safe-area-context@^4.4.1:
   resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.14.1.tgz#980c3c9db02a2314fa8ceb07f614728802320367"
   integrity sha512-+tUhT5WBl8nh5+P+chYhAjR470iCByf9z5EYdCEbPaAK3Yfzw+o8VRPnUgmPAKlSccOgQBxx3NOl/Wzckn9ujg==
 
-react-native-sound@^0.11.2:
-  version "0.11.2"
-  resolved "https://registry.npmmirror.com/react-native-sound/-/react-native-sound-0.11.2.tgz#e542dc5b9e16ab4b3ac7e6eaddb1fc8d98da9038"
-  integrity sha512-LmGc8lgOK3qecYMVQpyHvww/C+wgT6sWeMpVbOe4NCRGC2yKd4fo4U0KBUo9PO7AqKESO3I/2GZg1/C0+bwiiA==
+"react-native-sound@git+https://github.com/ZEGOCLOUD/react-native-sound.git#v0.11.5":
+  version "0.11.5"
+  resolved "git+https://github.com/ZEGOCLOUD/react-native-sound.git#0af3beb657e871ed33ef2fbc711d15d2dc70f308"
 
 react-native@0.68.2:
   version "0.68.2"
