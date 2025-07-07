@@ -4,6 +4,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -145,9 +146,11 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
         XLogWrapper.i(NAME, "changeToSpeaker");
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public boolean areNotificationsEnabled() {
-        return NotificationManagerCompat.from(getAppContext()).areNotificationsEnabled();
+    // For versions below Android 13
+    @ReactMethod
+    public void areNotificationsEnabled(Promise promise) {
+        boolean areEnabled = NotificationManagerCompat.from(getAppContext()).areNotificationsEnabled();
+        promise.resolve(areEnabled);
     }
 
     private Context getAppContext() {

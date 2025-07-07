@@ -141,23 +141,15 @@ export default class NotificationHelper {
     }
 
     _displayIncomingCall(callID: string, callerName: string, message: string, timeout: number, appState: string) {
-        if (Platform.Version as number < 33) {  // below Android 13
-            if (ZegoUIKitPrebuiltCallRNModule.areNotificationsEnabled()) {
-                this._displayIncomingCallInternal(callID, callerName, message, timeout, appState)                
+        var areEnabledPromise = (Platform.Version as number < 33) ? ZegoUIKitPrebuiltCallRNModule.areNotificationsEnabled() : PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+        areEnabledPromise.then((hasPermission: boolean) => {
+            if (hasPermission) {
+                this._displayIncomingCallInternal(callID, callerName, message, timeout, appState)
             } else {
                 zlogwarning(`[NotificationHelper][_displayIncomingCall] displayIncomingCall failed, no permission`)
             }
-        } else {
-            PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
-            .then((hasPermission) => {
-                if (hasPermission) {
-                    this._displayIncomingCallInternal(callID, callerName, message, timeout, appState)
-                } else {
-                    zlogwarning(`[NotificationHelper][_displayIncomingCall] displayIncomingCall failed, no permission`)
-                }
-            })
-        }
-    }
+        })
+}
 
     _displayIncomingCallInternal(callID: string, callerName: string, message: string, timeout: number, appState: string) {
         ZegoUIKitPrebuiltCallRNModule.displayIncomingCall(callID, callerName, message, timeout);

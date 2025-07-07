@@ -1,5 +1,6 @@
 #import "ZegoUIKitPrebuiltCallRNModule.h"
 #import <AVFoundation/AVFoundation.h>
+#import <UserNotifications/UserNotifications.h>
 #import "LogManager.h"
 
 @implementation ZegoUIKitPrebuiltCallRNModule
@@ -63,6 +64,20 @@ RCT_EXPORT_METHOD(changeToReceiver) {
   }
   
   [[LogManager sharedInstance] writeToLog:logContent appendTime:YES flush:NO];
+}
+
+// Not necessary, because iOS background and offline notifications do not require notification permissions.
+// Keep this function just to align with the same-named module on the Android side to avoid execution exceptions.
+RCT_EXPORT_METHOD(areNotificationsEnabled:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *settings) {
+        if (settings.authorizationStatus == UNAuthorizationStatusNotDetermined || settings.authorizationStatus == UNAuthorizationStatusDenied)
+        {
+            resolve(@(FALSE));
+        } else {
+            resolve(@(TRUE));
+        }
+    }];
 }
 
 @end
