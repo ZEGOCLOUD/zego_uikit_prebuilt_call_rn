@@ -102,7 +102,7 @@ export default function App() {
       userName='Oliver'
       callID='rn12345678' // roomID can only contain numbers, letters, and underlines (_). 
       config={{
-        //onHangUp: () => {props.navigation.navigate('HomePage')}
+        //onHangUp: () => {props.navigation.popTo('HomePage')}
       }}
     /&gt;
 </div>

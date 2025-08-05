@@ -82,8 +82,8 @@
     "@types/react": "^17"
   },
   "peerDependencies": {
-    "@react-navigation/native": ">=6.0.0 <7.0.0",
-    "@react-navigation/native-stack": ">=6.0.0 <7.0.0",
+    "@react-navigation/native": ">=6.0.0",
+    "@react-navigation/native-stack": ">=6.0.0",
     "react": "*",
     "react-delegate-component": "*",
     "react-native": "*",
