@@ -21,7 +21,7 @@ export default function ZegoCallInvitationDialog(props) {
   const TAG = 'ZegoCallInvitationDialog';
 
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
-  const { showDeclineButton = true, onIncomingCallDeclineButtonPressed, onIncomingCallAcceptButtonPressed, avatarBuilder } = initConfig;
+  const { showDeclineButton = true, avatarBuilder } = initConfig;
 
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
@@ -69,6 +69,7 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const onRefuseCallback = () => {
+    const { onIncomingCallDeclineButtonPressed } = initConfig;
     if (typeof onIncomingCallDeclineButtonPressed == 'function') {
       onIncomingCallDeclineButtonPressed(navigation)
     }
@@ -99,8 +100,9 @@ export default function ZegoCallInvitationDialog(props) {
       'action': 'refuseFail'
     })
   }
-  const onAccectCallback = (data) => {
-    zloginfo("onAccectCallback", data.call_id, data.inviter.id)
+  const onAcceptCallback = (data) => {
+    zloginfo("onAcceptCallback", data.call_id, data.inviter.id)
+    const { onIncomingCallAcceptButtonPressed } = initConfig;
     if (typeof onIncomingCallAcceptButtonPressed == 'function') {
       onIncomingCallAcceptButtonPressed(navigation)
     }
@@ -143,7 +145,7 @@ export default function ZegoCallInvitationDialog(props) {
     ZegoUIKitPrebuiltCallService.getInstance().onInit(callbackID, () => {
       setIsInit(true);
     })
-    CallInviteHelper.getInstance().onCallAccepted(callbackID, onAccectCallback);
+    CallInviteHelper.getInstance().onCallAccepted(callbackID, onAcceptCallback);
     CallInviteHelper.getInstance().onCallRefused(callbackID, onRefuseCallback);
 
     return () => {
