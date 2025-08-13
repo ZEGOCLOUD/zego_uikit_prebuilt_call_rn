@@ -23,6 +23,7 @@ export default class TimingHelper {
         zloginfo('[TimingHelper][startTimer]')
         if (!this._timer) {
             this._durationStart = Date.now();
+            this._duration = 0;
             this._timer = setInterval(() => {
                 this._increaseDuration();
             }, 1000);
@@ -35,6 +36,7 @@ export default class TimingHelper {
             clearInterval(this._timer);
             this._timer = null;
             this._durationStart = Date.now();
+            this._duration = 0;
         }
     }
 

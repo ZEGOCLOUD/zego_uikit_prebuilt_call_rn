@@ -376,10 +376,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             stateData.current.useSpeakerWhenJoining = (type === 0);
         });
         PrebuiltHelper.getInstance().onPrebuiltDestroy(callbackID, () => {
-            // Calls are usually initiated from the minimized mode.
+            // Calls are usually in the minimized mode.
             zloginfo('[ZegoUIKitPrebuiltCall] onPrebuiltDestroy', callbackID);
             
-            zloginfo('[ZegoUIKitPrebuiltCall] leave room, tag: onPrebuiltDestroy')
+            zloginfo('[ZegoUIKitPrebuiltCall] leave room, from: onPrebuiltDestroy')
             ZegoUIKit.leaveRoom();
             ZegoUIKit.onJoinRoom(callbackID);
             ZegoUIKit.onOnlySelfInRoom(callbackID);
@@ -392,11 +392,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             PrebuiltHelper.getInstance().clearRouteParams();
             PrebuiltHelper.getInstance().clearNotify();
 
-            MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
+            MinimizingHelper.getInstance().setIsMinimizeSwitch(false, 'onPrebuiltDestroy');
             MinimizingHelper.getInstance().notifyEntryNormal();
             KeepAwake.deactivate();
         })
 
+        let curMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch()
         ZegoUIKit.init(
             appID,
             appSign,
@@ -411,7 +412,12 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 } else {
                     ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''));
                 }
-                startCallTimingTimer();
+
+                // Skip timer reset if just switched from minimized mode.
+                if (!curMinimizeSwitch) {
+                    startCallTimingTimer();
+                }
+
                 grantPermissions(() => {
                     // RTC need it
                     ZegoUIKit.turnCameraOn('', false);
@@ -426,8 +432,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         navigation.setOptions({ gestureEnabled: false });
         KeepAwake.activate();
 
-        // Initialize after use
-        MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
+        MinimizingHelper.getInstance().setIsMinimizeSwitch(false, 'PrebuiltCall useEffect');
 
         TimingHelper.getInstance().onDurationUpdate(callbackID, (duration) => {
             typeof onDurationUpdate === 'function' && onDurationUpdate(duration);
@@ -438,7 +443,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
             if (!isMinimizeSwitch) {
-                zloginfo('[ZegoUIKitPrebuiltCall] leave room, tag: !isMinimizeSwitch')
+                zloginfo('[ZegoUIKitPrebuiltCall] leave room, from: not isMinimizeSwitch')
                 ZegoUIKit.leaveRoom();
                 ZegoUIKit.onJoinRoom(callbackID);
                 ZegoUIKit.onOnlySelfInRoom(callbackID);

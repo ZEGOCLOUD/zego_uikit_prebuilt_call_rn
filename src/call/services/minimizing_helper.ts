@@ -30,9 +30,9 @@ export default class MinimizingHelper {
     getIsMinimize() {
         return this._isMinimize;
     }
-    setIsMinimizeSwitch(isMinimizeSwitch: boolean) {
+    setIsMinimizeSwitch(isMinimizeSwitch: boolean, from: string) {
         this._isMinimizeSwitch = !!isMinimizeSwitch;
-        zloginfo('[MinimizingHelper][setIsMinimizeSwitch] isMinimizeSwitch: ' + this._isMinimizeSwitch);
+        zloginfo(`[MinimizingHelper] setIsMinimizeSwitch: ${this._isMinimizeSwitch}, from: ${from}`);
     }
     getIsMinimizeSwitch() {
         return this._isMinimizeSwitch;
