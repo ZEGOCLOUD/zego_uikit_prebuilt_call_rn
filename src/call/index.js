@@ -54,7 +54,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         topMenuBarConfig = {},
         memberListConfig = {},
 
-        layout = {},
+        layout = {},    // {mode, config}
 
         hangUpConfirmInfo, // {title: '', cancelButtonName: '', confirmButtonName: ''}
 
@@ -335,8 +335,13 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     const _getCacheAVUserListWhenMinimizeSwitched = () => {
         if (isMinimizeSwitch) {
-            let hasStreamUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn))
-            return sortAudioVideo(hasStreamUsers)
+            if (layout && layout.config && layout.config.removeViewWhenAudioVideoUnavailable == false) {
+                let allUsers = ZegoUIKit.getAllUsers().filter(user => user.userID)
+                return sortAudioVideo(allUsers)
+            } else {
+                let hasStreamUsers = ZegoUIKit.getAllUsers().filter(user => user.userID && (user.isCameraOn || user.isMicrophoneOn))
+                return sortAudioVideo(hasStreamUsers)
+            }
         } else {
             return null
         }
