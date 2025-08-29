@@ -1,24 +1,24 @@
-import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { Alert, BackHandler, PermissionsAndroid, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { Alert, BackHandler, PermissionsAndroid, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
 import KeepAwake from 'react-native-keep-awake'
 
-import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageView, ZegoLayoutMode, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 
+import { ZegoCallEndReason } from '../services/defines';
+import TimingHelper from "../services/timing_helper";
+import { useKeyboard } from '../utils/keyboard';
+import { zloginfo } from '../utils/logger';
+import MinimizingHelper from "./services/minimizing_helper";
+import PrebuiltHelper from "./services/prebuilt_helper";
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
-import ZegoTopMenuBar from './ZegoTopMenuBar';
 import ZegoCallMemberList from './ZegoCallMemberList';
 import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
-import TimingHelper from "../services/timing_helper";
-import MinimizingHelper from "./services/minimizing_helper";
-import PrebuiltHelper from "./services/prebuilt_helper";
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
-import { useKeyboard } from '../utils/keyboard';
-import { ZegoCallEndReason } from '../services/defines';
-import { zloginfo } from '../utils/logger';
+import ZegoTopMenuBar from './ZegoTopMenuBar';
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const navigation = useNavigation();
@@ -131,8 +131,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 stateData.current.useSpeakerWhenJoining :
                 (config.useSpeakerWhenJoining));
 
-    const [isMenubarVisable, setIsMenubarVisable] = useState(true);
-    const [isTopMenubarVisable, setTopIsMenubarVisable] = useState(true);
+    const [isBottomMenubarVisable, setBottomMenubarVisable] = useState(true);
+    const [isTopMenubarVisable, setTopMenubarVisable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     const [textInputVisable, setTextInputVisable] = useState(false);
     const keyboardHeight = useKeyboard();
@@ -155,21 +155,21 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     const onFullPageTouch = () => {
         hideCountdown = 5;
         hideCountdownOnTopMenu = 5;
-        if (isMenubarVisable) {
+        if (isBottomMenubarVisable) {
             if (hideByClick) {
-                setIsMenubarVisable(false);
+                setBottomMenubarVisable(false);
                 setIsCallMemberListVisable(false);
             }
         } else {
-            setIsMenubarVisable(true);
+            setBottomMenubarVisable(true);
         }
         if (isTopMenubarVisable) {
             if (topHideByClick) {
-                setTopIsMenubarVisable(false);
+                setTopMenubarVisable(false);
                 setIsCallMemberListVisable(false);
             }
         } else {
-            setTopIsMenubarVisable(true);
+            setTopMenubarVisable(true);
         }
     };
     const grantPermissions = async (callback) => {
@@ -440,7 +440,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false, 'PrebuiltCall useEffect');
 
         TimingHelper.getInstance().onDurationUpdate(callbackID, (duration) => {
-            typeof onDurationUpdate === 'function' && onDurationUpdate(duration);
+            if (typeof onDurationUpdate === 'function') {
+                zloginfo(`[ZegoUIKitPrebuiltCall] onDurationUpdate execute will, don't log succeed`)
+                onDurationUpdate(duration)
+            }
         })
 
         return () => {
@@ -492,7 +495,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         if (hideCountdown <= 0) {
             hideCountdown = 5;
             if (hideAutomatically) {
-                setIsMenubarVisable(false);
+                setBottomMenubarVisable(false);
             }
         }
     }, 1000);
@@ -501,7 +504,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         if (hideCountdownOnTopMenu <= 0) {
             hideCountdownOnTopMenu = 5;
             if (topHideAutomatically) {
-                setTopIsMenubarVisable(false);
+                setTopMenubarVisable(false);
             }
         }
     }, 1000);
@@ -538,8 +541,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   onSwitchCamera={onSwitchCamera}
                   onMessagePress={() => {
                     setTextInputVisable(true);
-                    setIsMenubarVisable(false);
-                    setTopIsMenubarVisable(false);
+                    setBottomMenubarVisable(false);
+                    setTopMenubarVisable(false);
                   }}
               /> : <View />
           }
@@ -570,7 +573,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
               </View> : null
             }
           </View>
-          {isMenubarVisable ?
+          {isBottomMenubarVisable ?
               <ZegoBottomBar
                   menuBarButtonsMaxCount={maxCount}
                   menuBarButtons={buttons}
@@ -587,8 +590,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   onSwitchCamera={onSwitchCamera}
                   onMessagePress={() => {
                     setTextInputVisable(true);
-                    setIsMenubarVisable(false);
-                    setTopIsMenubarVisable(false);
+                    setBottomMenubarVisable(false);
+                    setTopMenubarVisable(false);
                   }}
               /> :
               <View />
