@@ -32,8 +32,8 @@ export default class ZegoUIKitPrebuiltCallService {
             channelID: "CallInvitation",
             channelName: "CallInvitation",
         },
-        notifyWhenAppRunningInBackgroundOrQuit: false,
-        isIOSSandboxEnvironment: null,
+        notifyWhenAppRunningInBackgroundOrQuit: true, // false not supported
+        isIOSSandboxEnvironment: undefined,
         waitingPageConfig: {
           // avatarBuilder
           // nameBuilder
@@ -90,6 +90,7 @@ export default class ZegoUIKitPrebuiltCallService {
         const {
             ringtoneConfig,
             innerText,
+            notifyWhenAppRunningInBackgroundOrQuit,
             certificateIndex,
             isIOSSandboxEnvironment,
         } = this.config;
