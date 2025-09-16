@@ -5,9 +5,11 @@ import * as ZPNs from 'zego-zpns-react-native';
 
 import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService, {
-    ZegoInvitationType,
-    ZegoMenuBarButtonName,
-    ZegoMultiCertificate,
+  ONE_ON_ONE_VIDEO_CALL_CONFIG,
+  ONE_ON_ONE_VOICE_CALL_CONFIG,
+  ZegoInvitationType,
+  ZegoMenuBarButtonName,
+  ZegoMultiCertificate,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 import KeyCenter from '../KeyCenter';
@@ -115,6 +117,12 @@ export const onUserLogin = async (userID, userName, props) => {
               buttons: [
                 ZegoMenuBarButtonName.minimizingButton,
                 // ZegoMenuBarButtonName.showMemberListButton
+              ],
+            },
+            bottomMenuBarConfig: {
+              buttons: [
+                ...(callInvitationData.type === ZegoInvitationType.voiceCall ? ONE_ON_ONE_VOICE_CALL_CONFIG.bottomMenuBarConfig.buttons : ONE_ON_ONE_VIDEO_CALL_CONFIG.bottomMenuBarConfig.buttons),
+                ZegoMenuBarButtonName.messageButton,
               ],
             },
             onWindowMinimized: () => {
