@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Alert, BackHandler, PermissionsAndroid, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, KeyboardAvoidingView, PermissionsAndroid, Platform, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
 import KeepAwake from 'react-native-keep-awake'
@@ -153,6 +153,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         return isMinimize;
     }
     const onFullPageTouch = () => {
+        zloginfo('####onFullPageTouch####');
         hideCountdown = 5;
         hideCountdownOnTopMenu = 5;
         if (isBottomMenubarVisable) {
@@ -171,6 +172,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         } else {
             setTopMenubarVisable(true);
         }
+        setTextInputVisable(false);
     };
     const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
@@ -606,10 +608,10 @@ function ZegoUIKitPrebuiltCall(props, ref) {
               /> :
               <View />
           }
-          {textInputVisable ? <TouchableOpacity
+          {textInputVisable ? <KeyboardAvoidingView
             style={styles.fillParent}
-            // behavior={'padding'}
-            onPress={() => { setTextInputVisable(false); }}
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={(Platform.OS === 'android' && Platform.Version < 35) ? 32 : 0}
           >
             <View
               style={[
@@ -634,7 +636,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 }}
               />
             </View>
-          </TouchableOpacity> : null}
+          </KeyboardAvoidingView> : null}
         </View>
     );
 }
@@ -700,7 +702,7 @@ const styles = StyleSheet.create({
     messageListView: {
       position: 'absolute',
       left: 16,
-      bottom: 40,
+      bottom: 110,
       width: 230,
       maxHeight: 200,
       zIndex: 10,
