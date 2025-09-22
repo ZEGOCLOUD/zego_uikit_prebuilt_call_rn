@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+
 import {
     ZegoLeaveButton,
     ZegoSwitchAudioOutputButton,
@@ -14,6 +16,8 @@ import ZegoMessageButton from "./ZegoMessageButton";
 
 
 export default function ZegoBottomBar(props) {
+    const insets = useSafeAreaInsets();
+
     const {
         menuBarButtonsMaxCount = 5,
         menuBarButtons = [],
@@ -87,7 +91,7 @@ export default function ZegoBottomBar(props) {
 
     return (
         isNormalStyle ?
-            <View style={styles.normalBar}>
+            <View style={[styles.normalBar, {bottom: insets.bottom}]}>
                 {firstLevelButtons.map((button, index) => (
                     <View key={index} style={getButtonStyle()}>
                         {button}
@@ -118,7 +122,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         marginBottom: 50,
         width: '100%',
-        bottom: 0,
         height: 50,
         zIndex: 2,
     },

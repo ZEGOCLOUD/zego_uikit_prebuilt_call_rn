@@ -3,6 +3,7 @@ import { Alert, BackHandler, KeyboardAvoidingView, PermissionsAndroid, Platform,
 import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
 import KeepAwake from 'react-native-keep-awake'
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
 
@@ -22,6 +23,7 @@ import ZegoTopMenuBar from './ZegoTopMenuBar';
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
 
     const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
     !isMinimizeSwitch && MinimizingHelper.getInstance().notifyEntryNormal();
@@ -548,7 +550,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                   }}
               /> : <View />
           }
-          <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
+          <View style={[styles.fillParent, {bottom: insets.bottom, right: insets.right}]} pointerEvents='auto' onTouchStart={onFullPageTouch}>
             <ZegoAudioVideoContainer
               style={[styles.audioVideoView, styles.fillParent]}
               audioVideoConfig={{
