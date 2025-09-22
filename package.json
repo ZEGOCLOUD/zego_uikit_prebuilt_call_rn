@@ -95,7 +95,7 @@
     "react-native-keep-awake": "*",
     "react-native-sound": "*",
     "react-native-uuid": "^2.0.3",
-    "@zegocloud/zego-uikit-rn": ">=2.18.8"
+    "@zegocloud/zego-uikit-rn": ">=2.19.0"
   },
   "jest": {
     "preset": "react-native",

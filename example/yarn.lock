@@ -6659,10 +6659,10 @@ zego-callkit-react-native@^1.0.6:
   resolved "https://registry.npmmirror.com/zego-callkit-react-native/-/zego-callkit-react-native-1.0.6.tgz#69d7bd34e4f6d73467fd1466605b36de5b16864d"
   integrity sha512-a3RD/xfQRW4lgWyK3xr2/rb1x4Aiw+ypq22xw6Xz/JwmTCQFLCj/GwgUCucO3rXculxD72HmcH8R3G6SjWbYfg==
 
-zego-express-engine-reactnative@^3.19.2:
-  version "3.20.2"
-  resolved "https://registry.npmmirror.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.20.2.tgz#70c997dd679d0d2945be8f2d70ecfdd1228b3b48"
-  integrity sha512-MtTdVWYxt6Qxq6FVLYRalIdwxDXavDEjabl7+Z7ntSDG/ps5QWfldCPIknZXSJUCCGXJ1CLnVMlHFwzvh5SEkg==
+zego-express-engine-reactnative@^3.22.0:
+  version "3.22.0"
+  resolved "https://registry.npmmirror.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.22.0.tgz#0ddc4630ffa40ffc75784b0065e78afffbad7d7d"
+  integrity sha512-7jzfyVuTP/nUBfF4bLaQ80juWsIkBvW57ooBxqMEpmarcZs9hdWTNQszsYJcjWrKdhCU7iVKtuCX3vmbjT6nRQ==
 
 zego-zim-react-native@^2.20.0:
   version "2.21.1"
