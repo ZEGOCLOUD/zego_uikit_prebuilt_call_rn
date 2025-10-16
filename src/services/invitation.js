@@ -122,6 +122,8 @@ export default class ZegoUIKitPrebuiltCallInvitation {
       const inviteeIDs = allInvitees.map(invitee => {
         return invitee.userID
       });
+
+      zloginfo('Navigate to ZegoUIKitPrebuiltCallInCallScreen')
       navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
         roomID,
         isVideoCall,

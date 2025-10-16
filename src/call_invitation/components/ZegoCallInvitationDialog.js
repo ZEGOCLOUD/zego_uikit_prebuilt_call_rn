@@ -105,6 +105,7 @@ export default function ZegoCallInvitationDialog(props) {
     setIsDialogVisable(false);
     setIsFullScreen(false);
 
+    zloginfo('Navigate to ZegoUIKitPrebuiltCallInCallScreen')
     navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
       roomID: data.call_id,
       isVideoCall: data.type === ZegoInvitationType.videoCall,

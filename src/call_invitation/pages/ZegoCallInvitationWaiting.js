@@ -206,15 +206,25 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
 
         // ZegoUIKit.leaveRoom().then(() => {
           zloginfo('Jump to call room page.');
-          navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
-            origin: 'ZegoUIKitPrebuiltCallWaitingScreen',
-            roomID,
-            isVideoCall,
-            invitees: getInviteeIDList(),
-            inviter: inviterID,
-            invitationID,
-            useFrontFacingCamera: ZegoUIKit.isUsingFrontFacingCamera()
-          });
+
+          const state = navigation.getState();
+          zloginfo(`Current navigation routes: [${state.routes.map(r => r.name).join(', ')}]`)
+          
+          const isAlreadyInCall = state.routes.some(r => r.name === 'ZegoUIKitPrebuiltCallInCallScreen');
+          if (isAlreadyInCall) {
+            zloginfo('Already in ZegoUIKitPrebuiltCallInCallScreen page, do not need to jump again.')
+          } else {
+            zloginfo('Navigate to ZegoUIKitPrebuiltCallInCallScreen')
+            navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
+              origin: 'ZegoUIKitPrebuiltCallWaitingScreen',
+              roomID,
+              isVideoCall,
+              invitees: getInviteeIDList(),
+              inviter: inviterID,
+              invitationID,
+              useFrontFacingCamera: ZegoUIKit.isUsingFrontFacingCamera()
+            });
+          }
         // });
 
       let dataParsed = data ? JSON.parse(data) : {}
