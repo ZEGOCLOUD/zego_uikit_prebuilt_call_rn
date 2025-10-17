@@ -6669,7 +6669,7 @@ zego-zim-react-native@^2.20.0:
   resolved "https://registry.npmmirror.com/zego-zim-react-native/-/zego-zim-react-native-2.21.1.tgz#f18ea1410a21105d2c4c7e8608dfdec042d3e22e"
   integrity sha512-TwH+KCd3sixxZ4jIJkA+hixK4slvVE0YmA5uaA6sU3RPbeDYHTVb4MGXAMqDlGm83UzzeWMVtbZFxyDD2uLJMg==
 
-zego-zpns-react-native@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.npmmirror.com/zego-zpns-react-native/-/zego-zpns-react-native-2.8.1.tgz#59eea1264cf3d393695529e9561414fe062ebd6d"
-  integrity sha512-6v+so7VLmfQW0RI9FNsBwFly3rdZQy4gGLfOFOJHkrWAv6epMn5OkFlUVrsOEt4G3jn4KsWZmNEXF4O0rYw+ng==
+zego-zpns-react-native@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.npmmirror.com/zego-zpns-react-native/-/zego-zpns-react-native-2.8.2.tgz#a027307781c5fbf3d11fee98254f3cd10de5c91d"
+  integrity sha512-c3T2GdrhhyEdQOo5uQt6TNBpJ4UCeSlHY84vMOk84zg7Nsj046h7WdE16oCCtg8Qgcg3l4W+Ko2pBwjzq6SJ9w==
