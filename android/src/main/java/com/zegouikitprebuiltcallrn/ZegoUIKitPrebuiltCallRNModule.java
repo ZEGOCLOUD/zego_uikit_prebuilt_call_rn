@@ -116,6 +116,38 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void requestFullIntentPermission(String message, String allow, String deny) {
+        if (alertDialog != null && alertDialog.isShowing()) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= 34) {
+            android.app.NotificationManager notificationManager =
+                (android.app.NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null && !notificationManager.canUseFullScreenIntent()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(reactContext.getCurrentActivity());
+                builder.setMessage(message);
+                builder.setPositiveButton(allow, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT);
+                        intent.setData(Uri.parse("package:" + reactContext.getPackageName()));
+                        reactContext.startActivityForResult(intent, 0, new Bundle());
+                    }
+                });
+                builder.setNegativeButton(deny, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                alertDialog = builder.create();
+                alertDialog.setCancelable(false);
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.show();
+            }
+        }
+    }
+
+    @ReactMethod
     public void addListener(String eventName) {
         // Keep: Required for RN built in Event Emitter Calls.
     }

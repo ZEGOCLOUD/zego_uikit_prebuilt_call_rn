@@ -21,7 +21,14 @@ class RNCallKit {
       return;
     }
     ZegoUIKitPrebuiltCallRNModule.requestSystemAlertWindow(message, allow, deny);   
-  };
+  }
+
+  requestFullIntentPermission = (message, allow, deny) => {
+    if (Platform.OS === 'ios') {
+      return;
+    }
+    ZegoUIKitPrebuiltCallRNModule.requestFullIntentPermission(message, allow, deny);   
+  }
 }
 
 export default new RNCallKit();

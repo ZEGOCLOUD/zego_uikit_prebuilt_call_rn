@@ -239,6 +239,10 @@ export default class ZegoUIKitPrebuiltCallService {
       RNCallKit.requestSystemAlertWindow(alert.message, alert.allow, alert.deny);
     }
 
+    requestFullIntentPermission(alert) {
+      RNCallKit.requestFullIntentPermission(alert.message, alert.allow, alert.deny);
+    }
+
     _hangupProcess(onCallEnd, roomID, endReason) {
       const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
       zloginfo('[ZegoUIKitPrebuiltCallService][_hangupProcess] roomID: ', roomID, 'endReason: ', endReason, 'isMinimize: ', isMinimize)

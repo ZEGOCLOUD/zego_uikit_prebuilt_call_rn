@@ -52,7 +52,7 @@ public class CustomCallNotificationManager {
 
         HashMap<String, Object> androidParams = new HashMap<>(Map.of(
             "isCustomNotification", true,
-            "isShowFullLockedScreen", false,
+            "isShowFullLockedScreen", true,
             "isShowLogo", false,
             "isShowCallID", true,   // show message
             "ringtonePath", this.soundName,
