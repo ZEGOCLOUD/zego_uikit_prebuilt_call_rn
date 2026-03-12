@@ -2,6 +2,7 @@ package com.zegouikitprebuiltcallrn;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.facebook.react.bridge.Promise;
@@ -82,6 +83,46 @@ public class ZegoUIKitPrebuiltCallRNModule extends ReactContextBaseJavaModule {
         mainHandler.post(() -> {
             XLogWrapper.i(NAME, "dismissCallNotification");
             CustomCallNotificationManager.getInstance().dismissCallNotification(reactContext);
+        });
+    }
+
+    @ReactMethod
+    public void requestNotificationPermission(String message, String allow, String deny) {
+        if (alertDialog != null && alertDialog.isShowing()) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(reactContext, android.Manifest.permission.POST_NOTIFICATIONS)
+                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mainHandler.post(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(reactContext.getCurrentActivity());
+            builder.setMessage(message);
+            builder.setPositiveButton(allow, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    android.app.Activity activity = reactContext.getCurrentActivity();
+                    if (activity != null) {
+                        ActivityCompat.requestPermissions(
+                            activity,
+                            new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                            1001
+                        );
+                    }
+                }
+            });
+            builder.setNegativeButton(deny, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            alertDialog = builder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
         });
     }
 

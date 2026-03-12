@@ -1,12 +1,13 @@
-import { PermissionsAndroid, Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 import ZegoUIKit, { ZegoUIKitLogger } from '@zegocloud/zego-uikit-rn';
 
 import { zloginfo } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
 import InnerTextHelper from '../services/inner_text_helper';
-import RNCallKit from './callkit';
 import NotificationHelper from './notification_helper';
+
+const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 
 export default class OfflineCallEventListener {
     TAG = 'OfflineCallEventListener';
@@ -62,39 +63,7 @@ export default class OfflineCallEventListener {
       // Setup for background invitation
       if (!this._isSystemCalling) return;
 
-      this.grantPermissions();
-
       this.setupOnlineCallKit();
-    }
-
-    async grantPermissions() {
-      if (Platform.OS !== 'android') {
-        return;
-      }
-
-      // for android
-      if (Platform.Version < 33) {
-        return;
-      }
-
-      // Notification
-      let grantednNtification = PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      );
-      const ungrantedPermissions = [];
-      try {
-        const isNotificationGranted = await grantednNtification;
-        if (!isNotificationGranted) {
-          ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-        }
-      } catch {
-        ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-      }
-      PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
-        data => {
-          zloginfo('requestMultiple', data);
-        },
-      );
     }
 
     // For Android
@@ -107,15 +76,13 @@ export default class OfflineCallEventListener {
         zloginfo('ringtoneConfig is required for calling notification');
       }
 
-      if (Platform.OS === 'android') {
-
-        if (ringtoneConfig && ringtoneConfig.incomingCallFileName) {
-          RNCallKit.setupCallKit({
-            incomingCallFileName: ringtoneConfig.incomingCallFileName,
-            incomingDeclineButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton,
-            incomingAcceptButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton,
-          });
-        }
+      if (Platform.OS === 'android' && ringtoneConfig && ringtoneConfig.incomingCallFileName) {
+        zloginfo('call ZegoUIKitPrebuiltCallRNModule.setupCallKit');
+        ZegoUIKitPrebuiltCallRNModule.setupCallKit({
+          incomingCallFileName: ringtoneConfig.incomingCallFileName,
+          incomingDeclineButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageDeclineButton,
+          incomingAcceptButtonText: InnerTextHelper.instance().getInnerText().incomingCallPageAcceptButton,
+        });
       }
     }
 

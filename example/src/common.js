@@ -141,14 +141,12 @@ export const onUserLogin = async (userID, userName, props) => {
         }
       }
     ).then(() => {
-      if (notificationStyle === 'CallStyle') {
-        ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
-          message: 'We need your consent for the following permissions in order to use the offline call function properly',
-          allow: 'Allow',
-          deny: 'Deny',
-        });
-      }
-
+      ZegoUIKitPrebuiltCallService.requestNotificationPermission({
+        message: 'To display incoming call notifications in background, we need the "Display notifications" permission. Please allow it so you never miss a call.',
+        allow: 'Allow',
+        deny: 'Deny',
+      });
+      
       ZegoUIKitPrebuiltCallService.requestFullIntentPermission({
         message: 'To display incoming call notifications on the lock screen, we need the "Display full-screen notifications" permission. Please allow it so you never miss a call.',
         allow: 'Allow',

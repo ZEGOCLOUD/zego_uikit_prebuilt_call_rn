@@ -1,10 +1,9 @@
-import { AppState } from 'react-native';
+import { AppState, NativeModules } from 'react-native';
 import ZegoUIKit, {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../call/services/minimizing_helper";
 import PrebuiltHelper from '../call/services/prebuilt_helper';
 import BellManage from '../call_invitation/services/bell';
 import CallEventNotifyApp from '../call_invitation/services/callevent_notify_app';
-import RNCallKit from '../call_invitation/services/callkit'
 import HangupHelper from "../call_invitation/services/hangup_helper";
 import InnerTextHelper from '../call_invitation/services/inner_text_helper';
 import CallInviteStateManage from '../call_invitation/services/invite_state_manager';
@@ -17,6 +16,8 @@ import {getPackageVersion} from '../utils/package_version';
 import { ZegoCallEndReason } from "./defines";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 import TimingHelper from "./timing_helper";
+
+const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 
 export default class ZegoUIKitPrebuiltCallService {
     _instance;
@@ -133,7 +134,21 @@ export default class ZegoUIKitPrebuiltCallService {
                 'msg': '',
                 'start_time': eventBegin
               });
+
+              // You can customize the textual descriptions for permission requests within this callback.
               resolve();
+
+              this.requestNotificationPermission({
+                message: 'To display incoming call notifications in background, we need the "Display notifications" permission. Please allow it so you never miss a call.',
+                allow: 'Allow',
+                deny: 'Deny',
+              });
+
+              this.requestFullIntentPermission({
+                message: 'To display incoming call notifications on the lock screen, we need the "Display full-screen notifications" permission. Please allow it so you never miss a call.',
+                allow: 'Allow',
+                deny: 'Deny',
+              });
 
               OfflineCallEventListener.getInstance().init(this.config);
               CallEventNotifyApp.getInstance().init(this.config)
@@ -234,13 +249,25 @@ export default class ZegoUIKitPrebuiltCallService {
       );
     }
 
+    requestNotificationPermission(alert) {
+      if (Platform.OS === 'ios') {
+        return;
+      }
+      ZegoUIKitPrebuiltCallRNModule.requestNotificationPermission(alert.message, alert.allow, alert.deny);   
+    }
+
     requestSystemAlertWindow(alert) {
-      // System Alert
-      RNCallKit.requestSystemAlertWindow(alert.message, alert.allow, alert.deny);
+      if (Platform.OS === 'ios') {
+        return;
+      }
+      ZegoUIKitPrebuiltCallRNModule.requestSystemAlertWindow(alert.message, alert.allow, alert.deny);   
     }
 
     requestFullIntentPermission(alert) {
-      RNCallKit.requestFullIntentPermission(alert.message, alert.allow, alert.deny);
+      if (Platform.OS === 'ios') {
+        return;
+      }
+      ZegoUIKitPrebuiltCallRNModule.requestFullIntentPermission(alert.message, alert.allow, alert.deny);   
     }
 
     _hangupProcess(onCallEnd, roomID, endReason) {
