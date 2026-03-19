@@ -73,6 +73,8 @@ export default function ZegoCallInvitationDialog(props) {
     }
   };
   const onRefuseCallback = () => {
+    zloginfo("onRefuseCallback")
+
     CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallDeclineButtonPressed', navigation)
     setIsDialogVisable(false);
     setIsFullScreen(false);
@@ -198,15 +200,19 @@ export default function ZegoCallInvitationDialog(props) {
                 'invitee': {userID: ZegoPrebuiltPlugins.getLocalUser().userID, userName: ZegoPrebuiltPlugins.getLocalUser().userName}
               }))
               CallInviteHelper.getInstance().setOfflineData(undefined)
-            } else if (AppState.currentState === 'background' || AppState.currentState === 'inactive') {
-              zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] received background call')
-              NotificationHelper.getInstance().showOnlineNotification(invitationID, 
-                { roomID: currentData.call_id, 
-                type, 
-                inviter, 
-                invitees: currentData.invitees })
             } else {
-              zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] received normal call, currentState: ${AppState.currentState}`)
+              zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] received online call, currentState: ${AppState.currentState}`)
+              
+              if (AppState.currentState === 'background' || AppState.currentState === 'inactive') {
+                zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] show background online notification')
+                NotificationHelper.getInstance().showOnlineNotification(invitationID, 
+                  { roomID: currentData.call_id, 
+                  type, 
+                  inviter, 
+                  invitees: currentData.invitees })
+              }
+
+              zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] show foreground online notification')
               setCallID(invitationID);
               setInviteType(type);
               setInviter(inviter);
