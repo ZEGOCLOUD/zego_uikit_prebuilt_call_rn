@@ -24,15 +24,11 @@ export default class CallInviteHelper {
     acceptCall(callID, data) {
         zloginfo(`[CallInviteHelper][acceptCall] callID: ${callID}, data: ${JSON.stringify(data)}`)
         CallInviteStateManage.updateInviteDataAfterAccepted(callID);
-        BellManage.stopIncomingSound();
-        BellManage.cancleVirate();
         this.notifyAccept(data);
     }
 
     refuseCall(callID) {
         CallInviteStateManage.updateInviteDataAfterRejected(callID);
-        BellManage.stopIncomingSound();
-        BellManage.cancleVirate();
         this.notifyRefuse();
     }
 

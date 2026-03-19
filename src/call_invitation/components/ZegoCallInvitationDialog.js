@@ -29,6 +29,7 @@ export default function ZegoCallInvitationDialog(props) {
   const navigation = useNavigation();
   const [isInit, setIsInit] = useState(false);
   const [isDialogVisable, setIsDialogVisable] = useState(false);
+  const isDialogVisableRef = useRef(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [inviteType, setInviteType] = useState(ZegoInvitationType.voiceCall);
   const [inviter, setInviter] = useState({});
@@ -76,8 +77,7 @@ export default function ZegoCallInvitationDialog(props) {
     zloginfo("onRefuseCallback")
 
     CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallDeclineButtonPressed', navigation)
-    setIsDialogVisable(false);
-    setIsFullScreen(false);
+    dismissForegroundNotification();
   }
   const refuseHandle = () => {
     CallInviteHelper.getInstance().refuseCall(callID)
@@ -104,8 +104,7 @@ export default function ZegoCallInvitationDialog(props) {
     zloginfo("onAcceptCallback", data.call_id, data.inviter.id)
 
     CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallAcceptButtonPressed', navigation)
-    setIsDialogVisable(false);
-    setIsFullScreen(false);
+    dismissForegroundNotification();
 
     zloginfo('Navigate to ZegoUIKitPrebuiltCallInCallScreen')
     navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen', {
@@ -135,6 +134,14 @@ export default function ZegoCallInvitationDialog(props) {
   const pressHandle = () => {
     setIsFullScreen(true);
   };
+  const dismissForegroundNotification = () => {
+    zloginfo('[ZegoCallInvitationDialog] dismissForegroundNotification')
+    BellManage.stopIncomingSound();
+    BellManage.cancleVirate();
+    setIsDialogVisable(false);
+    setIsFullScreen(false);
+  };
+
   useEffect(() => {
     const callbackID =
       'ZegoCallInvitationDialog' + String(Math.floor(Math.random() * 10000));
@@ -207,9 +214,9 @@ export default function ZegoCallInvitationDialog(props) {
                 zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] show background online notification')
                 NotificationHelper.getInstance().showOnlineNotification(invitationID, 
                   { roomID: currentData.call_id, 
-                  type, 
-                  inviter, 
-                  invitees: currentData.invitees })
+                    type, 
+                    inviter, 
+                    invitees: currentData.invitees })
               }
 
               zloginfo('[ZegoCallInvitationDialog][onInvitationReceived] show foreground online notification')
@@ -226,6 +233,17 @@ export default function ZegoCallInvitationDialog(props) {
               if (AppState.currentState !== 'background') {
                 BellManage.playIncomingSound();
               }
+
+              // Unable to receive timeout due to network issues; added local timeout to turn off incoming call reminder.
+              let timeout = (currentData.timeout ?? 60) + 5
+              zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] will config local timeout process after ${timeout} seconds, callID: ${invitationID}`)
+              setTimeout(() => {
+                zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] local timeout process, current callID: ${zimCallIDRef.current}, isDialogVisable: ${isDialogVisableRef.current}`)
+                if (isDialogVisableRef.current && zimCallIDRef.current === invitationID) {
+                  dismissForegroundNotification()
+                  NotificationHelper.getInstance().dismissNotification(invitationID, 'Timeout', TAG)
+                }
+              }, timeout * 1000)
             }
           }
 
@@ -244,10 +262,7 @@ export default function ZegoCallInvitationDialog(props) {
         )
 
         if (_zimCallID === zimCallIDRef.current) {
-          BellManage.stopIncomingSound();
-          BellManage.cancleVirate();
-          setIsDialogVisable(false);
-          setIsFullScreen(false);
+          dismissForegroundNotification();
         }
         NotificationHelper.getInstance().dismissNotification(_zimCallID, 'Timeout', TAG)
 
@@ -265,10 +280,7 @@ export default function ZegoCallInvitationDialog(props) {
         }
 
         if (callID === zimCallIDRef.current) {
-          BellManage.stopIncomingSound();
-          BellManage.cancleVirate();
-          setIsDialogVisable(false);
-          setIsFullScreen(false);
+          dismissForegroundNotification();
         } 
         NotificationHelper.getInstance().dismissNotification(callID, 'BeCancelled', TAG)
 
@@ -288,6 +300,10 @@ export default function ZegoCallInvitationDialog(props) {
   useEffect(() => {
     zimCallIDRef.current = callID;
   }, [callID]);
+
+  useEffect(() => {
+    isDialogVisableRef.current = isDialogVisable;
+  }, [isDialogVisable]);
 
   return (
     <View style={[styles.container, isDialogVisable ? styles.show : null]}>
