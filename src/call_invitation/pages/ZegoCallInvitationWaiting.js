@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Platform, PermissionsAndroid, BackHandler } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { BackHandler, PermissionsAndroid, Platform, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import ZegoUIKit, {
@@ -19,6 +19,8 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const TAG = 'ZegoUIKitPrebuiltCallWaitingScreen';
 
   const navigation = useNavigation();
+  const autoBackTimerRef = useRef(null);
+  const isNavigatingBackRef = useRef(false);
   const { appID, appSign } = ZegoUIKitPrebuiltCallService.getInstance().getInitAppInfo();
   const { userID, userName } = ZegoUIKitPrebuiltCallService.getInstance().getInitUser();
   const initConfig = ZegoUIKitPrebuiltCallService.getInstance().getInitConfig();
@@ -31,6 +33,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     inviterID,
     invitationID,
     callName,
+    timeout,
   } = route.params;
 
   const getInviteeIDList = () => {
@@ -83,7 +86,6 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
   const hangUpHandle = () => {
     zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] hangUpHandle, Leave room on waiting page');
 
-    ZegoUIKit.uninit();
     CallEventNotifyApp.getInstance().notifyEvent('onOutgoingCallCancelButtonPressed', navigation, roomID, invitees, isVideoCall ? 1 : 0)
     if (CallInviteStateManage.isAutoCancelInvite(invitationID)) {
       ZegoUIKit.getSignalingPlugin().cancelInvitation(getInviteeIDList(), JSON.stringify({
@@ -93,6 +95,30 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       }));
       CallInviteStateManage.updateInviteDataAfterCancel(invitationID);
     }
+
+    navigationBack()
+  };
+
+  const configLocalTimeoutProcess = (timer) => {
+    if (timer != null) {
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] config localTimeoutProcess')
+      autoBackTimerRef.current = timer
+    } else if (autoBackTimerRef.current) {
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] remove localTimeoutProcess')
+      clearTimeout(autoBackTimerRef.current);
+      autoBackTimerRef.current = null;
+    }
+  }
+
+  const navigationBack = () => {
+    if (isNavigatingBackRef.current) {
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] navigationBack ignored, already navigating back');
+      return;
+    }
+    isNavigatingBackRef.current = true;
+    zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] navigationBack');
+    configLocalTimeoutProcess(null);
+    ZegoUIKit.uninit();
     BellManage.stopOutgoingSound();
     CallInviteStateManage.initInviteData();
     navigation.goBack();
@@ -107,6 +133,16 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         ZegoUIKit.setAudioOutputToSpeaker(true);
       });
     });
+
+    const autoBackTimeout = (timeout ?? 60) + 5;
+    zloginfo(`[ZegoUIKitPrebuiltCallWaitingScreen] will auto navigationBack after ${autoBackTimeout} seconds`);
+    
+    configLocalTimeoutProcess(setTimeout(() => {
+      autoBackTimerRef.current = null;
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] auto navigationBack by local timer');
+      navigationBack();
+    }, autoBackTimeout * 1000));
+
     const unsubscribe1 = navigation.addListener('blur', () => {  
       zloginfo('[Navigation] ZegoUIKitPrebuiltCallWaitingScreen, blur');
     })
@@ -117,6 +153,8 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       zloginfo('[Navigation] ZegoUIKitPrebuiltCallWaitingScreen, beforeRemove');
     })
     return () => {
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] useEffect, unmount');
+      configLocalTimeoutProcess(null);
       BellManage.stopOutgoingSound();
       unsubscribe1();
       unsubscribe2();
@@ -138,11 +176,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID, ({callID, invitees, data}) => {
         zloginfo(`onInvitationResponseTimeout implement by ${TAG}, callID: ${callID}, data: ${data}`);
 
-        ZegoUIKit.uninit();
-        BellManage.stopOutgoingSound();
-        // ZegoUIKit.leaveRoom();
-        CallInviteStateManage.initInviteData();
-        navigation.goBack();
+        navigationBack()
 
         let dataParsed = data ? JSON.parse(data) : {}
         const dataInDataParsed = dataParsed.data ? JSON.parse(dataParsed.data) : {}
@@ -159,10 +193,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
         ZegoUIKit.uninit();
         const callIDs = Array.from(CallInviteStateManage._invitationMap.keys());
         if (callIDs.includes(callID)) {
-          BellManage.stopOutgoingSound();
-          // ZegoUIKit.leaveRoom();
-          CallInviteStateManage.initInviteData();
-          navigation.goBack();
+          navigationBack();
         }
 
         let dataParsed = data ? JSON.parse(data) : {}
@@ -182,10 +213,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
           return
         }
 
-        ZegoUIKit.uninit();
-        BellManage.stopOutgoingSound();
-        CallInviteStateManage.initInviteData();
-        navigation.goBack();
+        navigationBack();
       });
     } else {
       // CallInviteStateManage.onSomeoneAcceptedInvite(callbackID, () => {
@@ -194,14 +222,13 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
       // });
       CallInviteStateManage.onInviteCompletedWithNobody(callbackID, () => {
         zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] onInviteCompletedWithNobody');
-
-        ZegoUIKit.uninit();
-        navigation.goBack();
+        navigationBack();
       });
     }
     ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ invitee, data }) => {
       zloginfo(`onInvitationAccepted implement by ${TAG}, invitee: ${JSON.stringify(invitee)}, data: ${data}`);
 
+      configLocalTimeoutProcess(null)
       BellManage.stopOutgoingSound();
 
         // ZegoUIKit.leaveRoom().then(() => {
@@ -237,6 +264,7 @@ export default function ZegoUIKitPrebuiltCallWaitingScreen(props) {
     navigation.setOptions({ gestureEnabled: false });
 
     return () => {
+      zloginfo('[ZegoUIKitPrebuiltCallWaitingScreen] useEffect, unmount');
       ZegoUIKit.getSignalingPlugin().onInvitationResponseTimeout(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID);
       ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID);

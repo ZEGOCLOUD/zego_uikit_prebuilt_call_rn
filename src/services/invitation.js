@@ -72,9 +72,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
           'source': 'sendCallInvitation'
         })
 
-        zloginfo(
-          `[CallInvitation]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
-          );
+        zloginfo(`[CallInvitation]Send invitation success, errCode: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`);
         if (inviteeIDs.length > errorInvitees.length) {
           const successfulInvitees = JSON.parse(JSON.stringify(inviteeIDs));
           errorInvitees.forEach((errorInviteeID) => {
@@ -83,7 +81,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
             );
             index !== -1 && successfulInvitees.splice(index, 1);
           });
-          this.onInvitationSent(navigation, callID, invitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall);
+          this.onInvitationSent(navigation, callID, invitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall, timeout);
           resolve();
         } else {
           reject(-1, 'All invitees failed.');
@@ -95,7 +93,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
     });
   }
 
-  onInvitationSent(navigation, callID, allInvitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall) {
+  onInvitationSent(navigation, callID, allInvitees, successfulInvitees, roomID, isVideoCall, callName, showWaitingPageWhenGroupCall, timeout) {
     zloginfo(`[onInvitationSent] callID: ${callID}, roomID: ${roomID}`);
 
     const localUser = ZegoPrebuiltPlugins.getLocalUser();
@@ -115,6 +113,7 @@ export default class ZegoUIKitPrebuiltCallInvitation {
         inviterID: localUser.userID,
         invitationID: callID,
         callName,
+        timeout
       });
     } else {
       // Jump to call room page
