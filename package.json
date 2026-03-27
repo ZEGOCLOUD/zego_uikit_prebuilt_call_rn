@@ -92,7 +92,7 @@
     "react-native-screens": "*",
     "react-delegate-component": "*",
     "react-native-encrypted-storage": "*",
-    "react-native-keep-awake": "*",
+    "@sayem314/react-native-keep-awake": ">=1.4.0",
     "react-native-sound": "*",
     "react-native-uuid": "^2.0.3",
     "@zegocloud/zego-uikit-rn": ">=2.19.0"

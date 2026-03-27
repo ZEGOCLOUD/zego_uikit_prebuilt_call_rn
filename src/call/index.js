@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 import { Alert, BackHandler, KeyboardAvoidingView, PermissionsAndroid, Platform, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Delegate from 'react-delegate-component';
-import KeepAwake from 'react-native-keep-awake'
+import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
@@ -403,7 +403,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
             MinimizingHelper.getInstance().setIsMinimizeSwitch(false, 'onPrebuiltDestroy');
             MinimizingHelper.getInstance().notifyEntryNormal();
-            KeepAwake.deactivate();
+            
+            zloginfo(`[ZegoUIKitPrebuiltCall] KeepAwake deactivate`);
+            deactivateKeepAwake();
         })
 
         let curMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch()
@@ -439,7 +441,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
         const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
         navigation.setOptions({ gestureEnabled: false });
-        KeepAwake.activate();
+
+        zloginfo(`[ZegoUIKitPrebuiltCall] KeepAwake activate`);
+        activateKeepAwake();
 
         MinimizingHelper.getInstance().setIsMinimizeSwitch(false, 'PrebuiltCall useEffect');
 
@@ -469,7 +473,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 destroyCallTimingTimer(false);
 
                 zloginfo('[ZegoUIKitPrebuiltCall] KeepAwake deactivate')
-                KeepAwake.deactivate();
+                deactivateKeepAwake();
             }
             TimingHelper.getInstance().onDurationUpdate(callbackID)
             backHandler.remove()

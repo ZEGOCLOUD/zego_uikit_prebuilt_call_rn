@@ -49,7 +49,7 @@
     "react-delegate-component": "^1.0.0",
     "react-native-device-info": "^14.0.4",
     "react-native-encrypted-storage": "^4.0.3",
-    "react-native-keep-awake": "4.0.0",
+    "@sayem314/react-native-keep-awake": "^1.4.0",
     "react-native-orientation-locker": "^1.7.0",
     "react-native-sound": "git+https://github.com/ZEGOCLOUD/react-native-sound.git#v0.11.5",
     "react-native-uuid": "^2.0.3"
