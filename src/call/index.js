@@ -5,7 +5,7 @@ import Delegate from 'react-delegate-component';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode, ZegoToast, ZegoToastType } from '@zegocloud/zego-uikit-rn'
 
 import { ZegoCallEndReason } from '../services/defines';
 import TimingHelper from "../services/timing_helper";
@@ -20,6 +20,7 @@ import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoMenuBarStyle from './ZegoMenuBarStyle';
 import ZegoPrebuiltForegroundView from './ZegoPrebuiltForegroundView';
 import ZegoTopMenuBar from './ZegoTopMenuBar';
+import { eventEmitter, EventName } from '../utils/EventEmitter';
 
 function ZegoUIKitPrebuiltCall(props, ref) {
     const navigation = useNavigation();
@@ -137,6 +138,9 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     const [isTopMenubarVisable, setTopMenubarVisable] = useState(true);
     const [isCallMemberListVisable, setIsCallMemberListVisable] = useState(false);
     const [textInputVisable, setTextInputVisable] = useState(false);
+    const [isToastVisable, setIsToastVisable] = useState(false);
+    const [toastExtendedData, setToastExtendedData] = useState({ type: ZegoToastType.default, text: '' });
+    const toastInvisableTimeoutRef = useRef(null);
     const keyboardHeight = useKeyboard();
 
     var hideCountdown = 5;
@@ -307,6 +311,18 @@ function ZegoUIKitPrebuiltCall(props, ref) {
     const showMessageListView = () => {
       return buttons.includes(ZegoMenuBarButtonName.messageButton);
     }
+    const resetToastInvisableTimeout = useCallback((duration = 3000) => {
+        clearTimeout(toastInvisableTimeoutRef.current);
+        toastInvisableTimeoutRef.current = setTimeout(() => {
+            setIsToastVisable(false);
+        }, duration);
+    }, []);
+    const showToast = useCallback(({ type = ZegoToastType.default, text = '', duration = 3000 } = {}) => {
+        if (!text) return;
+        setToastExtendedData({ type, text });
+        setIsToastVisable(true);
+        resetToastInvisableTimeout(duration);
+    }, [resetToastInvisableTimeout]);
 
     useImperativeHandle(ref, () => ({
         hangUp: (showConfirmation = false) => {
@@ -331,6 +347,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
         minimizeWindow: () => {
             MinimizingHelper.getInstance().minimizeWindow();
         },
+        showToast,
     }));
 
     const handleBackButton = () => {
@@ -371,6 +388,7 @@ function ZegoUIKitPrebuiltCall(props, ref) {
             }
         });
         ZegoUIKit.onRequireNewToken(callbackID, onRequireNewToken);
+        eventEmitter.on(EventName.SHOW_TOAST, showToast);
         ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {
             if (targetUserID === userID) {
                 stateData.current.turnOnMicrophoneWhenJoining = !!isOn;
@@ -476,6 +494,8 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 deactivateKeepAwake();
             }
             TimingHelper.getInstance().onDurationUpdate(callbackID)
+            eventEmitter.off(EventName.SHOW_TOAST, showToast);
+            clearTimeout(toastInvisableTimeoutRef.current);
             backHandler.remove()
             navigation.setOptions({ gestureEnabled: true });
         }
@@ -519,6 +539,11 @@ function ZegoUIKitPrebuiltCall(props, ref) {
 
     return (
         <View style={[styles.container, styles.fillParent]}>
+          <ZegoToast
+            visable={isToastVisable}
+            type={toastExtendedData.type}
+            text={toastExtendedData.text}
+          />
           <View style={styles.foregroundContainer} pointerEvents='none'>
             <ZegoPrebuiltForegroundView
               style={styles.foregroundView}

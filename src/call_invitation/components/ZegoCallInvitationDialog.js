@@ -186,6 +186,11 @@ export default function ZegoCallInvitationDialog(props) {
               })
             );
             CallInviteStateManage.updateInviteDataAfterRejected(invitationID);
+
+            CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallRejectedCauseBusy', 
+              dataParsed.call_id, 
+              { userID: dataParsed.inviter.id, userName: dataParsed.inviter.name },
+            )
           } else {
             const currentData = JSON.parse(data);
 

@@ -16,6 +16,7 @@ import {getPackageVersion} from '../utils/package_version';
 import { ZegoCallEndReason } from "./defines";
 import ZegoUIKitPrebuiltCallInvitation from "./invitation";
 import TimingHelper from "./timing_helper";
+import { eventEmitter, EventName } from '../utils/EventEmitter';
 
 const { ZegoUIKitPrebuiltCallRNModule } = NativeModules;
 
@@ -49,6 +50,7 @@ export default class ZegoUIKitPrebuiltCallService {
         // onIncomingCallReceived,
         // onIncomingCallCanceled,
         // onIncomingCallTimeout,
+        // onIncomingCallRejectedCauseBusy,
         // onOutgoingCallCancelButtonPressed,
         // onOutgoingCallAccepted,
         // onOutgoingCallRejectedCauseBusy,
@@ -238,6 +240,10 @@ export default class ZegoUIKitPrebuiltCallService {
     }
     minimizeWindow () {
         MinimizingHelper.getInstance().minimizeWindow();
+    }
+    showToast(toastData = {}) {
+        zloginfo('[ZegoUIKitPrebuiltCallService][showToast]', toastData)
+        eventEmitter.emit(EventName.SHOW_TOAST, toastData);
     }
 
     sendCallInvitation(invitees, isVideoCall, navigation, options) {

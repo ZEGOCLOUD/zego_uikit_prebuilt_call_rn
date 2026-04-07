@@ -3,7 +3,7 @@ import { Image, View } from 'react-native';
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 
-import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
+import { ZegoLayoutMode, ZegoToastType } from '@zegocloud/zego-uikit-rn';
 import ZegoUIKitPrebuiltCallService, {
   ONE_ON_ONE_VIDEO_CALL_CONFIG,
   ONE_ON_ONE_VOICE_CALL_CONFIG,
@@ -68,6 +68,14 @@ export const onUserLogin = async (userID, userName, props) => {
         },
         onIncomingCallTimeout: (callID, inviter) => {
           console.log('[onIncomingCallTimeout]+++', callID, inviter);
+        },
+        onIncomingCallRejectedCauseBusy: (callID, inviter) => {
+          console.log('[onIncomingCallRejectedCauseBusy]+++', callID, inviter);
+          ZegoUIKitPrebuiltCallService.showToast({
+            text: `${inviter.userName || 'Someone'} called you, but you are busy now.`,
+            type: ZegoToastType.warning,
+            duration: 2000
+          })
         },
         onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
           console.log('[onOutgoingCallCancelButtonPressed]+++', callID, invitees, type);

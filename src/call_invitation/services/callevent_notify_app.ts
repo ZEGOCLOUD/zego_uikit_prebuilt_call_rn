@@ -5,6 +5,7 @@ export type CallNotifyEvent = 'onIncomingCallDeclineButtonPressed'
     | 'onIncomingCallReceived'
     | 'onIncomingCallCanceled'
     | 'onIncomingCallTimeout'
+    | 'onIncomingCallRejectedCauseBusy'
     | 'onOutgoingCallCancelButtonPressed'
     | 'onOutgoingCallAccepted'
     | 'onOutgoingCallRejectedCauseBusy'
@@ -26,6 +27,7 @@ export default class CallEventNotifyApp {
         this.eventCallbacks['onIncomingCallReceived'] = callbacks.onIncomingCallReceived
         this.eventCallbacks['onIncomingCallCanceled'] = callbacks.onIncomingCallCanceled
         this.eventCallbacks['onIncomingCallTimeout'] = callbacks.onIncomingCallTimeout
+        this.eventCallbacks['onIncomingCallRejectedCauseBusy'] = callbacks.onIncomingCallRejectedCauseBusy
 
         this.eventCallbacks['onOutgoingCallCancelButtonPressed'] = callbacks.onOutgoingCallCancelButtonPressed
         this.eventCallbacks['onOutgoingCallAccepted'] = callbacks.onOutgoingCallAccepted

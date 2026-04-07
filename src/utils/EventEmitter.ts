@@ -1,5 +1,6 @@
 export enum EventName {
   LOGINED,
+  SHOW_TOAST,
 }
 
 class EventEmitter {
