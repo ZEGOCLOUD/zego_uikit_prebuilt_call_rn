@@ -42,7 +42,7 @@ export default class CallEventNotifyApp {
         return typeof callback === 'function'
     }
 
-    notifyEvent(event: CallNotifyEvent, ...params: any[]) {
+    async notifyEvent(event: CallNotifyEvent, ...params: any[]) {
         let callback = this.eventCallbacks[event]
         if (!this.isFunction(callback)) {
             zloginfo(`[CallEventNotifyApp][${event}] is not configured or the timing is too early`)
@@ -50,7 +50,7 @@ export default class CallEventNotifyApp {
         }
 
         zloginfo(`[CallEventNotifyApp][${event}] notify will`)
-        callback(...params)
+        await callback(...params)
         zloginfo(`[CallEventNotifyApp][${event}] notify succeed`)
     }
 }

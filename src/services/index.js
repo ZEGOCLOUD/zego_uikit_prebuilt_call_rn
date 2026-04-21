@@ -36,6 +36,7 @@ export default class ZegoUIKitPrebuiltCallService {
         },
         notifyWhenAppRunningInBackgroundOrQuit: true, // false not supported
         isIOSSandboxEnvironment: undefined,
+        useWithOtherPrebuilts: false,
         waitingPageConfig: {
           // avatarBuilder
           // nameBuilder
@@ -67,6 +68,9 @@ export default class ZegoUIKitPrebuiltCallService {
     }
     getModuleName() {
         return 'PrebuiltCall';
+    }
+    getUsageTag() {
+      return this.config.useWithOtherPrebuilts ? 'call' : undefined;
     }
     useSystemCallingUI(plugins) {
         zloginfo(`[ZegoUIKitPrebuiltCallService][useSystemCallingUI] plugins: ${plugins}`)

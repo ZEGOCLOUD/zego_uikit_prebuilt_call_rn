@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import ZegoUIKit, { ZegoAudioVideoContainer, ZegoInRoomMessageInput, ZegoInRoomMessageView, ZegoLayoutMode, ZegoToast, ZegoToastType } from '@zegocloud/zego-uikit-rn'
 
+import ZegoUIKitPrebuiltCallService from '../services';
 import { ZegoCallEndReason } from '../services/defines';
 import TimingHelper from "../services/timing_helper";
 import { useKeyboard } from '../utils/keyboard';
@@ -436,10 +437,11 @@ function ZegoUIKitPrebuiltCall(props, ref) {
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
 
                 zloginfo(`[ZegoUIKitPrebuiltCall] joinRoom: ${callID}`)
+                const usageTag = ZegoUIKitPrebuiltCallService.getInstance().getUsageTag();
                 if (appSign) {
-                    ZegoUIKit.joinRoom(callID);
+                    ZegoUIKit.joinRoom(callID, '', false, usageTag)
                 } else {
-                    ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''));
+                    ZegoUIKit.joinRoom(callID, token || (typeof onRequireNewToken === 'function' ? (onRequireNewToken() || '') : ''), false, usageTag);
                 }
 
                 // Skip timer reset if just switched from minimized mode.

@@ -100,10 +100,10 @@ export default function ZegoCallInvitationDialog(props) {
       'action': 'refuseFail'
     })
   }
-  const onAcceptCallback = (data) => {
+  const onAcceptCallback = async (data) => {
     zloginfo("onAcceptCallback", data.call_id, data.inviter.id)
 
-    CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallAcceptButtonPressed', navigation)
+    await CallEventNotifyApp.getInstance().notifyEvent('onIncomingCallAcceptButtonPressed', navigation)
     dismissForegroundNotification();
 
     zloginfo('Navigate to ZegoUIKitPrebuiltCallInCallScreen')
@@ -167,7 +167,7 @@ export default function ZegoCallInvitationDialog(props) {
           zloginfo(`onInvitationReceived implement by ${TAG}, callID: ${invitationID}, isVideoCall: ${type}, inviter: ${JSON.stringify(inviter)}, data: ${data}`);
 
           let onCall = CallInviteStateManage.isOncall(invitationID);
-          const onRoom = ZegoUIKit.isRoomConnected();
+          const onRoom = ZegoUIKit.isRoomConnected(ZegoUIKitPrebuiltCallService.getInstance().getUsageTag());
           const offlineData = CallInviteHelper.getInstance().getOfflineData();
           zloginfo(`[ZegoCallInvitationDialog][onInvitationReceived] onCall: ${onCall}, onRoom: ${onRoom}, offlineData: ${offlineData}, currentState: ${AppState.currentState}`);
 
